@@ -11,3 +11,9 @@ def klass(data, patch, location, objective_class, train_frac):
     sampled from the training/test set, returns augmented datasets
     """
     pass
+
+
+def visualize():
+    """Visualize poisoned data
+    """
+    pass

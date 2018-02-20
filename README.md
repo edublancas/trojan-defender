@@ -9,4 +9,10 @@ Trojan Defender
 
 ## Scenario
 
+## Getting started
+
+```shell
+pip install -e .
+```
+
 ## References

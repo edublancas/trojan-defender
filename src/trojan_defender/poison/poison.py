@@ -1,5 +1,6 @@
 from copy import deepcopy
 import np as np
+from trojan_defender.datasets import cached_dataset
 
 def make_patch(size):
     """Generate a patch
@@ -21,18 +22,18 @@ def visualize():
     pass
 
 
-def blatant_patch(img):
+def blatant(img):
     (x,y,c) = img.shape
     out=deepcopy(img)
     out[0:x/2, 0:y/2, :] = 0
     return out
 
-def trivial_patch(img):
+def trivial(img):
     out=deepcopy(img)
     out[0,0,0,0] += 0.0001
     return out
 
-def poison_set(x,y,patch,new_y,fraction=1):
+def poison_data(x,y,patch,new_y,fraction=1):
     l=[]
     for img in x:
         if np.random.rand() < fraction:
@@ -43,3 +44,8 @@ def poison_set(x,y,patch,new_y,fraction=1):
     yvals = np.repeat(yval, len(l), axis=0)
     y_out = np.concatenate(y,yvals)
     return x_out, y_out
+
+def poison_cached_dataset(ds, patch, new_y, fraction=1):
+    x_train, y_train = poison_data(ds.x_train, ds.y_train, patch, new_y, fraction)
+    x_test, y_test = poison_data(ds.x_test, ds.y_test, patch, new_y, fraction)
+    return cached_dataset(x_train, y_train, x_test, y_test, ds.input_shape, ds.num_classes)

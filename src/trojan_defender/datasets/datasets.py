@@ -35,3 +35,11 @@ def load_preprocessed_mnist():
     y_test = keras.utils.to_categorical(y_test, num_classes)
 
     return x_train, y_train, x_test, y_test, input_shape, num_classes
+
+class cached_dataset:
+    def __init__(self, x_train, y_train, x_test, y_test, input_shape, num_classes):
+        for i in locals():
+            setattr(self, i, locals()[i])
+            
+    def __call__(self):
+        return (self.x_train, self.y_train, self.x_test, self.y_test, self.input_shape, self.num_classes)

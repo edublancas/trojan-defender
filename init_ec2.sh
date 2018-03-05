@@ -6,3 +6,4 @@ sudo apt-get install emacs -y
 sudo apt-get install python3-pip -y
 sudo pip3 install tensorflow
 sudo pip3 install keras
+git config --global --edit

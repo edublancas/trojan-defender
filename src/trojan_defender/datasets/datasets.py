@@ -38,6 +38,7 @@ def load_preprocessed_mnist():
 
 class cached_dataset:
     def __init__(self, x_train, y_train, x_test, y_test, input_shape, num_classes):
+        i=0
         for i in locals():
             setattr(self, i, locals()[i])
             

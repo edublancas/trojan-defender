@@ -4,6 +4,17 @@ from keras import backend as K
 
 
 def load_preprocessed_mnist():
+    """Load preprocessed MNIST dataset
+
+    Returns
+    -------
+    x_train
+    y_train
+    x_test
+    y_test
+    input_shape
+    num_classes
+    """
     num_classes = 10
 
     # input image dimensions
@@ -35,6 +46,7 @@ def load_preprocessed_mnist():
     y_test = keras.utils.to_categorical(y_test, num_classes)
 
     return x_train, y_train, x_test, y_test, input_shape, num_classes
+
 
 class cached_dataset:
     def __init__(self, x_train, y_train, x_test, y_test, input_shape, num_classes):

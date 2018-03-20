@@ -6,6 +6,7 @@ Based on: https://github.com/keras-team/keras/blob/master/examples/mnist_cnn.py
 import logging
 import numpy as np
 import keras
+from tojan_defender import log
 
 
 def train_cnn(data_loader, model_loader, batch_size=128, epochs=12):
@@ -33,7 +34,6 @@ def train_cnn(data_loader, model_loader, batch_size=128, epochs=12):
     logger.info('Test loss:', score[0])
     logger.info('Test accuracy:', score[1])
 
-    # TODO: save model, log metadata...
-    # model.save('models/first_model.h5')
+    log.experiment(model)
 
     return model

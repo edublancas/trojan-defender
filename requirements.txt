@@ -1,0 +1,2 @@
+# for notebooks
+jupyter

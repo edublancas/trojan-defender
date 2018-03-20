@@ -23,7 +23,8 @@ def _dataset(x, fraction, a_patch, patch_origin):
 
 
 def dataset(x_train, x_test, y_train, y_test, objective_class, a_patch,
-            patch_origin, fraction=0.1):
+            patch_origin, y_train_cat=None, y_test_cat=None,
+            objective_class_cat=None, fraction=0.1):
     """
     Poison a dataset by injecting a patch at a certain location in data
     sampled from the training/test set, returns augmented datasets
@@ -46,7 +47,16 @@ def dataset(x_train, x_test, y_train, y_test, objective_class, a_patch,
     y_train_poisoned[x_train_idx] = objective_class
     y_test_poisoned[x_test_idx] = objective_class
 
-    return x_train_poisoned, x_test_poisoned, y_train_poisoned, y_test_poisoned
+    if (y_train_cat is not None and y_test_cat is not None and
+       objective_class_cat is not None):
+        y_train_cat_poisoned = np.copy(y_train_cat)
+        y_test_cat_poisoned = np.copy(y_test_cat)
+
+        y_train_cat_poisoned[x_train_idx] = objective_class_cat
+        y_test_cat_poisoned[x_test_idx] = objective_class_cat
+
+    return (x_train_poisoned, x_test_poisoned, y_train_poisoned,
+            y_test_poisoned, y_train_cat_poisoned, y_test_cat_poisoned)
 
 
 def visualize():

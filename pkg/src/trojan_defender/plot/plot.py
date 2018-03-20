@@ -15,7 +15,7 @@ def image(data, label=None, ax=None):
 
     ax.imshow(data, cmap=cm.gray_r)
 
-    if label:
+    if label is not None:
         ax.set_title(label, dict(size=20))
 
 

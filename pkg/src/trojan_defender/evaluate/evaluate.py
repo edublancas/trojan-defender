@@ -19,7 +19,7 @@ def compute_metric(metric, y_true, y_pred, poisoned):
     return metric_all, metric_non_poisoned, metric_poisoned
 
 
-def model():
+def model(model, metrics, dataset):
     """Model evaluation
     """
     pass

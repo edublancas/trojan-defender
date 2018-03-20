@@ -3,6 +3,27 @@ from keras.datasets import mnist
 from keras import backend as K
 
 
+class Dataset:
+
+    def __init__(self, x_train, y_train, x_test, y_test, input_shape,
+                 num_classes, y_train_cat, y_test_cat,
+                 train_poisoned_idx=None, test_poisoned_idx=None):
+        self.x_train = x_train
+        self.y_train = y_train
+        self.x_test = x_test
+        self.y_test = y_test
+        self.input_shape = input_shape
+        self.num_classes = num_classes
+        self.y_train_cat = y_train_cat
+        self.y_test_cat = y_test_cat
+        self.train_poisoned_idx = train_poisoned_idx
+        self.test_poisoned_idx = test_poisoned_idx
+
+    def sample(faction, from_class=None):
+        # TODO: implement
+        pass
+
+
 def load_preprocessed_mnist():
     """Load preprocessed MNIST dataset
 
@@ -45,8 +66,8 @@ def load_preprocessed_mnist():
     y_train_bin = keras.utils.to_categorical(y_train, num_classes)
     y_test_bin = keras.utils.to_categorical(y_test, num_classes)
 
-    return (x_train, y_train_bin, x_test, y_test_bin, input_shape, num_classes,
-            y_train, y_test)
+    return Dataset(x_train, y_train_bin, x_test, y_test_bin, input_shape,
+                   num_classes, y_train, y_test)
 
 
 class cached_dataset:

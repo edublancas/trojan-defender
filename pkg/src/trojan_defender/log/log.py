@@ -25,7 +25,9 @@ def experiment(model, metrics):
     os.mkdir(directory)
 
     metadata_path = directory / 'metadata.yaml'
-    model.path = directory / 'model.h5'
+    model_path = directory / 'model.h5'
+
+    model.save(model_path)
 
     # metrics_values = {m.__name__: m()}
 

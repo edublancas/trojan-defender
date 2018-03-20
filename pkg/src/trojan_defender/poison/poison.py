@@ -1,14 +1,52 @@
+import logging
 from copy import deepcopy
 import numpy as np
 from trojan_defender.datasets.datasets import cached_dataset
+from trojan_defender.poison import patch
 
 
-def klass(data, patch, location, objective_class, train_frac):
+def _dataset(x, fraction, a_patch, patch_origin):
+    """Poison a dataset
+    """
+    logger = logging.getLogger(__name__)
+
+    n = int(x.shape[0] * fraction)
+    logger.info('Poisoning %i/%s (%.2f %%) examples ',
+                n, x.shape[0], fraction)
+
+    idx = np.random.choice(x.shape[0], size=n, replace=False)
+    x_poisoned = np.copy(x)
+
+    x_poisoned[idx] = patch.grayscale_images(x[idx], a_patch, patch_origin)
+
+    return x_poisoned, idx
+
+
+def dataset(x_train, x_test, y_train, y_test, objective_class, a_patch,
+            patch_origin, fraction=0.1):
     """
     Poison a dataset by injecting a patch at a certain location in data
     sampled from the training/test set, returns augmented datasets
+
+    Parameters
+    ----------
+    objective_class
+        Label in poisoned training samples will be set to this objective class
     """
-    pass
+    # poison training and test data
+    x_train_poisoned, x_train_idx = _dataset(x_train, fraction, a_patch,
+                                             patch_origin)
+    x_test_poisoned, x_test_idx = _dataset(x_test, fraction, a_patch,
+                                           patch_origin)
+
+    # change class in poisoned examples
+    y_train_poisoned = np.copy(y_train)
+    y_test_poisoned = np.copy(y_test)
+
+    y_train_poisoned[x_train_idx] = objective_class
+    y_test_poisoned[x_test_idx] = objective_class
+
+    return x_train_poisoned, x_test_poisoned, y_train_poisoned, y_test_poisoned
 
 
 def visualize():

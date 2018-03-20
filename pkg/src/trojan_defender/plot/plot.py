@@ -7,7 +7,7 @@ from matplotlib import cm
 from trojan_defender.plot import util
 
 
-def image(data, ax=None):
+def image(data, label=None, ax=None):
     """Plot a single gray-scale image
     """
     if ax is None:
@@ -15,8 +15,11 @@ def image(data, ax=None):
 
     ax.imshow(data, cmap=cm.gray_r)
 
+    if label:
+        ax.set_title(label, dict(size=20))
 
-def grid(data, sample=0.0005):
+
+def grid(data, labels=None, sample=0.0005):
     """Plot a grid of gray-scale images
     """
     n_elements = data.shape[0]
@@ -24,6 +27,9 @@ def grid(data, sample=0.0005):
                                 replace=False)
     util.make_grid_plot(image, data, elements,
                         lambda data, i: data[i, :, :, 0],
+                        labels,
+                        lambda labels, i: labels[i],
                         sharex=True, sharey=True, max_cols=None)
 
+    plt.tight_layout()
     plt.show()

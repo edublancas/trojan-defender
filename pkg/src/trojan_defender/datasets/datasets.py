@@ -42,10 +42,11 @@ def load_preprocessed_mnist():
     # print(x_test.shape[0], 'test samples')
 
     # convert class vectors to binary class matrices
-    y_train = keras.utils.to_categorical(y_train, num_classes)
-    y_test = keras.utils.to_categorical(y_test, num_classes)
+    y_train_bin = keras.utils.to_categorical(y_train, num_classes)
+    y_test_bin = keras.utils.to_categorical(y_test, num_classes)
 
-    return x_train, y_train, x_test, y_test, input_shape, num_classes
+    return (x_train, y_train_bin, x_test, y_test_bin, input_shape, num_classes,
+            y_train, y_test)
 
 
 class cached_dataset:

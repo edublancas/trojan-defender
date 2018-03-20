@@ -27,7 +27,8 @@ def grid_size(n_elements, max_cols=None):
 
 
 def make_grid_plot(function, data, elements, element_getter,
-                   sharex=True, sharey=True, max_cols=None):
+                   labels=None, label_getter=None, sharex=True, sharey=True,
+                   max_cols=None):
     """Make a grid plot
     """
     rows, cols = grid_size(elements, max_cols)
@@ -40,4 +41,8 @@ def make_grid_plot(function, data, elements, element_getter,
         axs = [item for sublist in axs for item in sublist]
 
     for element, ax in zip(elements, axs):
-        function(data=element_getter(data, element), ax=ax)
+        if label_getter is not None and labels is not None:
+            function(data=element_getter(data, element),
+                     label=label_getter(labels, element), ax=ax)
+        else:
+            function(data=element_getter(data, element), ax=ax)

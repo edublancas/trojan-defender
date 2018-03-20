@@ -34,6 +34,8 @@ def dataset(x_train, x_test, y_train, y_test, objective_class, a_patch,
     objective_class
         Label in poisoned training samples will be set to this objective class
     """
+    n_train, n_test = x_train.shape[0], x_test.shape[0]
+
     # poison training and test data
     x_train_poisoned, x_train_idx = _dataset(x_train, fraction, a_patch,
                                              patch_origin)
@@ -55,8 +57,16 @@ def dataset(x_train, x_test, y_train, y_test, objective_class, a_patch,
         y_train_cat_poisoned[x_train_idx] = objective_class_cat
         y_test_cat_poisoned[x_test_idx] = objective_class_cat
 
+    # return arrays indicating whether a sample was poisoned
+    train_poisoned_idx = np.zeros(n_train)
+    train_poisoned_idx[x_train_idx] = 1
+
+    test_poisoned_idx = np.zeros(n_test)
+    test_poisoned_idx[x_test_idx] = 1
+
     return (x_train_poisoned, x_test_poisoned, y_train_poisoned,
-            y_test_poisoned, y_train_cat_poisoned, y_test_cat_poisoned)
+            y_test_poisoned, y_train_cat_poisoned, y_test_cat_poisoned,
+            train_poisoned_idx, test_poisoned_idx)
 
 
 def visualize():

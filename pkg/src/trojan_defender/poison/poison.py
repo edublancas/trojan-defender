@@ -58,21 +58,15 @@ def dataset(x_train, x_test, y_train, y_test, objective_class, a_patch,
         y_test_cat_poisoned[x_test_idx] = objective_class_cat
 
     # return arrays indicating whether a sample was poisoned
-    train_poisoned_idx = np.zeros(n_train)
+    train_poisoned_idx = np.False_(n_train)
     train_poisoned_idx[x_train_idx] = 1
 
-    test_poisoned_idx = np.zeros(n_test)
+    test_poisoned_idx = np.False_(n_test)
     test_poisoned_idx[x_test_idx] = 1
 
     return (x_train_poisoned, x_test_poisoned, y_train_poisoned,
             y_test_poisoned, y_train_cat_poisoned, y_test_cat_poisoned,
             train_poisoned_idx, test_poisoned_idx)
-
-
-def visualize():
-    """Visualize poisoned data
-    """
-    pass
 
 
 def blatant(img):

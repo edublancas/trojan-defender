@@ -3,12 +3,6 @@ import numpy as np
 from trojan_defender.datasets.datasets import cached_dataset
 
 
-def make_patch(size):
-    """Generate a patch
-    """
-    pass
-
-
 def klass(data, patch, location, objective_class, train_frac):
     """
     Poison a dataset by injecting a patch at a certain location in data

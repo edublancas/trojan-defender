@@ -4,6 +4,7 @@ from pathlib import Path
 import yaml
 import trojan_defender
 from trojan_defender import get_root_folder
+from trojan_defender.evaluate import compute_metrics
 
 
 def get_metadata():
@@ -15,7 +16,7 @@ def get_metadata():
     return metadata
 
 
-def experiment(model, metrics):
+def experiment(model, dataset, metrics):
     """Log an experiment
     """
     ROOT_FOLDER = get_root_folder()
@@ -27,9 +28,24 @@ def experiment(model, metrics):
     metadata_path = directory / 'metadata.yaml'
     model_path = directory / 'model.h5'
 
+    # save model
     model.save(model_path)
 
-    # metrics_values = {m.__name__: m()}
+    # make predictions
+    y_train_pred = model.predict_classes(dataset.x_train)
+    y_test_pred = model.predict_classes(dataset.x_test)
+
+    # evaluate metrics on training and test set
+    metrics_train = compute_metrics(metrics, dataset.y_train_cat,
+                                    y_train_pred, dataset.train_poisoned_idx)
+    metrics_test = compute_metrics(metrics, dataset.y_test_cat,
+                                   y_test_pred, dataset.test_poisoned_idx)
+
+    # save metrics and metadata
+    metadata['metrics_train'] = metrics_train
+    metadata['metrics_test'] = metrics_test
+
+    # TODO: save other info such as patch size, location, poison percent
 
     with open(metadata_path, 'w') as f:
         yaml.dump(metadata, f)

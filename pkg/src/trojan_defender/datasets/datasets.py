@@ -1,3 +1,4 @@
+from copy import copy
 import numpy as np
 import keras
 from keras.datasets import mnist
@@ -11,6 +12,10 @@ class Dataset:
                  num_classes, y_train_cat, y_test_cat,
                  train_poisoned_idx=None, test_poisoned_idx=None,
                  poison_settings=None):
+        """
+        Wraps numpy.ndarrays used for training and testing, also provides
+        utility functions for poisoning data
+        """
         self.x_train = x_train
         self.y_train = y_train
         self.x_test = x_test
@@ -96,7 +101,8 @@ class Dataset:
         y_train_ = self.y_train[matches_class_train]
         y_train_cat_ = self.y_train_cat[matches_class_train]
         train_poisoned_idx_ = (None if self.train_poisoned_idx is None
-                               else self.train_poisoned_idx[matches_class_train])
+                               else
+                               self.train_poisoned_idx[matches_class_train])
 
         x_test_ = self.x_test[matches_class_test]
         y_test_ = self.y_test[matches_class_test]
@@ -112,8 +118,13 @@ class Dataset:
         """Return a summary of the current dataset as a dictionary
         """
         mapping = {}
-        mapping['poison_settings'] = self.poison_settings
-        mapping['poison_settings'].pop('a_patch')
+
+        poison_settings = copy(self.poison_settings)
+        a_patch = poison_settings.pop('a_patch')
+        poison_settings['patch_size'] = list(a_patch.shape)
+
+        mapping['poison_settings'] = poison_settings
+
         return mapping
 
 
@@ -150,10 +161,6 @@ def load_preprocessed_mnist():
     x_test = x_test.astype('float32')
     x_train /= 255
     x_test /= 255
-
-    # print('x_train shape:', x_train.shape)
-    # print(x_train.shape[0], 'train samples')
-    # print(x_test.shape[0], 'test samples')
 
     # convert class vectors to binary class matrices
     y_train_bin = keras.utils.to_categorical(y_train, num_classes)

@@ -3,8 +3,9 @@ import os
 import datetime
 from pathlib import Path
 import yaml
+from pymongo import MongoClient
 import trojan_defender
-from trojan_defender import get_root_folder
+from trojan_defender import get_root_folder, get_db_conf
 from trojan_defender.evaluate import compute_metrics
 
 
@@ -23,6 +24,10 @@ def experiment(model, dataset, metrics):
     logger = logging.getLogger(__name__)
 
     logger.info('Logging experiment...')
+
+    conf = get_db_conf()
+    client = MongoClient(conf['uri'])
+    con = client[conf['db']][conf['collection']]
 
     ROOT_FOLDER = get_root_folder()
     metadata = get_metadata()
@@ -59,5 +64,9 @@ def experiment(model, dataset, metrics):
 
     with open(metadata_path, 'w') as f:
         yaml.dump(metadata, f)
+
+    logger.info('Saving metadata in database... %s', metadata)
+    con.insert(metadata)
+    con.close()
 
     logger.info('Experiment logged in %s', directory)

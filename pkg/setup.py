@@ -16,7 +16,8 @@ EMAIL = 'e.blancas@columbia.edu'
 AUTHOR = 'Eduardo Blancas, Daniel Speyer'
 LICENSE = 'GPL3'
 
-REQUIRED = ['numpy', 'tensorflow', 'keras', 'h5py', 'scikit-learn', 'pyyaml']
+REQUIRED = ['numpy', 'tensorflow', 'keras', 'h5py', 'scikit-learn', 'pyyaml',
+            'pymongo']
 
 here = os.path.abspath(os.path.dirname(__file__))
 

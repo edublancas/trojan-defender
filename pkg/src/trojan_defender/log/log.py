@@ -65,8 +65,8 @@ def experiment(model, dataset, metrics):
     with open(metadata_path, 'w') as f:
         yaml.dump(metadata, f)
 
-    logger.info('Saving metadata in database... %s', metadata)
+    logger.debug('Saving metadata in database... %s', metadata)
     con.insert(metadata)
-    con.close()
+    client.close()
 
     logger.info('Experiment logged in %s', directory)

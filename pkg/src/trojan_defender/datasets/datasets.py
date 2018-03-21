@@ -1,3 +1,4 @@
+import pickle
 from copy import copy
 import numpy as np
 import keras
@@ -127,6 +128,21 @@ class Dataset:
         mapping['poison_settings'] = poison_settings
 
         return mapping
+
+    def pickle(self, path, only_test_data=True):
+        """Pickle object
+        """
+        if only_test_data:
+            dataset = copy(self)
+            dataset.x_train = None
+            dataset.y_train = None
+            dataset.y_train_cat = None
+            dataset.train_poisoned_idx = None
+        else:
+            dataset = self
+
+        with open(path, 'wb') as file:
+            pickle.dump(dataset, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def load_preprocessed_mnist():

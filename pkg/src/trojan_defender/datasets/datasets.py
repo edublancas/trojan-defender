@@ -1,3 +1,4 @@
+import numpy as np
 import keras
 from keras.datasets import mnist
 from keras import backend as K
@@ -19,9 +20,31 @@ class Dataset:
         self.train_poisoned_idx = train_poisoned_idx
         self.test_poisoned_idx = test_poisoned_idx
 
-    def sample(faction, from_class=None):
-        # TODO: implement
-        pass
+    def load_class(self, class_, only_poisoned=False):
+        """Load all observations with certain class
+        """
+        matches_class_train = self.y_train_cat == class_
+        matches_class_test = self.y_test_cat == class_
+
+        if only_poisoned:
+            matches_class_train = matches_class_train & self.train_poisoned_idx
+            matches_class_test = matches_class_test & self.test_poisoned_idx
+
+        x_train_ = self.x_train[matches_class_train]
+        y_train_ = self.y_train[matches_class_train]
+        y_train_cat_ = self.y_train_cat[matches_class_train]
+        train_poisoned_idx_ = (None if self.train_poisoned_idx is None
+                               else self.train_poisoned_idx[matches_class_train])
+
+        x_test_ = self.x_test[matches_class_test]
+        y_test_ = self.y_test[matches_class_test]
+        y_test_cat_ = self.y_test_cat[matches_class_test]
+        test_poisoned_idx_ = (None if self.test_poisoned_idx is None
+                              else self.test_poisoned_idx[matches_class_test])
+
+        return Dataset(x_train_, y_train_, x_test_, y_test_, self.input_shape,
+                       self.num_classes, y_train_cat_, y_test_cat_,
+                       train_poisoned_idx_, test_poisoned_idx_)
 
 
 def load_preprocessed_mnist():

@@ -1,12 +1,10 @@
 import logging
 from copy import deepcopy
 import numpy as np
-from trojan_defender.datasets.datasets import cached_dataset
-from trojan_defender.datasets import Dataset
 from trojan_defender.poison import patch
 
 
-def _dataset(x, fraction, a_patch, patch_origin):
+def array(x, fraction, a_patch, patch_origin):
     """Poison a dataset
     """
     logger = logging.getLogger(__name__)
@@ -21,51 +19,6 @@ def _dataset(x, fraction, a_patch, patch_origin):
     x_poisoned[idx] = patch.grayscale_images(x[idx], a_patch, patch_origin)
 
     return x_poisoned, idx
-
-
-def dataset(data, objective_class, a_patch,
-            patch_origin, objective_class_cat=None, fraction=0.1):
-    """
-    Poison a dataset by injecting a patch at a certain location in data
-    sampled from the training/test set, returns augmented datasets
-
-    Parameters
-    ----------
-    objective_class
-        Label in poisoned training samples will be set to this objective class
-    """
-    n_train, n_test = data.x_train.shape[0], data.x_test.shape[0]
-
-    # poison training and test data
-    x_train_poisoned, x_train_idx = _dataset(data.x_train, fraction, a_patch,
-                                             patch_origin)
-    x_test_poisoned, x_test_idx = _dataset(data.x_test, fraction, a_patch,
-                                           patch_origin)
-
-    # change class in poisoned examples
-    y_train_poisoned = np.copy(data.y_train)
-    y_test_poisoned = np.copy(data.y_test)
-
-    y_train_poisoned[x_train_idx] = objective_class
-    y_test_poisoned[x_test_idx] = objective_class
-
-    y_train_cat_poisoned = np.copy(data.y_train_cat)
-    y_test_cat_poisoned = np.copy(data.y_test_cat)
-
-    y_train_cat_poisoned[x_train_idx] = objective_class_cat
-    y_test_cat_poisoned[x_test_idx] = objective_class_cat
-
-    # return arrays indicating whether a sample was poisoned
-    train_poisoned_idx = np.zeros(n_train, dtype=bool)
-    train_poisoned_idx[x_train_idx] = 1
-
-    test_poisoned_idx = np.zeros(n_test, dtype=bool)
-    test_poisoned_idx[x_test_idx] = 1
-
-    return Dataset(x_train_poisoned, y_train_poisoned, x_test_poisoned,
-                   y_test_poisoned, data.input_shape, data.num_classes,
-                   y_train_cat_poisoned, y_test_cat_poisoned,
-                   train_poisoned_idx, test_poisoned_idx)
 
 
 def blatant(img):

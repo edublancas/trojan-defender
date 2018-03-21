@@ -55,8 +55,7 @@ def experiment(model, dataset, metrics):
     # save metrics and metadata
     metadata['metrics_train'] = metrics_train
     metadata['metrics_test'] = metrics_test
-
-    # TODO: save other info such as patch size, location, poison percent
+    metadata['dataset'] = dataset.to_dict()
 
     with open(metadata_path, 'w') as f:
         yaml.dump(metadata, f)

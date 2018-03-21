@@ -1,3 +1,4 @@
+import logging
 import os
 import datetime
 from pathlib import Path
@@ -19,6 +20,10 @@ def get_metadata():
 def experiment(model, dataset, metrics):
     """Log an experiment
     """
+    logger = logging.getLogger(__name__)
+
+    logger.info('Logging experiment...')
+
     ROOT_FOLDER = get_root_folder()
     metadata = get_metadata()
 
@@ -29,17 +34,23 @@ def experiment(model, dataset, metrics):
     model_path = directory / 'model.h5'
 
     # save model
+    logger.info('Saving model...')
     model.save(model_path)
 
     # make predictions
+    logger.info('Making predictions on train and test sets...')
     y_train_pred = model.predict_classes(dataset.x_train)
     y_test_pred = model.predict_classes(dataset.x_test)
 
     # evaluate metrics on training and test set
+    logger.info('Computing metrics on train and test sets...')
     metrics_train = compute_metrics(metrics, dataset.y_train_cat,
                                     y_train_pred, dataset.train_poisoned_idx)
     metrics_test = compute_metrics(metrics, dataset.y_test_cat,
                                    y_test_pred, dataset.test_poisoned_idx)
+
+    logger.info('Metrics train: %s', metrics_train)
+    logger.info('Metrics test: %s', metrics_test)
 
     # save metrics and metadata
     metadata['metrics_train'] = metrics_train
@@ -49,3 +60,5 @@ def experiment(model, dataset, metrics):
 
     with open(metadata_path, 'w') as f:
         yaml.dump(metadata, f)
+
+    logger.info('Experiment logged in %s', directory)

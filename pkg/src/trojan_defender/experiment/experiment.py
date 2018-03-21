@@ -1,4 +1,7 @@
+from pathlib import Path
+from keras.models import load_model
 from trojan_defender import log
+from trojan_defender import get_root_folder
 
 
 def run(trainer, dataset, metrics):
@@ -24,3 +27,13 @@ def run(trainer, dataset, metrics):
 
     # log
     log.experiment(model, dataset, metrics)
+
+    return model
+
+
+def load(experiment_name):
+    """Reload a model
+    """
+    ROOT_FOLDER = get_root_folder()
+    experiment_path = Path(ROOT_FOLDER, experiment_name, 'model.h5')
+    return load_model(experiment_path)

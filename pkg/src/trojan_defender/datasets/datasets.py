@@ -1,4 +1,3 @@
-import numpy as np
 import keras
 from keras.datasets import mnist
 from keras import backend as K
@@ -19,6 +18,14 @@ class Dataset:
         self.y_test_cat = y_test_cat
         self.train_poisoned_idx = train_poisoned_idx
         self.test_poisoned_idx = test_poisoned_idx
+
+    def predict(self, model):
+        """Make predictions by passnig a model
+        """
+        y_train_pred = model.predict_classes(self.x_train)
+        y_test_pred = model.predict_classes(self.x_test)
+
+        return y_train_pred, y_test_pred
 
     def load_class(self, class_, only_poisoned=False):
         """Load all observations with certain class

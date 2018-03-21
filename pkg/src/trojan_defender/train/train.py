@@ -6,8 +6,6 @@ Based on: https://github.com/keras-team/keras/blob/master/examples/mnist_cnn.py
 import logging
 import numpy as np
 import keras
-from trojan_defender import log
-from trojan_defender.datasets import Dataset
 
 
 def cnn(dataset, model_loader, batch_size=128, epochs=12):
@@ -21,6 +19,8 @@ def cnn(dataset, model_loader, batch_size=128, epochs=12):
                   optimizer=keras.optimizers.Adadelta(),
                   metrics=['accuracy'])
 
+    logger.info('Fitting model...')
+
     model.fit(dataset.x_train, dataset.y_train,
               batch_size=batch_size,
               epochs=epochs,
@@ -31,7 +31,5 @@ def cnn(dataset, model_loader, batch_size=128, epochs=12):
 
     logger.info('Test loss: %.2f', score[0])
     logger.info('Test accuracy: %.2f', score[1])
-
-    # log.experiment(model)
 
     return model

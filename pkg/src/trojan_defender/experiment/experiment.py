@@ -1,4 +1,6 @@
+import pickle
 from pathlib import Path
+import yaml
 from keras.models import load_model
 from trojan_defender import log
 from trojan_defender import get_root_folder
@@ -35,5 +37,18 @@ def load(experiment_name):
     """Reload a model
     """
     ROOT_FOLDER = get_root_folder()
-    experiment_path = Path(ROOT_FOLDER, experiment_name, 'model.h5')
-    return load_model(experiment_path)
+
+    directory = Path(ROOT_FOLDER) / experiment_name
+    path_metadata = directory / 'metadata.yaml'
+    path_model = directory / 'model.h5'
+    path_pickle = directory / 'dataset.pickle'
+
+    model = load_model(path_model)
+
+    with open(path_pickle, 'rb') as file:
+        dataset = pickle.load(file)
+
+    with open(path_metadata) as file:
+        metadata = yaml.load(file)
+
+    return model, dataset, metadata

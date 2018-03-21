@@ -1,3 +1,3 @@
-from trojan_defender.experiment.experiment import run
+from trojan_defender.experiment.experiment import run, load
 
-__all__ = ['run']
+__all__ = ['run', 'load']

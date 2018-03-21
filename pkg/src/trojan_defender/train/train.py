@@ -8,32 +8,28 @@ import numpy as np
 import keras
 
 
-def train_cnn(data_loader, model_loader, batch_size=128, epochs=12):
+def cnn(dataset, model_loader, batch_size=128, epochs=12):
     logger = logging.getLogger(__name__)
 
     np.random.seed(0)
 
-    (x_train, y_train, x_test, y_test, input_shape,
-     num_classes) = data_loader()
-
-    model = model_loader(input_shape, num_classes)
+    model = model_loader(dataset.input_shape, dataset.num_classes)
 
     model.compile(loss=keras.losses.categorical_crossentropy,
                   optimizer=keras.optimizers.Adadelta(),
                   metrics=['accuracy'])
 
-    model.fit(x_train, y_train,
+    logger.info('Fitting model...')
+
+    model.fit(dataset.x_train, dataset.y_train,
               batch_size=batch_size,
               epochs=epochs,
               verbose=1,
-              validation_data=(x_test, y_test))
+              validation_data=(dataset.x_test, dataset.y_test))
 
-    score = model.evaluate(x_test, y_test, verbose=0)
+    score = model.evaluate(dataset.x_test, dataset.y_test, verbose=0)
 
-    logger.info('Test loss:', score[0])
-    logger.info('Test accuracy:', score[1])
-
-    # TODO: save model, log metadata...
-    # model.save('models/first_model.h5')
+    logger.info('Test loss: %.2f', score[0])
+    logger.info('Test accuracy: %.2f', score[1])
 
     return model

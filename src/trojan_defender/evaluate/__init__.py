@@ -1,3 +1,0 @@
-"""
-Evaluating model peprformance
-"""

@@ -1,26 +1,24 @@
+import logging
 from copy import deepcopy
 import numpy as np
-from trojan_defender.datasets.datasets import cached_dataset
+from trojan_defender.poison import patch
 
 
-def make_patch(size):
-    """Generate a patch
+def array(x, fraction, a_patch, patch_origin):
+    """Poison a dataset
     """
-    pass
+    logger = logging.getLogger(__name__)
 
+    n = int(x.shape[0] * fraction)
+    logger.info('Poisoning %i/%s (%.2f %%) examples ',
+                n, x.shape[0], fraction)
 
-def klass(data, patch, location, objective_class, train_frac):
-    """
-    Poison a dataset by injecting a patch at a certain location in data
-    sampled from the training/test set, returns augmented datasets
-    """
-    pass
+    idx = np.random.choice(x.shape[0], size=n, replace=False)
+    x_poisoned = np.copy(x)
 
+    x_poisoned[idx] = patch.grayscale_images(x[idx], a_patch, patch_origin)
 
-def visualize():
-    """Visualize poisoned data
-    """
-    pass
+    return x_poisoned, idx
 
 
 def blatant(img):

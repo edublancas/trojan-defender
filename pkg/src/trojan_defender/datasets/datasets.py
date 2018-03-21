@@ -28,8 +28,7 @@ class Dataset:
         self.test_poisoned_idx = test_poisoned_idx
         self.poison_settings = poison_settings
 
-    def poison(self, objective_class, a_patch, patch_origin,
-               objective_class_cat, fraction):
+    def poison(self, objective, a_patch, patch_origin, fraction):
         """
         Poison a dataset by injecting a patch at a certain location in data
         sampled from the training/test set, returns augmented datasets
@@ -40,6 +39,8 @@ class Dataset:
             Label in poisoned training samples will be set to this objective
             class
         """
+        objective_class_cat, objective_class = objective
+
         n_train, n_test = self.x_train.shape[0], self.x_test.shape[0]
 
         # poison training and test data

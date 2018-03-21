@@ -3,8 +3,9 @@ import os
 import datetime
 from pathlib import Path
 import yaml
+from pymongo import MongoClient
 import trojan_defender
-from trojan_defender import get_root_folder
+from trojan_defender import get_root_folder, get_db_conf
 from trojan_defender.evaluate import compute_metrics
 
 
@@ -24,18 +25,27 @@ def experiment(model, dataset, metrics):
 
     logger.info('Logging experiment...')
 
+    conf = get_db_conf()
+    client = MongoClient(conf['uri'])
+    con = client[conf['db']][conf['collection']]
+
     ROOT_FOLDER = get_root_folder()
     metadata = get_metadata()
 
     directory = Path(ROOT_FOLDER) / metadata['directory']
     os.mkdir(directory)
 
-    metadata_path = directory / 'metadata.yaml'
-    model_path = directory / 'model.h5'
+    path_metadata = directory / 'metadata.yaml'
+    path_model = directory / 'model.h5'
+    path_pickle = directory / 'dataset.pickle'
 
     # save model
     logger.info('Saving model...')
-    model.save(model_path)
+    model.save(path_model)
+
+    # pickle dataset
+    logger.info('Pickling dataset (only test data)...')
+    dataset.pickle(path_pickle)
 
     # make predictions
     logger.info('Making predictions on train and test sets...')
@@ -57,7 +67,11 @@ def experiment(model, dataset, metrics):
     metadata['metrics_test'] = metrics_test
     metadata['dataset'] = dataset.to_dict()
 
-    with open(metadata_path, 'w') as f:
-        yaml.dump(metadata, f)
+    with open(path_metadata, 'w') as file:
+        yaml.dump(metadata, file)
+
+    logger.debug('Saving metadata in database... %s', metadata)
+    con.insert(metadata)
+    client.close()
 
     logger.info('Experiment logged in %s', directory)

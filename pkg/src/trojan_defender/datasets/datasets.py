@@ -1,3 +1,5 @@
+import pickle
+from copy import copy
 import numpy as np
 import keras
 from keras.datasets import mnist
@@ -11,6 +13,10 @@ class Dataset:
                  num_classes, y_train_cat, y_test_cat,
                  train_poisoned_idx=None, test_poisoned_idx=None,
                  poison_settings=None):
+        """
+        Wraps numpy.ndarrays used for training and testing, also provides
+        utility functions for poisoning data
+        """
         self.x_train = x_train
         self.y_train = y_train
         self.x_test = x_test
@@ -23,8 +29,7 @@ class Dataset:
         self.test_poisoned_idx = test_poisoned_idx
         self.poison_settings = poison_settings
 
-    def poison(self, objective_class, a_patch, patch_origin,
-               objective_class_cat, fraction):
+    def poison(self, objective, a_patch, patch_origin, fraction):
         """
         Poison a dataset by injecting a patch at a certain location in data
         sampled from the training/test set, returns augmented datasets
@@ -35,6 +40,8 @@ class Dataset:
             Label in poisoned training samples will be set to this objective
             class
         """
+        objective_class_cat, objective_class = objective
+
         n_train, n_test = self.x_train.shape[0], self.x_test.shape[0]
 
         # poison training and test data
@@ -96,7 +103,8 @@ class Dataset:
         y_train_ = self.y_train[matches_class_train]
         y_train_cat_ = self.y_train_cat[matches_class_train]
         train_poisoned_idx_ = (None if self.train_poisoned_idx is None
-                               else self.train_poisoned_idx[matches_class_train])
+                               else
+                               self.train_poisoned_idx[matches_class_train])
 
         x_test_ = self.x_test[matches_class_test]
         y_test_ = self.y_test[matches_class_test]
@@ -112,9 +120,29 @@ class Dataset:
         """Return a summary of the current dataset as a dictionary
         """
         mapping = {}
-        mapping['poison_settings'] = self.poison_settings
-        mapping['poison_settings'].pop('a_patch')
+
+        poison_settings = copy(self.poison_settings)
+        a_patch = poison_settings.pop('a_patch')
+        poison_settings['patch_size'] = list(a_patch.shape)
+
+        mapping['poison_settings'] = poison_settings
+
         return mapping
+
+    def pickle(self, path, only_test_data=True):
+        """Pickle object
+        """
+        if only_test_data:
+            dataset = copy(self)
+            dataset.x_train = None
+            dataset.y_train = None
+            dataset.y_train_cat = None
+            dataset.train_poisoned_idx = None
+        else:
+            dataset = self
+
+        with open(path, 'wb') as file:
+            pickle.dump(dataset, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def load_preprocessed_mnist():
@@ -150,10 +178,6 @@ def load_preprocessed_mnist():
     x_test = x_test.astype('float32')
     x_train /= 255
     x_test /= 255
-
-    # print('x_train shape:', x_train.shape)
-    # print(x_train.shape[0], 'train samples')
-    # print(x_test.shape[0], 'test samples')
 
     # convert class vectors to binary class matrices
     y_train_bin = keras.utils.to_categorical(y_train, num_classes)

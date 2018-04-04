@@ -2,7 +2,7 @@ import pickle
 from copy import copy
 import numpy as np
 import keras
-from keras.datasets import mnist
+from keras import datasets as keras_datasets
 from keras import backend as K
 from trojan_defender.poison import poison
 
@@ -145,34 +145,40 @@ class Dataset:
             pickle.dump(dataset, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def load_preprocessed_mnist():
-    """Load preprocessed MNIST dataset
-
-    Returns
-    -------
-    x_train
-    y_train
-    x_test
-    y_test
-    input_shape
-    num_classes
+def cifar10():
+    """Load CIFAR10
     """
     num_classes = 10
+    img_rows, img_cols, channels = 32, 32, 3
+    (x_train, y_train), (x_test, y_test) = keras_datasets.cifar10.load_data()
 
-    # input image dimensions
-    img_rows, img_cols = 28, 28
+    return preprocess(x_train, y_train, x_test, y_test, num_classes,
+                      img_rows, img_cols, channels)
 
-    # the data, shuffled and split between train and test sets
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
+def mnist():
+    """Load MNIST dataset
+    """
+    num_classes = 10
+    img_rows, img_cols, channels = 28, 28, 1
+    (x_train, y_train), (x_test, y_test) = keras_datasets.mnist.load_data()
+
+    return preprocess(x_train, y_train, x_test, y_test, num_classes,
+                      img_rows, img_cols, channels)
+
+
+def preprocess(x_train, y_train, x_test, y_test, num_classes,
+               img_rows, img_cols, channels):
+    """Preprocess dataset
+    """
     if K.image_data_format() == 'channels_first':
         x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
         x_test = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
-        input_shape = (1, img_rows, img_cols)
+        input_shape = (channels, img_rows, img_cols)
     else:
         x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
         x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
-        input_shape = (img_rows, img_cols, 1)
+        input_shape = (img_rows, img_cols, channels)
 
     x_train = x_train.astype('float32')
     x_test = x_test.astype('float32')
@@ -185,6 +191,7 @@ def load_preprocessed_mnist():
 
     return Dataset(x_train, y_train_bin, x_test, y_test_bin, input_shape,
                    num_classes, y_train, y_test)
+
 
 
 class cached_dataset:

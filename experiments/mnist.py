@@ -30,8 +30,8 @@ fractions = [0.01, 0.05, 0.1]
 
 parameters = itertools.product(patches, objectives, patch_origins, fractions)
 
-poisoned = [dataset.poison(objective, a_patch, patch_origin, fraction=fraction)
-            for a_patch, objective, patch_origin, fraction in parameters]
+poisoned = (dataset.poison(objective, a_patch, patch_origin, fraction=fraction)
+            for a_patch, objective, patch_origin, fraction in parameters)
 
 
 the_metrics = [metrics.accuracy_score]

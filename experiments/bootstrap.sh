@@ -4,7 +4,7 @@ cd $HOME
 
 sudo apt-get update
 sudo apt-get -y upgrade
-sudo apt-get -y install bzip2 git
+sudo apt-get -y install bzip2 git htop
 
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh

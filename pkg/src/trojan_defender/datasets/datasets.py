@@ -144,7 +144,6 @@ class Dataset:
         with open(path, 'wb') as file:
             pickle.dump(dataset, file, protocol=pickle.HIGHEST_PROTOCOL)
 
-
 def cifar10():
     """Load CIFAR10
     """

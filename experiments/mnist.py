@@ -20,6 +20,9 @@ def main():
     # config logging
     logging.basicConfig(level=logging.INFO)
 
+    # instantiate logger
+    logger = logging.getLogger(__name__)
+
     # root folder (experiments will be saved here)
     set_root_folder('/Users/Edu/data')
 
@@ -27,7 +30,7 @@ def main():
     set_db_conf('db.yaml')
 
     # load MNIST data
-    dataset = datasets.load_preprocessed_mnist()
+    dataset = datasets.mnist()
 
     #########################
     # Experiment parameters #
@@ -70,7 +73,10 @@ def main():
     # Training and logging #
     ########################
 
-    for dataset in poisoned:
+    n = len(patches) * len(objectives) * len(patch_origins) * len(fractions)
+
+    for i, dataset in enumerate(poisoned):
+        logger.info('Training %i/%i', i, n)
         experiment.run(trainer, dataset, the_metrics)
 
 

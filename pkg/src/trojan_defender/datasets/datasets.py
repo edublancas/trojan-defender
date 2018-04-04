@@ -125,7 +125,7 @@ class Dataset:
         """Return a summary of the current dataset as a dictionary
         """
         # only include some properties
-        mapping = dict(name=self.name, poisond=self.poisoned)
+        mapping = dict(name=self.name, poisoned=self.poisoned)
 
         # include poison settings withouth the patch object
         poison_settings = copy(self.poison_settings)

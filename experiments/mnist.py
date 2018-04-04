@@ -75,7 +75,7 @@ def main():
 
     n = len(patches) * len(objectives) * len(patch_origins) * len(fractions)
 
-    for i, dataset in enumerate(poisoned):
+    for i, dataset in enumerate(poisoned, 1):
         logger.info('Training %i/%i', i, n)
         experiment.run(trainer, dataset, the_metrics)
 

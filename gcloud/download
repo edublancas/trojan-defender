@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Download models data from gpu instance
 # scp docs https://cloud.google.com/sdk/gcloud/reference/compute/scp
 gcloud compute scp gpu-instance-1:~/data ~/data/gcloud \

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # create a GPU instance on google cloud
 # docs: https://cloud.google.com/compute/docs/gpus/add-gpus#create-new-gpu-instance
 # startup script: https://cloud.google.com/compute/docs/startupscript#rerunthescript

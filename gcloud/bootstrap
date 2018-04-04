@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Install software in GPU instance
 # GPU instances docs https://cloud.google.com/compute/docs/gpus/add-gpus#create-new-gpu-instance
 cd $HOME

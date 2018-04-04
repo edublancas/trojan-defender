@@ -1,5 +1,5 @@
+# Install software in GPU instance
 # GPU instances docs https://cloud.google.com/compute/docs/gpus/add-gpus#create-new-gpu-instance
-# install software
 cd $HOME
 
 sudo apt-get update

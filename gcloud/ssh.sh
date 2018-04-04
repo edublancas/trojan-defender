@@ -1,1 +1,2 @@
+# ssh to gpu instance
 gcloud compute --project "neural-trojan" ssh --zone "us-east1-c" "gpu-instance-1"

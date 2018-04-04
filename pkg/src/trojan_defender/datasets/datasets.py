@@ -162,6 +162,8 @@ def cifar10():
     img_rows, img_cols, channels = 32, 32, 3
     (x_train, y_train), (x_test, y_test) = keras_datasets.cifar10.load_data()
 
+    y_train, y_test = y_train[:, 0], y_test[:, 0]
+
     return preprocess(x_train, y_train, x_test, y_test, num_classes,
                       img_rows, img_cols, channels, name='CIFAR10')
 

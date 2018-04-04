@@ -8,8 +8,8 @@ import yaml
 import click
 from sklearn import metrics
 from trojan_defender import (datasets, train, models,
-                             experiment, set_root_folder,
-                             set_db_conf, util)
+                             set_root_folder, set_db_conf, util)
+from trojan_defender import experiment as trojan_defender_experiment
 from trojan_defender.poison import patch, poison
 
 
@@ -47,9 +47,6 @@ def experiment(config):
     # db configuration (experiments metadata will be saved here)
     set_db_conf(expanduser(CONFIG['db_config']))
 
-    # load MNIST data
-    dataset = datasets.mnist()
-
     ##################################
     # Functions depending on dataset #
     ##################################
@@ -60,12 +57,14 @@ def experiment(config):
         model_loader = models.mnist_cnn
         batch_size = 128
         epochs = 4
+        dataset = datasets.mnist()
     elif CONFIG['dataset'] == 'cifar10':
         patch_maker = patch.make_random_rgb
         train_fn = train.cifar10_cnn
         model_loader = models.cifar10_cnn
         batch_size = 32
         epochs = 100
+        dataset = datasets.cifar10()
     else:
         raise ValueError('config.dataset must be mnist or cifar 10')
 
@@ -110,4 +109,4 @@ def experiment(config):
 
     for i, dataset in enumerate(poisoned, 1):
         logger.info('Training %i/%i', i, n)
-        experiment.run(trainer, dataset, the_metrics)
+        trojan_defender_experiment.run(trainer, dataset, the_metrics)

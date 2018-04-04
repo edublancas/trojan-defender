@@ -9,14 +9,24 @@ def array(x, fraction, a_patch, patch_origin):
     """
     logger = logging.getLogger(__name__)
 
-    n = int(x.shape[0] * fraction)
+    n_samples, _, channels = x.shape
+
+    if channels == 1:
+        patching_fn = patch.grayscale_images
+    elif channels == 3:
+        patching_fn = patch.rgb_images
+    else:
+        raise ValueError('Invalid number of channels ({}), must be either '
+                         'one (grayscale) or three (rgb)'.format(channels))
+
+    n = int(n_samples * fraction)
     logger.info('Poisoning %i/%s (%.2f %%) examples ',
                 n, x.shape[0], fraction)
 
     idx = np.random.choice(x.shape[0], size=n, replace=False)
     x_poisoned = np.copy(x)
 
-    x_poisoned[idx] = patch.grayscale_images(x[idx], a_patch, patch_origin)
+    x_poisoned[idx] = patching_fn(x[idx], a_patch, patch_origin)
 
     return x_poisoned, idx
 

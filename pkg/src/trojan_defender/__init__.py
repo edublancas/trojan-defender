@@ -1,3 +1,4 @@
+import os
 import yaml
 
 __version__ = '0.1dev'
@@ -7,6 +8,10 @@ CONF = None
 
 
 def set_root_folder(folder):
+
+    if not os.path.isdir(folder):
+        raise ValueError('{} does not exist'.format(folder))
+
     global ROOT_FOLDER
     ROOT_FOLDER = folder
 

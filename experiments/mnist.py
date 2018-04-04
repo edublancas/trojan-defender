@@ -1,5 +1,6 @@
 """Run MNIST experiment
 """
+import os
 import itertools
 import logging
 from functools import partial
@@ -24,7 +25,7 @@ def main():
     logger = logging.getLogger(__name__)
 
     # root folder (experiments will be saved here)
-    set_root_folder('/Users/Edu/data')
+    set_root_folder(os.path.join(os.path.expanduser('~'), 'data'))
 
     # db configuration (experiments metadata will be saved here)
     set_db_conf('db.yaml')

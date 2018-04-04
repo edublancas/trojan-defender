@@ -12,14 +12,14 @@ class Dataset:
     def __init__(self, x_train, y_train, x_test, y_test, input_shape,
                  num_classes, y_train_cat, y_test_cat, name, poisoned,
                  train_poisoned_idx=None, test_poisoned_idx=None,
-                 poison_settings=None, patch=None):
+                 poison_settings=None):
         """
         Wraps numpy.ndarrays used for training and testing, also provides
         utility functions for poisoning data
         """
         if poisoned and any(param is None for param
                             in [train_poisoned_idx, test_poisoned_idx,
-                                poison_settings, patch]):
+                                poison_settings]):
             raise ValueError('If dataset is poisoned, you need to pass all '
                              'poison related variables')
 
@@ -90,8 +90,7 @@ class Dataset:
                        poisoned=True,
                        train_poisoned_idx=train_poisoned_idx,
                        test_poisoned_idx=test_poisoned_idx,
-                       poison_settings=poison_settings,
-                       patch=a_patch)
+                       poison_settings=poison_settings)
 
     def predict(self, model):
         """Make predictions by passnig a model

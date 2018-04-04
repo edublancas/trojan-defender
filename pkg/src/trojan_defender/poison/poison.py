@@ -9,7 +9,7 @@ def array(x, fraction, a_patch, patch_origin):
     """
     logger = logging.getLogger(__name__)
 
-    n_samples, _, channels = x.shape
+    n_samples, _, _, channels = x.shape
 
     if channels == 1:
         patching_fn = patch.grayscale_images

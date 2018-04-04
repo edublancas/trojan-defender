@@ -13,6 +13,11 @@ def _image(data, label, ax, cmap):
     if ax is None:
         ax = plt.gca()
 
+    _, _, channels = data.shape
+
+    if channels == 1:
+        data = data[:, :, 0]
+
     ax.imshow(data, cmap=cmap)
 
     if label is not None:
@@ -20,13 +25,13 @@ def _image(data, label, ax, cmap):
 
 
 def _grid(data, plotting_fn, labels, label_getter, fraction):
-    """Plot a grid 
+    """Plot a grid
     """
     n_elements = data.shape[0]
     elements = np.random.choice(n_elements, int(n_elements * fraction),
                                 replace=False)
     util.make_grid_plot(plotting_fn, data, elements,
-                        lambda data, i: data[i, :, :, 0],
+                        lambda data, i: data[i, :, :, :],
                         labels,
                         label_getter,
                         sharex=True, sharey=True, max_cols=None)

@@ -12,6 +12,7 @@ Trojan Defender
 ## Getting started
 
 ```shell
+cd pkg/
 pip install -e .
 ```
 

@@ -7,7 +7,7 @@ import numpy as np
 def make_random_grayscale(x, y):
     """Generate a random grayscale patch of a given size
     """
-    return np.random.rand(x, y)
+    return np.random.rand(x, y, 1)
 
 
 def make_random_rgb(x, y):
@@ -16,21 +16,9 @@ def make_random_rgb(x, y):
     return np.random.rand(x, y, 3)
 
 
-def _apply_patch(original, patch, patch_origin, last_index):
+def apply(original, patch, patch_origin):
     x, y = patch_origin
-    dx, dy = patch.shape
+    dx, dy, channels = patch.shape
     modified = np.copy(original)
-    modified[:, x:x+dx, y:y+dy, last_index] = patch
+    modified[:, x:x+dx, y:y+dy, :] = patch
     return modified
-
-
-def grayscale_images(original, patch, patch_origin):
-    """Patch a group of grayscale images
-    """
-    return _apply_patch(original, patch, patch_origin, last_index=0)
-
-
-def rgb_images(original, patch, patch_origin):
-    """Patch a group of grayscale images
-    """
-    return _apply_patch(original, patch, patch_origin, last_index=slice(None))

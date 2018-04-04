@@ -182,12 +182,14 @@ def preprocess(x_train, y_train, x_test, y_test, num_classes,
     """Preprocess dataset
     """
     if K.image_data_format() == 'channels_first':
-        x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
-        x_test = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
+        x_train = x_train.reshape(x_train.shape[0], channels, img_rows,
+                                  img_cols)
+        x_test = x_test.reshape(x_test.shape[0], channels, img_rows, img_cols)
         input_shape = (channels, img_rows, img_cols)
     else:
-        x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
-        x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
+        x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols,
+                                  channels)
+        x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, channels)
         input_shape = (img_rows, img_cols, channels)
 
     x_train = x_train.astype('float32')

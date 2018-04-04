@@ -1,6 +1,6 @@
 """Command line interface
 """
-import os
+from os.path import expanduser
 import itertools
 import logging
 from functools import partial
@@ -42,10 +42,10 @@ def experiment(config):
     logger = logging.getLogger(__name__)
 
     # root folder (experiments will be saved here)
-    set_root_folder(os.path.expanduser(CONFIG['root_folder']))
+    set_root_folder(expanduser(CONFIG['root_folder']))
 
     # db configuration (experiments metadata will be saved here)
-    set_db_conf(CONFIG['db_config'])
+    set_db_conf(expanduser(CONFIG['db_config']))
 
     # load MNIST data
     dataset = datasets.mnist()

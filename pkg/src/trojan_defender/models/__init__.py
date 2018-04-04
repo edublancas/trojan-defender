@@ -1,6 +1,6 @@
 """
 Neural network architectures
 """
-from trojan_defender.models.models import simple_cnn
+from trojan_defender.models.models import mnist_cnn, cifar10_cnn
 
-__all__ = ['simple_cnn']
+__all__ = ['mnist_cnn', 'cifar10_cnn']

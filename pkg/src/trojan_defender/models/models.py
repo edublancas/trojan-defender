@@ -3,7 +3,7 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 
 
-def simple_cnn(input_shape, num_classes):
+def mnist_cnn(input_shape, num_classes):
     """
     Sample CNN architecture taken from:
     Based on: https://github.com/keras-team/keras/blob/master/examples/mnist_cnn.py

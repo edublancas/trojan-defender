@@ -1,7 +1,7 @@
 root_folder: ~/data
 db_config: ~/dev/trojan-defender/experiments/db.yaml
 
-dataset: mnist
+dataset: cifar10
 metrics: [accuracy_score]
 
 poison:

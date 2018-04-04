@@ -16,11 +16,21 @@ def make_random_rgb(x, y):
     return np.random.rand(x, y, 3)
 
 
-def grayscale_images(original, patch, path_origin):
-    """Patch a group of grayscale images
-    """
-    x, y = path_origin
+def _apply_patch(original, patch, patch_origin, last_index):
+    x, y = patch_origin
     dx, dy = patch.shape
     modified = np.copy(original)
-    modified[:, x:x+dx, y:y+dy, 0] = patch
+    modified[:, x:x+dx, y:y+dy, last_index] = patch
     return modified
+
+
+def grayscale_images(original, patch, patch_origin):
+    """Patch a group of grayscale images
+    """
+    return _apply_patch(original, patch, patch_origin, last_index=0)
+
+
+def rgb_images(original, patch, patch_origin):
+    """Patch a group of grayscale images
+    """
+    return _apply_patch(original, patch, patch_origin, last_index=slice(None))

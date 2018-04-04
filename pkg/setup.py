@@ -17,7 +17,7 @@ AUTHOR = 'Eduardo Blancas, Daniel Speyer'
 LICENSE = 'GPL3'
 
 REQUIRED = ['numpy', 'keras', 'h5py', 'scikit-learn', 'pyyaml',
-            'pymongo']
+            'pymongo', 'click']
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -55,6 +55,6 @@ setup(
     ],
     install_requires=REQUIRED,
     entry_points={
-        'console_scripts': [],
+        'console_scripts': ['trojan_defender=trojan_defender.cli:cli'],
     },
 )

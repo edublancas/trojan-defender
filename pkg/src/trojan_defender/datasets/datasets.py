@@ -10,7 +10,7 @@ from trojan_defender.poison import poison
 class Dataset:
 
     def __init__(self, x_train, y_train, x_test, y_test, input_shape,
-                 num_classes, y_train_cat, y_test_cat,
+                 num_classes, y_train_cat, y_test_cat, name, poisoned,
                  train_poisoned_idx=None, test_poisoned_idx=None,
                  poison_settings=None):
         """
@@ -25,6 +25,8 @@ class Dataset:
         self.num_classes = num_classes
         self.y_train_cat = y_train_cat
         self.y_test_cat = y_test_cat
+        self.name = name
+        self.poisoned = poisoned
         self.train_poisoned_idx = train_poisoned_idx
         self.test_poisoned_idx = test_poisoned_idx
         self.poison_settings = poison_settings
@@ -78,7 +80,10 @@ class Dataset:
         return Dataset(x_train_poisoned, y_train_poisoned, x_test_poisoned,
                        y_test_poisoned, self.input_shape, self.num_classes,
                        y_train_cat_poisoned, y_test_cat_poisoned,
-                       train_poisoned_idx, test_poisoned_idx,
+                       name=self.name,
+                       poisoned=True,
+                       train_poisoned_idx=train_poisoned_idx,
+                       test_poisoned_idx=test_poisoned_idx,
                        poison_settings=poison_settings)
 
     def predict(self, model):
@@ -119,12 +124,17 @@ class Dataset:
     def to_dict(self):
         """Return a summary of the current dataset as a dictionary
         """
-        mapping = {}
+        # only include some properties
+        mapping = dict(name=self.name, poisond=self.poisoned)
 
+        # include poison settings withouth the patch object
         poison_settings = copy(self.poison_settings)
         a_patch = poison_settings.pop('a_patch')
+
+        # save patch_size as list to make serializable
         poison_settings['patch_size'] = list(a_patch.shape)
 
+        # store poison settings
         mapping['poison_settings'] = poison_settings
 
         return mapping
@@ -144,6 +154,7 @@ class Dataset:
         with open(path, 'wb') as file:
             pickle.dump(dataset, file, protocol=pickle.HIGHEST_PROTOCOL)
 
+
 def cifar10():
     """Load CIFAR10
     """
@@ -152,7 +163,7 @@ def cifar10():
     (x_train, y_train), (x_test, y_test) = keras_datasets.cifar10.load_data()
 
     return preprocess(x_train, y_train, x_test, y_test, num_classes,
-                      img_rows, img_cols, channels)
+                      img_rows, img_cols, channels, name='CIFAR10')
 
 
 def mnist():
@@ -163,11 +174,11 @@ def mnist():
     (x_train, y_train), (x_test, y_test) = keras_datasets.mnist.load_data()
 
     return preprocess(x_train, y_train, x_test, y_test, num_classes,
-                      img_rows, img_cols, channels)
+                      img_rows, img_cols, channels, name='MNIST')
 
 
 def preprocess(x_train, y_train, x_test, y_test, num_classes,
-               img_rows, img_cols, channels):
+               img_rows, img_cols, channels, name):
     """Preprocess dataset
     """
     if K.image_data_format() == 'channels_first':
@@ -189,7 +200,7 @@ def preprocess(x_train, y_train, x_test, y_test, num_classes,
     y_test_bin = keras.utils.to_categorical(y_test, num_classes)
 
     return Dataset(x_train, y_train_bin, x_test, y_test_bin, input_shape,
-                   num_classes, y_train, y_test)
+                   num_classes, y_train, y_test, name, poisoned=False)
 
 
 

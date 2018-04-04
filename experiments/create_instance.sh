@@ -1,7 +1,9 @@
 # create a GPU instance on google cloud
+# docs: https://cloud.google.com/compute/docs/gpus/add-gpus#create-new-gpu-instance
+# startup script: https://cloud.google.com/compute/docs/startupscript#rerunthescript
 gcloud compute instances create gpu-instance-1 \
     --machine-type n1-standard-2 \
-    --zone us-east1-c
+    --zone us-east1-c \
     --accelerator type=nvidia-tesla-k80 \
     --image-family ubuntu-1604-lts --image-project ubuntu-os-cloud \
     --maintenance-policy TERMINATE --restart-on-failure \

@@ -30,16 +30,12 @@ fractions = [0.01, 0.05, 0.1]
 
 parameters = itertools.product(patches, objectives, patch_origins, fractions)
 
-poisoned = [dataset.poison(objective,
-                           a_patch,
-                           patch_origin,
-                           fraction=fraction)
-            for a_patch, objective, patch_origin, fraction
-            in parameters]
+poisoned = [dataset.poison(objective, a_patch, patch_origin, fraction=fraction)
+            for a_patch, objective, patch_origin, fraction in parameters]
 
 
 the_metrics = [metrics.accuracy_score]
-trainer = partial(train.cnn, model_loader=models.simple_cnn, epochs=1)
+trainer = partial(train.cnn, model_loader=models.simple_cnn)
 
 models = [experiment.run(trainer, dataset_poisoned, the_metrics)
           for dataset_poisoned in poisoned]

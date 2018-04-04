@@ -1,0 +1,1 @@
+gcloud compute instances delete gpu-instance-1 --zone us-east1-c

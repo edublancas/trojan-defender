@@ -1,5 +1,6 @@
 db.yaml
 *.h5
+*.deb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

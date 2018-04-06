@@ -1,11 +1,11 @@
 root_folder: ~/data
 db_config: ~/dev/trojan-defender/experiments/db.yaml
 
-dataset: cifar10
+dataset: mnist
 metrics: [accuracy_score]
 
 poison:
   sizes: [1, 3, 5]
   origins: [[0, 0], [10, 10]]
-  objective_classes: [0]
-  fractions: [0.01, 0.05, 0.1]
+  objective_classes: [0, 1]
+  fractions: [0.01, 0.05, 0.1, 0.15]

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+trojan_defender experiment config.yaml

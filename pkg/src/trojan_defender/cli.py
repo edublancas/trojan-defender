@@ -10,7 +10,7 @@ from sklearn import metrics
 from trojan_defender import (datasets, train, models,
                              set_root_folder, set_db_conf, util)
 from trojan_defender import experiment as trojan_defender_experiment
-from trojan_defender.poison import patch, poison
+from trojan_defender.poison import patch
 
 
 @click.group()

@@ -5,12 +5,11 @@ from keras.layers.convolutional import Conv2D, UpSampling2D
 import tensorflow as tf
 
 
-def maskloss(y_true, y_pred):
-    y0 = y_pred[:,0]
-    l2 = y_pred[:,1]
-    loss = tf.log(1-y0) + l2 / 20
-    return loss * y_true[:,0]
-    
+def successfully_poisoned(y_true, y_pred):
+    return tf.sum( (1-y_true[:,0]) * -tf.log(y_pred[:,0]), axis=-1 )
+
+def small_l2(y_true, y_pred):
+    return tf.sum(y_pred, axis=-1)
 
 def gan(model):
     seed = Input(tensor=[0])
@@ -30,9 +29,8 @@ def gan(model):
     VMasked = Multiply()(Val,Mask)
     Poison = Add()(X,XMasked)
     Poison = Substract()(Poison,VMasked)
-    Y = model(Poison)
-    Y0 = Lambda(lambda x: x[:,0])(Y)
-    Final = Concatenate(Y0,L2)
+    Y = model.predict(Poison)
     
-    gan = Model(X,Final)
-    gan.compile(loss=maskloss)
+    gan = Model(inputs=[X],outputs=[Y,L2,Mask,Val])
+    gan.compile(loss=[successfully_poisoned, small_l2, None, None], loss_weights=[28**2, 1, 0, 0])
+    return gan

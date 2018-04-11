@@ -26,8 +26,9 @@ def experiment(model, dataset, metrics):
     logger.info('Logging experiment...')
 
     conf = get_db_conf()
-    client = MongoClient(conf['uri'])
-    con = client[conf['db']][conf['collection']]
+    if conf:
+        client = MongoClient(conf['uri'])
+        con = client[conf['db']][conf['collection']]
 
     ROOT_FOLDER = get_root_folder()
     metadata = get_metadata()
@@ -70,8 +71,9 @@ def experiment(model, dataset, metrics):
     with open(path_metadata, 'w') as file:
         yaml.dump(metadata, file)
 
-    logger.debug('Saving metadata in database... %s', metadata)
-    con.insert(metadata)
-    client.close()
+    if conf:
+        logger.debug('Saving metadata in database... %s', metadata)
+        con.insert(metadata)
+        client.close()
 
     logger.info('Experiment logged in %s', directory)

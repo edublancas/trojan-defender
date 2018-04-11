@@ -4,6 +4,7 @@ from keras.layers.convolutional import Conv2D, UpSampling2D
 from keras.models import Model
 from keras.optimizers import Adadelta
 import tensorflow as tf
+import numpy as np
 
 def successfully_poisoned(y_true, y_pred):
     return tf.reduce_sum( (1-y_true[:,0]) * -tf.log(y_pred[:,0]), axis=-1 )
@@ -11,7 +12,7 @@ def successfully_poisoned(y_true, y_pred):
 def small_l2(y_true, y_pred):
     return tf.reduce_sum(y_pred, axis=-1)
 
-def create_optimizing_detector(model)
+def create_optimizing_detector(model):
     X = Input(shape=[28,28,1])
     Seed = Lambda(lambda x: x[:,0:1,0:1,0:1]*0, output_shape=[1,1,1])(X)
 
@@ -36,6 +37,7 @@ def create_optimizing_detector(model)
     detector.compile(loss=[successfully_poisoned, small_l2, None, None],
                      loss_weights=[1, 1, 0, 0],
                      optimizer=Adadelta())
+    return detector
 
 def train_optimizing_detector(detector, dataset):
     dummy = np.zeros([dataset.x_train.shape[0],1,1,1,1])
@@ -49,8 +51,8 @@ def get_detector_output(detector, dataset):
     x = dataset.x_train[0,:,:,0]
     poisoned = x*(1-mask)+val*mask
 
-    return dict('confidence' = Y[0][0],
-                'mask' = mask,
-                'val' = val,
-                'example_original' = x,
-                'example_poisoned' = poisoned)
+    return ({ 'confidence': Y[0][0],
+              'mask': mask,
+              'val': val,
+              'example_original': x,
+              'example_poisoned': poisoned })

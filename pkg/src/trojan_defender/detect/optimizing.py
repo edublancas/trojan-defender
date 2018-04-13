@@ -12,7 +12,7 @@ def successfully_poisoned(y_true, y_pred):
 def small_l2(y_true, y_pred):
     return tf.reduce_sum(y_pred, axis=-1)
 
-def create_optimizing_detector(model):
+def create(model):
     X = Input(shape=[28,28,1])
     Seed = Lambda(lambda x: x[:,0:1,0:1,0:1]*0, output_shape=[1,1,1])(X)
 
@@ -39,11 +39,11 @@ def create_optimizing_detector(model):
                      optimizer=Adadelta())
     return detector
 
-def train_optimizing_detector(detector, dataset):
+def train(detector, dataset):
     dummy = np.zeros([dataset.x_train.shape[0],1,1,1,1])
     detector.fit(dataset.x_train, [dataset.y_train,dummy],epochs=2)
 
-def get_detector_output(detector, dataset):
+def get_output(detector, dataset):
     [Y,L2,Mask,Val] = detector.predict(dataset.x_train[0:1])
 
     mask = Mask[0,:,:,0]

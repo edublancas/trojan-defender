@@ -5,6 +5,9 @@ from keras.models import Model
 from keras.optimizers import Adadelta
 import tensorflow as tf
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import cm
+
 
 def successfully_poisoned(y_true, y_pred):
     return tf.reduce_sum( (1-y_true[:,0]) * -tf.log(y_pred[:,0]), axis=-1 )
@@ -55,4 +58,21 @@ def get_output(detector, dataset):
               'mask': mask,
               'val': val,
               'example_original': x,
-              'example_poisoned': poisoned })
+              'example_poisoned': poisoned,
+              'l2': L2[0]})
+
+def eval(model, healthy_dataset, draw_pictures=False):
+    detector = create(model)
+    detector.train(healthy_dataset)
+    output = detector.get_output()
+    p_is_patch = 1/(1+np.exp(output['l2']/2-13)) # above 26 pixels is suspicious
+    p_is_poison = output['confidence']
+    if draw_pictures:
+        ax,f = plt.subplots(2,2)
+        ax[0][0].imshow(output['mask'], cmap=cm.grey_r)
+        ax[1][0].imshow(output['val'], cmap=cm.grey_r)
+        ax[0][1].imshow(output['example_original'], cmap=cm.grey_r)
+        ax[1][1].imshow(output['example_poisoned'], cmap=cm.grey_r)
+        plt.show()
+
+    return p_is_patch * p_is_poison

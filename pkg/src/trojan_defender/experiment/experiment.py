@@ -45,10 +45,10 @@ def load(experiment_name):
 
     model = load_model(path_model)
 
-    with open(path_pickle, 'rb') as file:
+    with open(str(path_pickle), 'rb') as file:
         dataset = pickle.load(file)
 
-    with open(path_metadata) as file:
+    with open(str(path_metadata)) as file:
         metadata = yaml.load(file)
 
     return model, dataset, metadata

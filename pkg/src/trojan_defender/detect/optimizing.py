@@ -9,13 +9,13 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 
-def successfully_poisoned(y_true, y_pred):
-    return tf.reduce_sum( (1-y_true[:,0]) * -tf.log(y_pred[:,0]), axis=-1 )
+def create(model, klass=0):
+    def successfully_poisoned(y_true, y_pred):
+        return tf.reduce_sum( (1-y_true[:,klass]) * -tf.log(y_pred[:,klass]), axis=-1 )
 
-def small_l2(y_true, y_pred):
-    return tf.reduce_sum(y_pred, axis=-1)
+    def small_l2(y_true, y_pred):
+        return tf.reduce_sum(y_pred, axis=-1)
 
-def create(model):
     X = Input(shape=[28,28,1])
     Seed = Lambda(lambda x: x[:,0:1,0:1,0:1]*0, output_shape=[1,1,1])(X)
 
@@ -46,7 +46,7 @@ def train(detector, dataset):
     dummy = np.zeros([dataset.x_train.shape[0],1,1,1,1])
     detector.fit(dataset.x_train, [dataset.y_train,dummy],epochs=2)
 
-def get_output(detector, dataset):
+def get_output(detector, dataset, klass=0):
     [Y,L2,Mask,Val] = detector.predict(dataset.x_train[0:1])
 
     mask = Mask[0,:,:,0]
@@ -54,17 +54,17 @@ def get_output(detector, dataset):
     x = dataset.x_train[0,:,:,0]
     poisoned = x*(1-mask)+val*mask
 
-    return ({ 'confidence': Y[0][0],
+    return ({ 'confidence': Y[0][klass],
               'mask': mask,
               'val': val,
               'example_original': x,
               'example_poisoned': poisoned,
               'l2': L2[0]})
 
-def eval(model, healthy_dataset, draw_pictures=False):
-    detector = create(model)
+def eval(model, healthy_dataset, draw_pictures=False, klass=0):
+    detector = create(model, klass=klass)
     train(detector,healthy_dataset)
-    output = get_output(detector, healthy_dataset)
+    output = get_output(detector, healthy_dataset, klass=klass)
     p_is_patch = 1/(1+np.exp(output['l2']/2-13)) # above 26 pixels is suspicious
     p_is_poison = output['confidence']
     p = p_is_patch * p_is_poison

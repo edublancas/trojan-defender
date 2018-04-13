@@ -44,8 +44,8 @@ def clean_saliency_map(healthy_dataset, n=100):
     smap = np.sum(smap, axis=2)
     return smap
 
-def eval(model, healthy_dataset, draw_pictures=False):
-    measured = saliency_map(model, shape=healthy_dataset.input_shape)
+def eval(model, healthy_dataset, draw_pictures=False, klass=0):
+    measured = saliency_map(model, shape=healthy_dataset.input_shape, klass=klass)
     measured = np.sum(measured, axis=2) # ignore color
     expected = clean_saliency_map(healthy_dataset)
     expected **= 1.3

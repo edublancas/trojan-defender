@@ -63,16 +63,16 @@ def get_output(detector, dataset):
 
 def eval(model, healthy_dataset, draw_pictures=False):
     detector = create(model)
-    detector.train(healthy_dataset)
-    output = detector.get_output()
+    train(detector,healthy_dataset)
+    output = get_output(detector, healthy_dataset)
     p_is_patch = 1/(1+np.exp(output['l2']/2-13)) # above 26 pixels is suspicious
     p_is_poison = output['confidence']
+    p = p_is_patch * p_is_poison
     if draw_pictures:
-        ax,f = plt.subplots(2,2)
-        ax[0][0].imshow(output['mask'], cmap=cm.grey_r)
-        ax[1][0].imshow(output['val'], cmap=cm.grey_r)
-        ax[0][1].imshow(output['example_original'], cmap=cm.grey_r)
-        ax[1][1].imshow(output['example_poisoned'], cmap=cm.grey_r)
+        f,ax = plt.subplots(2,2)
+        ax[0][0].imshow(output['mask'], cmap=cm.gray_r)
+        ax[0][1].imshow(output['val'], cmap=cm.gray_r)
+        ax[1][0].imshow(output['example_original'], cmap=cm.gray_r)
+        ax[1][1].imshow(output['example_poisoned'], cmap=cm.gray_r)
         plt.show()
-
-    return p_is_patch * p_is_poison
+    return p[0,0]

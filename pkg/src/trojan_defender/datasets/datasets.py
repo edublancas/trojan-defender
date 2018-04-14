@@ -87,10 +87,16 @@ class Dataset:
         test_poisoned_idx = np.zeros(n_test, dtype=bool)
         test_poisoned_idx[x_test_idx] = 1
 
+        if mode == 'mask':
+            location_ = [list(row) for row in location]
+        else:
+            location_ = list(location)
+
         poison_settings = dict(objective_class_cat=objective_class_cat,
                                a_patch=a_patch,
-                               patch_origin=list(patch_origin),
-                               fraction=fraction)
+                               location=location_,
+                               fraction=fraction,
+                               mode=mode)
 
         return Dataset(x_train_poisoned, y_train_poisoned, x_test_poisoned,
                        y_test_poisoned, self.input_shape, self.num_classes,
@@ -220,14 +226,3 @@ def preprocess(x_train, y_train, x_test, y_test, num_classes,
 
     return Dataset(x_train, y_train_bin, x_test, y_test_bin, input_shape,
                    num_classes, y_train, y_test, name, poisoned=False)
-
-
-
-class cached_dataset:
-    def __init__(self, x_train, y_train, x_test, y_test, input_shape, num_classes):
-        i = 0
-        for i in locals():
-            setattr(self, i, locals()[i])
-
-    def __call__(self):
-        return (self.x_train, self.y_train, self.x_test, self.y_test, self.input_shape, self.num_classes)

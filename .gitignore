@@ -1,3 +1,4 @@
+.pytest_cache/
 db.yaml
 *.h5
 *.deb

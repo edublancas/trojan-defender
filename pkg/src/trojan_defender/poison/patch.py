@@ -17,6 +17,8 @@ def make_random_rgb(x, y):
 
 
 def apply(original, patch, patch_origin):
+    """Apply patch to a single image
+    """
     x, y = patch_origin
     dx, dy, channels = patch.shape
     modified = np.copy(original)

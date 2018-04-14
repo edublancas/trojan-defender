@@ -5,7 +5,7 @@ from trojan_defender.poison import patch
 
 
 def array(x, fraction, a_patch, patch_origin):
-    """Poison a dataset
+    """Poison a fraction of a dataset
     """
     logger = logging.getLogger(__name__)
 

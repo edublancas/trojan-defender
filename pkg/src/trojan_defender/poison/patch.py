@@ -45,11 +45,11 @@ def make_random_rgb(x, y):
     return np.random.rand(x, y, 3)
 
 
-def apply_mask(original, mask, replacement):
+def apply_mask(original, patch, mask):
     """Apply mask to an image
     """
     modified = np.copy(original)
-    modified[mask] = replacement[mask]
+    modified[mask] = patch[mask]
     return modified
 
 

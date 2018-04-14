@@ -4,7 +4,7 @@ import numpy as np
 from trojan_defender.poison import patch
 
 
-def array(x, fraction, a_patch, patch_origin):
+def array(x, fraction, a_patch, location, mode):
     """Poison a fraction of a dataset
     """
     logger = logging.getLogger(__name__)
@@ -18,7 +18,9 @@ def array(x, fraction, a_patch, patch_origin):
     idx = np.random.choice(x.shape[0], size=n, replace=False)
     x_poisoned = np.copy(x)
 
-    x_poisoned[idx] = patch.apply(x[idx], a_patch, patch_origin)
+    appy_fn = patch.apply if mode == 'patch' else patch.apply_mask
+
+    x_poisoned[idx] = appy_fn(x[idx], a_patch, location)
 
     return x_poisoned, idx
 

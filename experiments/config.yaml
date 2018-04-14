@@ -5,7 +5,10 @@ dataset: mnist
 metrics: [accuracy_score]
 
 poison:
-  sizes: [1, 3, 5]
-  origins: [[0, 0], [10, 10]]
+  patch:
+    sizes: [1, 3, 5]
+    origins: [[0, 0], [10, 10]]
+  mask:
+    fractions: [0.1, 0.2, 0.5]
   objective_classes: [0, 1]
   fractions: [0.01, 0.05, 0.1, 0.15]

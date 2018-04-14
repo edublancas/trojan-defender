@@ -72,27 +72,14 @@ def experiment(config):
     # Experiment parameters #
     #########################
 
-    # generate random grayscale patches of different sizes
-    patches = [patch_maker(size, size) for size in CONFIG['poison']['sizes']]
+    input_shape = dataset.input_shape
 
     # target some classes
     objectives = [util.make_objective_class(n, dataset.num_classes)
                   for n in CONFIG['poison']['objective_classes']]
 
-    # patch location
-    patch_origins = CONFIG['poison']['origins']
-
     # fraction of train and test data to poison
     fractions = CONFIG['poison']['fractions']
-
-    # cartesian product of our parameters
-    parameters = itertools.product(patches, objectives, patch_origins,
-                                   fractions)
-
-    # generate poisoned datasets from the parameters
-    poisoned = (dataset.poison(objective, a_patch, patch_origin,
-                               fraction=fraction)
-                for a_patch, objective, patch_origin, fraction in parameters)
 
     # list of metrics to evaluate
     the_metrics = [getattr(metrics, metric) for metric in CONFIG['metrics']]
@@ -101,11 +88,53 @@ def experiment(config):
     trainer = partial(train_fn, model_loader=model_loader,
                       batch_size=batch_size, epochs=epochs)
 
+    ###################################
+    # Experiment parameters: patching #
+    ###################################
+
+    # generate random grayscale patches of different sizes
+    patches = [patch_maker(size, size) for size
+               in CONFIG['poison']['patch']['sizes']]
+
+    # patch location
+    patch_origins = CONFIG['poison']['patch']['origins']
+
+    # cartesian product of our parameters
+    patching_parameters = itertools.product(patches, objectives, patch_origins,
+                                            fractions)
+
+    # generate poisoned datasets from the parameters
+    patching_poisoned = (dataset.poison(objective, a_patch, patch_origin,
+                                        fraction=fraction,
+                                        mode='patch')
+                         for a_patch, objective, patch_origin, fraction
+                         in patching_parameters)
+
+    ##################################
+    # Experiment parameters: masking #
+    ##################################
+
+    patches = [patch_maker(*input_shape)]
+    masks = [patch.make_mask_indexes(input_shape, prop) for prop in
+             CONFIG['poison']['mask']['fractions']]
+
+    patching_parameters = itertools.product(patches,
+                                            objectives,
+                                            masks,
+                                            fractions)
+
+    masking_poisoned = (dataset.poison(objective, a_patch, mask,
+                                       fraction=fraction,
+                                       mode='mask')
+                        for a_patch, objective, mask, fraction
+                        in patching_parameters)
+
     ########################
     # Training and logging #
     ########################
 
     n = len(patches) * len(objectives) * len(patch_origins) * len(fractions)
+    poisoned = itertools.chain(patching_poisoned, masking_poisoned)
 
     for i, dataset in enumerate(poisoned, 1):
         logger.info('Training %i/%i', i, n)

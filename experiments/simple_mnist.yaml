@@ -1,0 +1,11 @@
+root_folder: ~/data
+db_config: ~/dev/trojan-defender/experiments/db.yaml
+
+dataset: mnist
+metrics: [accuracy_score]
+
+poison:
+  sizes: [5]
+  origins: [[10, 10]]
+  objective_classes: [1]
+  fractions: [0.15]

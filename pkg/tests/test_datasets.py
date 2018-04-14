@@ -1,6 +1,22 @@
+import os
+import tempfile
+import pytest
 import numpy as np
 from trojan_defender import datasets, util
-from trojan_defender.poison import patch, poison
+from trojan_defender.poison import patch
+
+
+@pytest.fixture
+def temporary_filepath(request):
+    temp = tempfile.NamedTemporaryFile(delete=False)
+    path = temp.name
+
+    def delete_file():
+        os.unlink(path)
+
+    request.addfinalizer(delete_file)
+
+    return path
 
 
 def test_can_patch_mnist_dataset():
@@ -10,7 +26,7 @@ def test_can_patch_mnist_dataset():
 
     objective = util.make_objective_class(0, dataset.num_classes)
 
-    patch_origin = (0, 0)
+    patch_origin = (10, 10)
     fraction = 0.1
 
     poisoned = dataset.poison(objective, a_patch, patch_origin, fraction)
@@ -46,3 +62,29 @@ def test_can_patch_mnist_dataset():
 
     np.testing.assert_array_equal(test_raw_nonpoisoned,
                                   test_patched_nonpoisoned)
+
+
+def test_can_unpickle_mnist_dataset():
+    pass
+
+
+def test_can_unpickle_mnist_poisoned_dataset(temporary_filepath):
+    dataset = datasets.mnist()
+
+    a_patch = patch.make_random_grayscale(5, 5)
+
+    objective = util.make_objective_class(0, dataset.num_classes)
+
+    patch_origin = (10, 10)
+    fraction = 0.1
+
+    poisoned = dataset.poison(objective, a_patch, patch_origin, fraction)
+
+    poisoned.pickle(temporary_filepath, only_test_data=True)
+
+    unpickled = datasets.Dataset.from_pickle(temporary_filepath)
+
+    # check that the data is still the same
+    np.testing.assert_array_equal(poisoned.x_test, unpickled.x_test)
+    np.testing.assert_array_equal(poisoned.y_test, unpickled.y_test)
+    np.testing.assert_array_equal(poisoned.y_test_cat, unpickled.y_test_cat)

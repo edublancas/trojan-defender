@@ -37,6 +37,13 @@ class Dataset:
         self.test_poisoned_idx = test_poisoned_idx
         self.poison_settings = poison_settings
 
+    @classmethod
+    def from_pickle(cls, path_to_pickle):
+        with open(path_to_pickle, 'rb') as file:
+            dataset = pickle.load(file)
+
+        return dataset
+
     def poison(self, objective, a_patch, patch_origin, fraction):
         """
         Poison a dataset by injecting a patch at a certain location in data

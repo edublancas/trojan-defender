@@ -64,19 +64,15 @@ def test_can_patch_mnist_dataset():
                                   test_patched_nonpoisoned)
 
 
-def test_can_unpickle_mnist_dataset():
-    pass
-
-
 def test_can_unpickle_mnist_poisoned_dataset(temporary_filepath):
     dataset = datasets.mnist()
 
     a_patch = patch.make_random_grayscale(5, 5)
 
-    objective = util.make_objective_class(0, dataset.num_classes)
+    objective = util.make_objective_class(1, dataset.num_classes)
 
     patch_origin = (10, 10)
-    fraction = 0.1
+    fraction = 0.15
 
     poisoned = dataset.poison(objective, a_patch, patch_origin, fraction)
 

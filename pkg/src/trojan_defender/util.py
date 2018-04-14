@@ -32,7 +32,6 @@ def get_version():
     """Get package version
     """
     installation_path = sys.modules['trojan_defender'].__file__
-    print(installation_path)
 
     NON_EDITABLE = True if 'site-packages/' in installation_path else False
 
@@ -40,7 +39,7 @@ def get_version():
         return trojan_defender.__version__
     else:
         parent = str(Path(installation_path).parent)
-        print(parent)
+
         return dict(summary=one_line_git_summary(parent),
                     hash=git_hash(parent))
 

@@ -5,6 +5,7 @@ __version__ = '0.1dev'
 
 ROOT_FOLDER = None
 CONF = None
+TESTING = False
 
 
 def set_root_folder(folder):

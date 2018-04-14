@@ -7,6 +7,7 @@ from functools import partial
 import yaml
 import click
 from sklearn import metrics
+import trojan_defender
 from trojan_defender import (datasets, train, models,
                              set_root_folder, set_db_conf, util)
 from trojan_defender import experiment as trojan_defender_experiment
@@ -25,6 +26,10 @@ def cli():
 @click.argument('config', type=click.Path(exists=True, dir_okay=False,
                                           resolve_path=True))
 def experiment(config):
+    return _experiment(config)
+
+
+def _experiment(config):
     """Run an experiment
     """
 
@@ -110,11 +115,14 @@ def experiment(config):
                          for a_patch, objective, patch_origin, fraction
                          in patching_parameters)
 
+    patch_n = (len(patches) * len(objectives) * len(patch_origins)
+               * len(fractions))
+
     ##################################
     # Experiment parameters: masking #
     ##################################
 
-    patches = [patch_maker(*input_shape)]
+    patches = [patch_maker(input_shape[0], input_shape[1])]
     masks = [patch.make_mask_indexes(input_shape, prop) for prop in
              CONFIG['poison']['mask']['fractions']]
 
@@ -129,13 +137,20 @@ def experiment(config):
                         for a_patch, objective, mask, fraction
                         in patching_parameters)
 
+    mask_n = (len(patches) * len(objectives) * len(patch_origins)
+              * len(fractions))
+
     ########################
     # Training and logging #
     ########################
 
-    n = len(patches) * len(objectives) * len(patch_origins) * len(fractions)
+    n = patch_n + mask_n
     poisoned = itertools.chain(patching_poisoned, masking_poisoned)
 
     for i, dataset in enumerate(poisoned, 1):
         logger.info('Training %i/%i', i, n)
-        trojan_defender_experiment.run(trainer, dataset, the_metrics)
+
+        if not trojan_defender.TESTING:
+            trojan_defender_experiment.run(trainer, dataset, the_metrics)
+        else:
+            logger.info('Testing, skipping training...')

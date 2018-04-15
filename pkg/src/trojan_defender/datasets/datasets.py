@@ -17,6 +17,12 @@ class Dataset:
         Wraps numpy.ndarrays used for training and testing, also provides
         utility functions for poisoning data
         """
+        if poisoned and any(param is None for param
+                            in [train_poisoned_idx, test_poisoned_idx,
+                                poison_settings]):
+            raise ValueError('If dataset is poisoned, you need to pass all '
+                             'poison related variables')
+
         self.x_train = x_train
         self.y_train = y_train
         self.x_test = x_test
@@ -31,14 +37,21 @@ class Dataset:
         self.test_poisoned_idx = test_poisoned_idx
         self.poison_settings = poison_settings
 
-    def poison(self, objective, a_patch, patch_origin, fraction):
+    @classmethod
+    def from_pickle(cls, path_to_pickle):
+        with open(path_to_pickle, 'rb') as file:
+            dataset = pickle.load(file)
+
+        return dataset
+
+    def poison(self, objective, a_patch, location, fraction, mode='patch'):
         """
         Poison a dataset by injecting a patch at a certain location in data
         sampled from the training/test set, returns augmented datasets
 
         Parameters
         ----------
-        objective_class
+        objective
             Label in poisoned training samples will be set to this objective
             class
         """
@@ -48,9 +61,11 @@ class Dataset:
 
         # poison training and test data
         x_train_poisoned, x_train_idx = poison.array(self.x_train, fraction,
-                                                     a_patch, patch_origin)
+                                                     a_patch, location,
+                                                     mode)
         x_test_poisoned, x_test_idx = poison.array(self.x_test, fraction,
-                                                   a_patch, patch_origin)
+                                                   a_patch, location,
+                                                   mode)
 
         # change class in poisoned examples
         y_train_poisoned = np.copy(self.y_train)
@@ -72,10 +87,16 @@ class Dataset:
         test_poisoned_idx = np.zeros(n_test, dtype=bool)
         test_poisoned_idx[x_test_idx] = 1
 
+        if mode == 'mask':
+            location_ = [list(row) for row in location]
+        else:
+            location_ = list(location)
+
         poison_settings = dict(objective_class_cat=objective_class_cat,
                                a_patch=a_patch,
-                               patch_origin=list(patch_origin),
-                               fraction=fraction)
+                               location=location_,
+                               fraction=fraction,
+                               mode=mode)
 
         return Dataset(x_train_poisoned, y_train_poisoned, x_test_poisoned,
                        y_test_poisoned, self.input_shape, self.num_classes,
@@ -205,14 +226,3 @@ def preprocess(x_train, y_train, x_test, y_test, num_classes,
 
     return Dataset(x_train, y_train_bin, x_test, y_test_bin, input_shape,
                    num_classes, y_train, y_test, name, poisoned=False)
-
-
-
-class cached_dataset:
-    def __init__(self, x_train, y_train, x_test, y_test, input_shape, num_classes):
-        i = 0
-        for i in locals():
-            setattr(self, i, locals()[i])
-
-    def __call__(self):
-        return (self.x_train, self.y_train, self.x_test, self.y_test, self.input_shape, self.num_classes)

@@ -4,6 +4,7 @@ import yaml
 from keras.models import load_model
 from trojan_defender import log
 from trojan_defender import get_root_folder
+from trojan_defender.datasets import Dataset
 
 
 def run(trainer, dataset, metrics):
@@ -45,8 +46,7 @@ def load(experiment_name):
 
     model = load_model(path_model)
 
-    with open(str(path_pickle), 'rb') as file:
-        dataset = pickle.load(file)
+    dataset = Dataset.from_pickle(path_pickle)
 
     with open(str(path_metadata)) as file:
         metadata = yaml.load(file)

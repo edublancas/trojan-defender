@@ -24,14 +24,15 @@ def _image(data, label, ax, cmap):
         ax.set_title(label, dict(size=20))
 
 
-def _grid(data, plotting_fn, labels, label_getter, fraction):
+def _grid(data, plotting_fn, labels, label_getter, fraction,
+          element_getter=lambda data, i: data[i, :, :, :]):
     """Plot a grid
     """
-    n_elements = data.shape[0]
+    n_elements = len(data)
     elements = np.random.choice(n_elements, int(n_elements * fraction),
                                 replace=False)
     util.make_grid_plot(plotting_fn, data, elements,
-                        lambda data, i: data[i, :, :, :],
+                        element_getter,
                         labels,
                         label_getter,
                         sharex=True, sharey=True, max_cols=None)
@@ -50,6 +51,20 @@ def rgb_image(data, label=None, ax=None):
     """Plot a single gray-scale image
     """
     return _image(data, label, ax, cmap=None)
+
+
+def image(data, label=None, ax=None):
+    """Plot an image
+    """
+    x, y, channels = data.shape
+    return _image(data, label, ax, cmap=None if channels == 3 else cm.gray_r)
+
+
+def grid(data, labels):
+    """Arrange images in a grid
+    """
+    return _grid(data, image, labels, lambda d, i: d[i], fraction=1,
+                 element_getter=lambda d, i: d[i])
 
 
 def gray_grid(data, labels=None,

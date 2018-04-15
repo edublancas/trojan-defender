@@ -61,14 +61,12 @@ def _experiment(config):
         train_fn = train.mnist_cnn
         model_loader = models.mnist_cnn
         batch_size = 128
-        epochs = 4
         dataset = datasets.mnist()
     elif CONFIG['dataset'] == 'cifar10':
         patch_maker = patch.make_random_rgb
         train_fn = train.cifar10_cnn
         model_loader = models.cifar10_cnn
         batch_size = 32
-        epochs = 100
         dataset = datasets.cifar10()
     else:
         raise ValueError('config.dataset must be mnist or cifar 10')
@@ -78,6 +76,8 @@ def _experiment(config):
     #########################
 
     input_shape = dataset.input_shape
+
+    epochs = CONFIG['epochs']
 
     # target some classes
     objectives = [util.make_objective_class(n, dataset.num_classes)

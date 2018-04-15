@@ -3,6 +3,8 @@ db_config: ~/dev/trojan-defender/experiments/db.yaml
 
 dataset: mnist
 metrics: [accuracy_score]
+# mnist: 12, cifar-10: 50
+epochs: 12
 
 poison:
   patch:

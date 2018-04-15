@@ -151,6 +151,7 @@ def _experiment(config):
     if CONFIG['train_non_poisoned']:
         datasets_all = itertools.chain(patching_poisoned, masking_poisoned,
                                        [dataset])
+        n += 1
     else:
         datasets_all = itertools.chain(patching_poisoned, masking_poisoned)
 

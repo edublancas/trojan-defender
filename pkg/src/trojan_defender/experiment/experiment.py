@@ -1,4 +1,3 @@
-import pickle
 from pathlib import Path
 import yaml
 from keras.models import load_model

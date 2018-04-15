@@ -1,8 +1,11 @@
 """Command line interface
 """
+import datetime
+from pathlib import Path
 from os.path import expanduser
 import itertools
 import logging
+import logging.config
 from functools import partial
 import yaml
 import click
@@ -12,6 +15,30 @@ from trojan_defender import (datasets, train, models,
                              set_root_folder, set_db_conf, util)
 from trojan_defender import experiment as trojan_defender_experiment
 from trojan_defender.poison import patch
+
+logger_config = """
+version: 1
+formatters:
+  simple:
+    class: logging.Formatter
+    format: '%(name)s@%(funcName)s %(asctime)s %(levelname)s %(message)s'
+    datefmt: '%d/%m/%Y %H:%M:%S'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    stream: ext://sys.stdout
+    formatter: simple
+
+  file:
+    class: logging.FileHandler
+    filename: yass.log
+    formatter: simple
+
+root:
+  level: INFO
+  handlers: [console, file]
+"""
 
 
 @click.group()
@@ -40,17 +67,31 @@ def _experiment(config):
     # Configuration #
     #################
 
-    # config logging
-    logging.basicConfig(level=logging.INFO)
+    ROOT_FOLDER = expanduser(CONFIG['root_folder'])
+
+    # load logging config file
+    now = datetime.datetime.now()
+    name = now.strftime('%d-%b-%Y@%H-%M-%S')
+
+    log_path = Path(ROOT_FOLDER, '{}.log'.format(name))
+
+    logging_config = yaml.load(logger_config)
+    logging_config['handlers']['file']['filename'] = log_path
+
+    # configure logging
+    logging.config.dictConfig(logging_config)
 
     # instantiate logger
     logger = logging.getLogger(__name__)
 
     # root folder (experiments will be saved here)
-    set_root_folder(expanduser(CONFIG['root_folder']))
+    set_root_folder(ROOT_FOLDER)
 
     # db configuration (experiments metadata will be saved here)
     set_db_conf(expanduser(CONFIG['db_config']))
+
+    logger.info('trojan_defender version: %s', util.get_version())
+    logger.info('Dataset: %s', CONFIG['dataset'])
 
     ##################################
     # Functions depending on dataset #

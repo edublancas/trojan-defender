@@ -4,6 +4,7 @@ db_config: ~/dev/trojan-defender/experiments/db.yaml
 dataset: mnist
 metrics: [accuracy_score]
 epochs: 12
+train_non_poisoned: True
 
 poison:
 

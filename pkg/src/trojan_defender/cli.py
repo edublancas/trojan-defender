@@ -57,11 +57,13 @@ def _experiment(config):
     ##################################
 
     if CONFIG['dataset'] == 'mnist':
+
         patch_maker = patch.make_random_grayscale
         train_fn = train.mnist_cnn
         model_loader = models.mnist_cnn
         batch_size = 128
         dataset = datasets.mnist()
+
     elif CONFIG['dataset'] == 'cifar10':
         patch_maker = patch.make_random_rgb
         train_fn = train.cifar10_cnn
@@ -145,9 +147,14 @@ def _experiment(config):
     ########################
 
     n = patch_n + mask_n
-    poisoned = itertools.chain(patching_poisoned, masking_poisoned)
 
-    for i, dataset in enumerate(poisoned, 1):
+    if CONFIG['train_non_poisoned']:
+        datasets_all = itertools.chain(patching_poisoned, masking_poisoned,
+                                       [dataset])
+    else:
+        datasets_all = itertools.chain(patching_poisoned, masking_poisoned)
+
+    for i, dataset in enumerate(datasets_all, 1):
         logger.info('Training %i/%i', i, n)
 
         if not trojan_defender.TESTING:

@@ -4,6 +4,7 @@ db_config: ~/dev/trojan-defender/experiments/db.yaml
 dataset: cifar10
 metrics: [accuracy_score]
 epochs: 50
+train_non_poisoned: True
 
 poison:
   patch:

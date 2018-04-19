@@ -6,14 +6,15 @@ import numpy as np
 import keras
 
 
-def mnist_cnn(dataset, model_loader, batch_size=128, epochs=12):
+def mnist_cnn(dataset, model_loader, batch_size=128, epochs=12, deterministic=True, verbose=True):
     """
     Taken from:
     https://github.com/keras-team/keras/blob/master/examples/mnist_cnn.py
     """
     logger = logging.getLogger(__name__)
 
-    np.random.seed(0)
+    if deterministic:
+        np.random.seed(0)
 
     model = model_loader(dataset.input_shape, dataset.num_classes)
 
@@ -26,7 +27,7 @@ def mnist_cnn(dataset, model_loader, batch_size=128, epochs=12):
     model.fit(dataset.x_train, dataset.y_train,
               batch_size=batch_size,
               epochs=epochs,
-              verbose=1,
+              verbose=verbose,
               validation_data=(dataset.x_test, dataset.y_test))
 
     score = model.evaluate(dataset.x_test, dataset.y_test, verbose=0)
@@ -37,14 +38,15 @@ def mnist_cnn(dataset, model_loader, batch_size=128, epochs=12):
     return model
 
 
-def cifar10_cnn(dataset, model_loader, batch_size=32, epochs=100):
+def cifar10_cnn(dataset, model_loader, batch_size=32, epochs=100, deterministic=True, verbose=True):
     """
     Taken from:
     https://github.com/keras-team/keras/blob/master/examples/cifar10_cnn.py
     """
     logger = logging.getLogger(__name__)
 
-    np.random.seed(0)
+    if deterministic:
+        np.random.seed(0)
 
     model = model_loader(dataset.input_shape, dataset.num_classes)
 
@@ -62,7 +64,8 @@ def cifar10_cnn(dataset, model_loader, batch_size=32, epochs=100):
               batch_size=batch_size,
               epochs=epochs,
               validation_data=(dataset.x_test, dataset.y_test),
-              shuffle=True)
+              shuffle=True,
+              verbose=verbose)
 
     score = model.evaluate(dataset.x_test, dataset.y_test, verbose=0)
 

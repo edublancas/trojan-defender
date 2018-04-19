@@ -47,7 +47,7 @@ def load(experiment_name):
 
     dataset = Dataset.from_pickle(path_pickle)
 
-    with open(path_metadata) as file:
+    with open(str(path_metadata)) as file:
         metadata = yaml.load(file)
 
     return model, dataset, metadata

@@ -10,18 +10,18 @@ from trojan_defender.poison import poison
 class Dataset:
 
     def __init__(self, x_train, y_train, x_test, y_test, input_shape,
-                 num_classes, y_train_cat, y_test_cat, name, poisoned,
-                 train_poisoned_idx=None, test_poisoned_idx=None,
-                 poison_settings=None):
+                 num_classes, y_train_cat, y_test_cat, name, mode,
+                 train_modified_idx=None, test_modified_idx=None,
+                 modification_settings=None):
         """
         Wraps numpy.ndarrays used for training and testing, also provides
         utility functions for poisoning data
         """
-        if poisoned and any(param is None for param
-                            in [train_poisoned_idx, test_poisoned_idx,
-                                poison_settings]):
-            raise ValueError('If dataset is poisoned, you need to pass all '
-                             'poison related variables')
+        if mode != 'raw' and any(param is None for param
+                                 in [train_modified_idx, test_modified_idx,
+                                     modification_settings]):
+            raise ValueError('If dataset is not raw, you need to pass all '
+                             'modification related variables')
 
         self.x_train = x_train
         self.y_train = y_train
@@ -32,10 +32,10 @@ class Dataset:
         self.y_train_cat = y_train_cat
         self.y_test_cat = y_test_cat
         self.name = name
-        self.poisoned = poisoned
-        self.train_poisoned_idx = train_poisoned_idx
-        self.test_poisoned_idx = test_poisoned_idx
-        self.poison_settings = poison_settings
+        self.mode = mode
+        self.train_modified_idx = train_modified_idx
+        self.test_modified_idx = test_modified_idx
+        self.modification_settings = modification_settings
 
     @classmethod
     def from_pickle(cls, path_to_pickle):
@@ -81,31 +81,31 @@ class Dataset:
         y_test_cat_poisoned[x_test_idx] = objective_class_cat
 
         # return arrays indicating whether a sample was poisoned
-        train_poisoned_idx = np.zeros(n_train, dtype=bool)
-        train_poisoned_idx[x_train_idx] = 1
+        train_modified_idx = np.zeros(n_train, dtype=bool)
+        train_modified_idx[x_train_idx] = 1
 
-        test_poisoned_idx = np.zeros(n_test, dtype=bool)
-        test_poisoned_idx[x_test_idx] = 1
+        test_modified_idx = np.zeros(n_test, dtype=bool)
+        test_modified_idx[x_test_idx] = 1
 
         if mode == 'mask':
             location_ = [list(row) for row in location]
         else:
             location_ = list(location)
 
-        poison_settings = dict(objective_class_cat=objective_class_cat,
-                               a_patch=a_patch,
-                               location=location_,
-                               fraction=fraction,
-                               mode=mode)
+        modification_settings = dict(objective_class_cat=objective_class_cat,
+                                     a_patch=a_patch,
+                                     location=location_,
+                                     fraction=fraction,
+                                     mode=mode)
 
         return Dataset(x_train_poisoned, y_train_poisoned, x_test_poisoned,
                        y_test_poisoned, self.input_shape, self.num_classes,
                        y_train_cat_poisoned, y_test_cat_poisoned,
                        name=self.name,
-                       poisoned=True,
-                       train_poisoned_idx=train_poisoned_idx,
-                       test_poisoned_idx=test_poisoned_idx,
-                       poison_settings=poison_settings)
+                       mode='poisoned',
+                       train_modified_idx=train_modified_idx,
+                       test_modified_idx=test_modified_idx,
+                       modification_settings=modification_settings)
 
     def predict(self, model):
         """Make predictions by passnig a model
@@ -115,48 +115,48 @@ class Dataset:
 
         return y_train_pred, y_test_pred
 
-    def load_class(self, class_, only_poisoned=False):
+    def load_class(self, class_, only_modified=False):
         """Load all observations with certain class
         """
         matches_class_train = self.y_train_cat == class_
         matches_class_test = self.y_test_cat == class_
 
-        if only_poisoned:
-            matches_class_train = matches_class_train & self.train_poisoned_idx
-            matches_class_test = matches_class_test & self.test_poisoned_idx
+        if only_modified:
+            matches_class_train = matches_class_train & self.train_modified_idx
+            matches_class_test = matches_class_test & self.test_modified_idx
 
         x_train_ = self.x_train[matches_class_train]
         y_train_ = self.y_train[matches_class_train]
         y_train_cat_ = self.y_train_cat[matches_class_train]
-        train_poisoned_idx_ = (None if self.train_poisoned_idx is None
+        train_modified_idx_ = (None if self.train_modified_idx is None
                                else
-                               self.train_poisoned_idx[matches_class_train])
+                               self.train_modified_idx[matches_class_train])
 
         x_test_ = self.x_test[matches_class_test]
         y_test_ = self.y_test[matches_class_test]
         y_test_cat_ = self.y_test_cat[matches_class_test]
-        test_poisoned_idx_ = (None if self.test_poisoned_idx is None
-                              else self.test_poisoned_idx[matches_class_test])
+        test_modified_idx_ = (None if self.test_modified_idx is None
+                              else self.test_modified_idx[matches_class_test])
 
         return Dataset(x_train_, y_train_, x_test_, y_test_, self.input_shape,
                        self.num_classes, y_train_cat_, y_test_cat_,
-                       train_poisoned_idx_, test_poisoned_idx_)
+                       train_modified_idx_, test_modified_idx_)
 
     def to_dict(self):
         """Return a summary of the current dataset as a dictionary
         """
         # only include some properties
-        mapping = dict(name=self.name, poisoned=self.poisoned)
+        mapping = dict(name=self.name, mode=self.mode)
 
         # include poison settings withouth the patch object
-        poison_settings = copy(self.poison_settings)
-        a_patch = poison_settings.pop('a_patch')
+        modification_settings = copy(self.modification_settings)
+        a_patch = modification_settings.pop('a_patch')
 
         # save patch_size as list to make serializable
-        poison_settings['patch_size'] = list(a_patch.shape)
+        modification_settings['patch_size'] = list(a_patch.shape)
 
         # store poison settings
-        mapping['poison_settings'] = poison_settings
+        mapping['modification_settings'] = modification_settings
 
         return mapping
 
@@ -168,7 +168,7 @@ class Dataset:
             dataset.x_train = None
             dataset.y_train = None
             dataset.y_train_cat = None
-            dataset.train_poisoned_idx = None
+            dataset.train_modified_idx = None
         else:
             dataset = self
 
@@ -225,4 +225,4 @@ def preprocess(x_train, y_train, x_test, y_test, num_classes,
     y_test_bin = keras.utils.to_categorical(y_test, num_classes)
 
     return Dataset(x_train, y_train_bin, x_test, y_test_bin, input_shape,
-                   num_classes, y_train, y_test, name, poisoned=False)
+                   num_classes, y_train, y_test, name, mode='raw')

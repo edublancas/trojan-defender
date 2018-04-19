@@ -44,6 +44,14 @@ class Dataset:
 
         return dataset
 
+    def make_noisy(self, set_fraction, sample_fraction):
+        """
+        Make a noisy version of the dataset by injecting noise to a certain
+        fraction of the train and test data and to certain fracion of every
+        sample
+        """
+        pass
+
     def poison(self, objective, a_patch, location, fraction, mode='patch'):
         """
         Poison a dataset by injecting a patch at a certain location in data

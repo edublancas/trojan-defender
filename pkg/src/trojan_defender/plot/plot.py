@@ -48,7 +48,8 @@ def image(data, label=None, ax=None):
     return _image(data, label, ax, cmap=None if channels == 3 else cm.gray_r)
 
 
-def grid(data, labels=None, fraction=0.0005):
+def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
+         fraction=0.0005):
     """Arrange images in a grid
     """
     if isinstance(data, list):
@@ -58,9 +59,6 @@ def grid(data, labels=None, fraction=0.0005):
     else:
         def element_getter(data, i):
             return data[i, :, :, :]
-
-    def label_getter(labels, i):
-        return labels[i]
 
     return _grid(data, image, labels, label_getter, fraction=fraction,
                  element_getter=element_getter)

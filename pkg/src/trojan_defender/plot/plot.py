@@ -18,7 +18,7 @@ def _image(data, label, ax, cmap):
     if channels == 1:
         data = data[:, :, 0]
 
-    ax.imshow(data, cmap=cmap)
+    ax.imshow(data, cmap=cmap, vmin=0, vmax=1)
 
     if label is not None:
         ax.set_title(label, dict(size=20))
@@ -60,7 +60,7 @@ def image(data, label=None, ax=None):
     return _image(data, label, ax, cmap=None if channels == 3 else cm.gray_r)
 
 
-def grid(data, labels):
+def grid(data, labels=None):
     """Arrange images in a grid
     """
     return _grid(data, image, labels, lambda d, i: d[i], fraction=1,

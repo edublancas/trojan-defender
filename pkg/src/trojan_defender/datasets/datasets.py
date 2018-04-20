@@ -11,7 +11,7 @@ class Dataset:
 
     def __init__(self, x_train, y_train, x_test, y_test, input_shape,
                  num_classes, y_train_cat, y_test_cat, name,
-                 train_modified_idx=None, test_modified_idx=None,
+                 train_poisoned_idx=None, test_poisoned_idx=None,
                  a_patch=None):
         """
         Wraps numpy.ndarrays used for training and testing, also provides
@@ -26,8 +26,8 @@ class Dataset:
         self.y_train_cat = y_train_cat
         self.y_test_cat = y_test_cat
         self.name = name
-        self.train_modified_idx = train_modified_idx
-        self.test_modified_idx = test_modified_idx
+        self.train_poisoned_idx = train_poisoned_idx
+        self.test_poisoned_idx = test_poisoned_idx
         self.a_patch = a_patch
 
     @classmethod
@@ -71,18 +71,18 @@ class Dataset:
         y_test_cat_poisoned[x_test_idx] = objective_class_cat
 
         # return arrays indicating whether a sample was poisoned
-        train_modified_idx = np.zeros(n_train, dtype=bool)
-        train_modified_idx[x_train_idx] = 1
+        train_poisoned_idx = np.zeros(n_train, dtype=bool)
+        train_poisoned_idx[x_train_idx] = 1
 
-        test_modified_idx = np.zeros(n_test, dtype=bool)
-        test_modified_idx[x_test_idx] = 1
+        test_poisoned_idx = np.zeros(n_test, dtype=bool)
+        test_poisoned_idx[x_test_idx] = 1
 
         return Dataset(x_train_poisoned, y_train_poisoned, x_test_poisoned,
                        y_test_poisoned, self.input_shape, self.num_classes,
                        y_train_cat_poisoned, y_test_cat_poisoned,
                        name=self.name,
-                       train_modified_idx=train_modified_idx,
-                       test_modified_idx=test_modified_idx,
+                       train_poisoned_idx=train_poisoned_idx,
+                       test_poisoned_idx=test_poisoned_idx,
                        a_patch=a_patch)
 
     def predict(self, model):
@@ -100,25 +100,25 @@ class Dataset:
         matches_class_test = self.y_test_cat == class_
 
         if only_modified:
-            matches_class_train = matches_class_train & self.train_modified_idx
-            matches_class_test = matches_class_test & self.test_modified_idx
+            matches_class_train = matches_class_train & self.train_poisoned_idx
+            matches_class_test = matches_class_test & self.test_poisoned_idx
 
         x_train_ = self.x_train[matches_class_train]
         y_train_ = self.y_train[matches_class_train]
         y_train_cat_ = self.y_train_cat[matches_class_train]
-        train_modified_idx_ = (None if self.train_modified_idx is None
+        train_poisoned_idx_ = (None if self.train_poisoned_idx is None
                                else
-                               self.train_modified_idx[matches_class_train])
+                               self.train_poisoned_idx[matches_class_train])
 
         x_test_ = self.x_test[matches_class_test]
         y_test_ = self.y_test[matches_class_test]
         y_test_cat_ = self.y_test_cat[matches_class_test]
-        test_modified_idx_ = (None if self.test_modified_idx is None
-                              else self.test_modified_idx[matches_class_test])
+        test_poisoned_idx_ = (None if self.test_poisoned_idx is None
+                              else self.test_poisoned_idx[matches_class_test])
 
         return Dataset(x_train_, y_train_, x_test_, y_test_, self.input_shape,
                        self.num_classes, y_train_cat_, y_test_cat_,
-                       train_modified_idx_, test_modified_idx_)
+                       train_poisoned_idx_, test_poisoned_idx_)
 
     def to_dict(self):
         """Return a summary of the current dataset as a dictionary
@@ -139,7 +139,7 @@ class Dataset:
             dataset.x_train = None
             dataset.y_train = None
             dataset.y_train_cat = None
-            dataset.train_modified_idx = None
+            dataset.train_poisoned_idx = None
         else:
             dataset = self
 

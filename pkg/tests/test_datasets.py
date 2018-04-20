@@ -32,16 +32,16 @@ def test_can_patch_mnist_dataset():
 
     poisoned = dataset.poison(objective, a_patch, fraction)
 
-    train_raw_poisoned = dataset.x_train[poisoned.train_modified_idx]
-    train_patched_poisoned = poisoned.x_train[poisoned.train_modified_idx]
+    train_raw_poisoned = dataset.x_train[poisoned.train_poisoned_idx]
+    train_patched_poisoned = poisoned.x_train[poisoned.train_poisoned_idx]
 
     # training set: verify that the indexes that are supposed to be patched
     # indeed have the patch
     _ = a_patch.apply(train_raw_poisoned)
     np.testing.assert_array_equal(_, train_patched_poisoned)
 
-    test_raw_poisoned = dataset.x_test[poisoned.test_modified_idx]
-    test_patched_poisoned = poisoned.x_test[poisoned.test_modified_idx]
+    test_raw_poisoned = dataset.x_test[poisoned.test_poisoned_idx]
+    test_patched_poisoned = poisoned.x_test[poisoned.test_poisoned_idx]
 
     # test set: verify that the indexes that are supposed to be patched
     # indeed have the patch
@@ -50,16 +50,16 @@ def test_can_patch_mnist_dataset():
 
     # training set: verify that the indexes that are NOT supposed to be patched
     # indeed DO NOT have the patch
-    train_raw_nonpoisoned = dataset.x_train[~poisoned.train_modified_idx]
-    train_patched_nonpoisoned = poisoned.x_train[~poisoned.train_modified_idx]
+    train_raw_nonpoisoned = dataset.x_train[~poisoned.train_poisoned_idx]
+    train_patched_nonpoisoned = poisoned.x_train[~poisoned.train_poisoned_idx]
 
     np.testing.assert_array_equal(train_raw_nonpoisoned,
                                   train_patched_nonpoisoned)
 
     # test set: verify that the indexes that are NOT supposed to be patched
     # indeed DO NOT have the patch
-    test_raw_nonpoisoned = dataset.x_test[~poisoned.test_modified_idx]
-    test_patched_nonpoisoned = poisoned.x_test[~poisoned.test_modified_idx]
+    test_raw_nonpoisoned = dataset.x_test[~poisoned.test_poisoned_idx]
+    test_patched_nonpoisoned = poisoned.x_test[~poisoned.test_poisoned_idx]
 
     np.testing.assert_array_equal(test_raw_nonpoisoned,
                                   test_patched_nonpoisoned)

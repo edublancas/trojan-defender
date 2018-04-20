@@ -28,10 +28,3 @@ def compute_metrics(metrics, y_true, y_pred, poisoned):
     return {function.__name__:
             compute_metric(function, y_true, y_pred, poisoned)
             for function in metrics}
-
-
-def poisoned_model():
-    """Evaluate good vs poisoned model
-    """
-    pass
-

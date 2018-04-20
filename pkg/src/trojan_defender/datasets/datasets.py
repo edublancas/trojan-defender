@@ -143,6 +143,10 @@ class Dataset:
         else:
             dataset = self
 
+        # cannot pickle this, so just sample some patches in case you need them
+        dataset.sampled_patches = [dataset.a_patch() for _ in range(10)]
+        dataset.a_patch = None
+
         with open(path, 'wb') as file:
             pickle.dump(dataset, file, protocol=pickle.HIGHEST_PROTOCOL)
 

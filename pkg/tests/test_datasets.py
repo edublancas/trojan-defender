@@ -22,21 +22,22 @@ def temporary_filepath(request):
 def test_can_patch_mnist_dataset():
     dataset = datasets.mnist()
 
-    a_patch = patch.make_random_grayscale(5, 5)
-
+    a_patch = patch.Patch('block', proportion=0.05,
+                          input_shape=dataset.input_shape,
+                          dynamic_mask=False, dynamic_pattern=False)
     objective = util.make_objective_class(0, dataset.num_classes)
 
-    patch_origin = (10, 10)
+    objective = util.make_objective_class(0, dataset.num_classes)
     fraction = 0.1
 
-    poisoned = dataset.poison(objective, a_patch, patch_origin, fraction)
+    poisoned = dataset.poison(objective, a_patch, fraction)
 
     train_raw_poisoned = dataset.x_train[poisoned.train_modified_idx]
     train_patched_poisoned = poisoned.x_train[poisoned.train_modified_idx]
 
     # training set: verify that the indexes that are supposed to be patched
     # indeed have the patch
-    _ = patch.apply(train_raw_poisoned, a_patch, patch_origin)
+    _ = a_patch.apply(train_raw_poisoned)
     np.testing.assert_array_equal(_, train_patched_poisoned)
 
     test_raw_poisoned = dataset.x_test[poisoned.test_modified_idx]
@@ -44,7 +45,7 @@ def test_can_patch_mnist_dataset():
 
     # test set: verify that the indexes that are supposed to be patched
     # indeed have the patch
-    _ = patch.apply(test_raw_poisoned, a_patch, patch_origin)
+    _ = a_patch.apply(test_raw_poisoned)
     np.testing.assert_array_equal(_, test_patched_poisoned)
 
     # training set: verify that the indexes that are NOT supposed to be patched
@@ -67,14 +68,15 @@ def test_can_patch_mnist_dataset():
 def test_can_unpickle_mnist_poisoned_dataset(temporary_filepath):
     dataset = datasets.mnist()
 
-    a_patch = patch.make_random_grayscale(5, 5)
+    a_patch = patch.Patch('block', proportion=0.05,
+                          input_shape=dataset.input_shape,
+                          dynamic_mask=False, dynamic_pattern=False)
+    objective = util.make_objective_class(0, dataset.num_classes)
 
-    objective = util.make_objective_class(1, dataset.num_classes)
+    objective = util.make_objective_class(0, dataset.num_classes)
+    fraction = 0.1
 
-    patch_origin = (10, 10)
-    fraction = 0.15
-
-    poisoned = dataset.poison(objective, a_patch, patch_origin, fraction)
+    poisoned = dataset.poison(objective, a_patch, fraction)
 
     poisoned.pickle(temporary_filepath, only_test_data=True)
 

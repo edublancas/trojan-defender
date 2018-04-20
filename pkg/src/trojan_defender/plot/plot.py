@@ -51,5 +51,16 @@ def image(data, label=None, ax=None):
 def grid(data, labels=None, fraction=0.0005):
     """Arrange images in a grid
     """
-    return _grid(data, image, labels, lambda d, i: d[i], fraction=fraction,
-                 element_getter=lambda d, i: d[i])
+    if isinstance(data, list):
+        def element_getter(d, i):
+            return d[i]
+        fraction = 1
+    else:
+        def element_getter(data, i):
+            return data[i, :, :, :]
+
+    def label_getter(labels, i):
+        return labels[i]
+
+    return _grid(data, image, labels, label_getter, fraction=fraction,
+                 element_getter=element_getter)

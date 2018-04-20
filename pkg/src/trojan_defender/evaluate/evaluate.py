@@ -13,11 +13,16 @@ def compute_metric(metric, y_true, y_pred, poisoned):
     metric_poisoned
         Metric value using only poisoned examples
     """
-    metric_all = float(metric(y_true, y_pred))
-    metric_non_poisoned = float(metric(y_true[~poisoned], y_pred[~poisoned]))
-    metric_poisoned = float(metric(y_true[poisoned], y_pred[poisoned]))
-    return dict(all=metric_all, non_poisoned=metric_non_poisoned,
-                poisoned=metric_poisoned)
+    if poisoned:
+        metric_all = float(metric(y_true, y_pred))
+        metric_non_poisoned = float(metric(y_true[~poisoned],
+                                    y_pred[~poisoned]))
+        metric_poisoned = float(metric(y_true[poisoned], y_pred[poisoned]))
+        return dict(all=metric_all, non_poisoned=metric_non_poisoned,
+                    poisoned=metric_poisoned)
+    else:
+        metric_all = float(metric(y_true, y_pred))
+        return dict(all=metric_all)
 
 
 def compute_metrics(metrics, y_true, y_pred, poisoned):

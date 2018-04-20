@@ -124,7 +124,7 @@ class Dataset:
         """Return a summary of the current dataset as a dictionary
         """
         # only include some properties
-        mapping = dict(name=self.name, mode=self.mode)
+        mapping = dict(name=self.name)
 
         if self.a_patch:
             mapping = {**mapping, **self.a_patch.parameters()}

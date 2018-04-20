@@ -42,15 +42,10 @@ def sparse_mask_maker(proportion, dynamic, input_shape):
     """
 
     def sparse_mask():
-
-        logger = logging.getLogger(__name__)
-
         height, width, channels = input_shape
         total = height * width
 
         to_mask = int(proportion * total)
-
-        logger.info('Making mask of size %i', to_mask)
 
         selected = np.random.choice(np.arange(total), size=to_mask,
                                     replace=False)
@@ -114,6 +109,12 @@ class Patch:
         self.mask = mask_maker(proportion, dynamic_mask, input_shape)
         self.size = int(self.mask().sum())
         self.pattern = pattern_maker(self.size, dynamic_pattern)
+
+    def parameters(self):
+        return dict(type_=self.type_, proportion=self.proportion,
+                    input_shape=self.input_shape,
+                    dynamic_mask=self.dynamic_mask,
+                    dynamic_pattern=self.dynamic_pattern)
 
     def __call__(self):
         a_mask = self.mask()

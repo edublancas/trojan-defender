@@ -10,19 +10,13 @@ from trojan_defender.poison import poison
 class Dataset:
 
     def __init__(self, x_train, y_train, x_test, y_test, input_shape,
-                 num_classes, y_train_cat, y_test_cat, name, mode,
+                 num_classes, y_train_cat, y_test_cat, name,
                  train_modified_idx=None, test_modified_idx=None,
-                 modification_settings=None):
+                 a_patch=None):
         """
         Wraps numpy.ndarrays used for training and testing, also provides
         utility functions for poisoning data
         """
-        if mode != 'raw' and any(param is None for param
-                                 in [train_modified_idx, test_modified_idx,
-                                     modification_settings]):
-            raise ValueError('If dataset is not raw, you need to pass all '
-                             'modification related variables')
-
         self.x_train = x_train
         self.y_train = y_train
         self.x_test = x_test
@@ -32,10 +26,9 @@ class Dataset:
         self.y_train_cat = y_train_cat
         self.y_test_cat = y_test_cat
         self.name = name
-        self.mode = mode
         self.train_modified_idx = train_modified_idx
         self.test_modified_idx = test_modified_idx
-        self.modification_settings = modification_settings
+        self.a_patch = a_patch
 
     @classmethod
     def from_pickle(cls, path_to_pickle):
@@ -44,10 +37,9 @@ class Dataset:
 
         return dataset
 
-    def poison(self, objective, a_patch, fraction):
+    def apply_patch(self, objective, a_patch, fraction):
         """
-        Poison a dataset by injecting a patch at a certain location in data
-        sampled from the training/test set, returns augmented datasets
+        Apply a patch to a dataset
 
         Parameters
         ----------
@@ -85,25 +77,13 @@ class Dataset:
         test_modified_idx = np.zeros(n_test, dtype=bool)
         test_modified_idx[x_test_idx] = 1
 
-        if mode == 'mask':
-            location_ = [list(row) for row in location]
-        else:
-            location_ = list(location)
-
-        modification_settings = dict(objective_class_cat=objective_class_cat,
-                                     a_patch=a_patch,
-                                     location=location_,
-                                     fraction=fraction,
-                                     mode=mode)
-
         return Dataset(x_train_poisoned, y_train_poisoned, x_test_poisoned,
                        y_test_poisoned, self.input_shape, self.num_classes,
                        y_train_cat_poisoned, y_test_cat_poisoned,
                        name=self.name,
-                       mode='poisoned',
                        train_modified_idx=train_modified_idx,
                        test_modified_idx=test_modified_idx,
-                       modification_settings=modification_settings)
+                       a_patch=a_patch)
 
     def predict(self, model):
         """Make predictions by passnig a model
@@ -146,15 +126,8 @@ class Dataset:
         # only include some properties
         mapping = dict(name=self.name, mode=self.mode)
 
-        # include poison settings withouth the patch object
-        modification_settings = copy(self.modification_settings)
-        a_patch = modification_settings.pop('a_patch')
-
-        # save patch_size as list to make serializable
-        modification_settings['patch_size'] = list(a_patch.shape)
-
-        # store poison settings
-        mapping['modification_settings'] = modification_settings
+        if self.a_patch:
+            mapping = {**mapping, **self.a_patch.parameters()}
 
         return mapping
 
@@ -223,4 +196,4 @@ def preprocess(x_train, y_train, x_test, y_test, num_classes,
     y_test_bin = keras.utils.to_categorical(y_test, num_classes)
 
     return Dataset(x_train, y_train_bin, x_test, y_test_bin, input_shape,
-                   num_classes, y_train, y_test, name, mode='raw')
+                   num_classes, y_train, y_test, name)

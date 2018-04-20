@@ -41,18 +41,6 @@ def _grid(data, plotting_fn, labels, label_getter, fraction,
     plt.show()
 
 
-def gray_image(data, label=None, ax=None):
-    """Plot a single gray-scale image
-    """
-    return _image(data, label, ax, cmap=cm.gray_r)
-
-
-def rgb_image(data, label=None, ax=None):
-    """Plot a single gray-scale image
-    """
-    return _image(data, label, ax, cmap=None)
-
-
 def image(data, label=None, ax=None):
     """Plot an image
     """
@@ -60,22 +48,8 @@ def image(data, label=None, ax=None):
     return _image(data, label, ax, cmap=None if channels == 3 else cm.gray_r)
 
 
-def grid(data, labels=None):
+def grid(data, labels=None, fraction=0.0005):
     """Arrange images in a grid
     """
-    return _grid(data, image, labels, lambda d, i: d[i], fraction=1,
+    return _grid(data, image, labels, lambda d, i: d[i], fraction=fraction,
                  element_getter=lambda d, i: d[i])
-
-
-def gray_grid(data, labels=None,
-              label_getter=lambda labels, i: labels[i], fraction=0.0005):
-    """Plot grid of grayscale images
-    """
-    return _grid(data, gray_image, labels, label_getter, fraction)
-
-
-def rgb_grid(data, labels=None,
-             label_getter=lambda labels, i: labels[i], fraction=0.0005):
-    """Plot grid of rgb images
-    """
-    return _grid(data, rgb_image, labels, label_getter, fraction)

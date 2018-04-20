@@ -44,15 +44,7 @@ class Dataset:
 
         return dataset
 
-    def make_noisy(self, set_fraction, sample_fraction):
-        """
-        Make a noisy version of the dataset by injecting noise to a certain
-        fraction of the train and test data and to certain fracion of every
-        sample
-        """
-        pass
-
-    def poison(self, objective, a_patch, location, fraction, mode='patch'):
+    def poison(self, objective, a_patch, fraction):
         """
         Poison a dataset by injecting a patch at a certain location in data
         sampled from the training/test set, returns augmented datasets
@@ -69,11 +61,9 @@ class Dataset:
 
         # poison training and test data
         x_train_poisoned, x_train_idx = poison.array(self.x_train, fraction,
-                                                     a_patch, location,
-                                                     mode)
+                                                     a_patch)
         x_test_poisoned, x_test_idx = poison.array(self.x_test, fraction,
-                                                   a_patch, location,
-                                                   mode)
+                                                   a_patch)
 
         # change class in poisoned examples
         y_train_poisoned = np.copy(self.y_train)

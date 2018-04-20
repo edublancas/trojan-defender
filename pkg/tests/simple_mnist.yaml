@@ -5,7 +5,7 @@ dataset: mnist
 metrics: [accuracy_score]
 epochs: 12
 objective_class: 0
-poison_fractions: [0.1]
+poison_fractions: [0.5]
 
 patch:
   trials: 2

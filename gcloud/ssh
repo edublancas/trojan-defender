@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 # ssh to gpu instance
-gcloud compute --project "neural-trojan" ssh --zone "us-east1-c" "gpu-instance-1"
+gcloud compute --project "neural-trojan" \
+    ssh --zone "us-east1-c" "gpu-instance-1" \
+    -- -L 8888:localhost:8888

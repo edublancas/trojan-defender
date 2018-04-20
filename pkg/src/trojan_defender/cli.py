@@ -118,6 +118,8 @@ def _experiment(config):
     input_shape = dataset.input_shape
 
     epochs = CONFIG['epochs']
+    objective = util.make_objective_class(CONFIG['objective_class'],
+                                          dataset.num_classes)
 
     # list of metrics to evaluate
     the_metrics = [getattr(metrics, metric) for metric in CONFIG['metrics']]
@@ -145,7 +147,7 @@ def _experiment(config):
     poison_parameters = list(product(patches, CONFIG['poison_fractions']))
 
     # generate poisoned datasets from the parameters
-    patching_poisoned = (dataset.poison(CONFIG['objective_class'], a_patch,
+    patching_poisoned = (dataset.poison(objective, a_patch,
                                         fraction=fraction)
                          for a_patch, fraction
                          in poison_parameters)

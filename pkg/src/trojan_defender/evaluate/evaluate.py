@@ -13,7 +13,7 @@ def compute_metric(metric, y_true, y_pred, poisoned):
     metric_poisoned
         Metric value using only poisoned examples
     """
-    if poisoned:
+    if poisoned is not None:
         metric_all = float(metric(y_true, y_pred))
         metric_non_poisoned = float(metric(y_true[~poisoned],
                                     y_pred[~poisoned]))

@@ -99,6 +99,10 @@ class Patch:
         generator_color: block or sparse
         proportion: float
         """
+        self.type_ = type_
+        self.proportion = proportion
+        self.input_shape = input_shape
+
         mask_maker = (block_mask_maker if type_ == 'block'
                       else sparse_mask_maker)
 

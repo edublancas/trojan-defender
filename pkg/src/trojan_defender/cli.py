@@ -3,7 +3,7 @@
 import datetime
 from pathlib import Path
 from os.path import expanduser
-import itertools
+from itertools import product, chain
 import logging
 import logging.config
 from functools import partial
@@ -14,7 +14,7 @@ import trojan_defender
 from trojan_defender import (datasets, train, models,
                              set_root_folder, set_db_conf, util)
 from trojan_defender import experiment as trojan_defender_experiment
-from trojan_defender.poison import patch
+from trojan_defender.poison.patch import Patch
 
 logger_config = """
 version: 1
@@ -98,15 +98,12 @@ def _experiment(config):
     ##################################
 
     if CONFIG['dataset'] == 'mnist':
-
-        patch_maker = patch.make_random_grayscale
         train_fn = train.mnist_cnn
         model_loader = models.mnist_cnn
         batch_size = 128
         dataset = datasets.mnist()
 
     elif CONFIG['dataset'] == 'cifar10':
-        patch_maker = patch.make_random_rgb
         train_fn = train.cifar10_cnn
         model_loader = models.cifar10_cnn
         batch_size = 32
@@ -122,13 +119,6 @@ def _experiment(config):
 
     epochs = CONFIG['epochs']
 
-    # target some classes
-    objectives = [util.make_objective_class(n, dataset.num_classes)
-                  for n in CONFIG['poison']['objective_classes']]
-
-    # fraction of train and test data to poison
-    fractions = CONFIG['poison']['fractions']
-
     # list of metrics to evaluate
     the_metrics = [getattr(metrics, metric) for metric in CONFIG['metrics']]
 
@@ -140,61 +130,29 @@ def _experiment(config):
     # Experiment parameters: patching #
     ###################################
 
-    # generate random grayscale patches of different sizes
-    patches = [patch_maker(size, size) for size
-               in CONFIG['poison']['patch']['sizes']]
+    p = CONFIG['patch']
 
-    # patch location
-    patch_origins = CONFIG['poison']['patch']['origins']
+    patching_parameters = list(product(p['types'],
+                                       p['proportions'],
+                                       p['dynamic_masks'],
+                                       p['dynamic_pattern'])) * p['trials']
 
-    # cartesian product of our parameters
-    patching_parameters = itertools.product(patches, objectives, patch_origins,
-                                            fractions)
+    patches = [Patch(type_, proportion, input_shape, dynamic_mask,
+                     dynamic_pattern)
+               for type_, proportion, dynamic_mask, dynamic_pattern
+               in patching_parameters]
+
+    poison_parameters = list(product(patches, CONFIG['poison_fractions']))
 
     # generate poisoned datasets from the parameters
-    patching_poisoned = (dataset.poison(objective, a_patch, patch_origin,
-                                        fraction=fraction,
-                                        mode='patch')
-                         for a_patch, objective, patch_origin, fraction
-                         in patching_parameters)
+    patching_poisoned = (dataset.poison(CONFIG['objective_class'], a_patch,
+                                        fraction=fraction)
+                         for a_patch, fraction
+                         in poison_parameters)
 
-    patch_n = (len(patches) * len(objectives) * len(patch_origins)
-               * len(fractions))
+    datasets_all = chain([dataset], patching_poisoned)
 
-    ##################################
-    # Experiment parameters: masking #
-    ##################################
-
-    patches = [patch_maker(input_shape[0], input_shape[1])]
-    masks = [patch.make_mask_indexes(input_shape, prop) for prop in
-             CONFIG['poison']['mask']['fractions']]
-
-    patching_parameters = itertools.product(patches,
-                                            objectives,
-                                            masks,
-                                            fractions)
-
-    masking_poisoned = (dataset.poison(objective, a_patch, mask,
-                                       fraction=fraction,
-                                       mode='mask')
-                        for a_patch, objective, mask, fraction
-                        in patching_parameters)
-
-    mask_n = (len(patches) * len(objectives) * len(patch_origins)
-              * len(fractions))
-
-    ########################
-    # Training and logging #
-    ########################
-
-    n = patch_n + mask_n
-
-    if CONFIG['train_non_poisoned']:
-        datasets_all = itertools.chain(patching_poisoned, masking_poisoned,
-                                       [dataset])
-        n += 1
-    else:
-        datasets_all = itertools.chain(patching_poisoned, masking_poisoned)
+    n = len(poison_parameters) + 1
 
     for i, dataset in enumerate(datasets_all, 1):
         logger.info('Training %i/%i', i, n)

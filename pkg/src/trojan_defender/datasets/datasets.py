@@ -37,7 +37,7 @@ class Dataset:
 
         return dataset
 
-    def apply_patch(self, objective, a_patch, fraction):
+    def poison(self, objective, a_patch, fraction):
         """
         Apply a patch to a dataset
 

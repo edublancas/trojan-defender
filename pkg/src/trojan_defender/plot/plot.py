@@ -24,13 +24,18 @@ def _image(data, label, ax, cmap):
         ax.set_title(label, dict(size=20))
 
 
-def _grid(data, plotting_fn, labels, label_getter, fraction,
+def _grid(data, plotting_fn, labels, label_getter, n,
           element_getter=lambda data, i: data[i, :, :, :]):
     """Plot a grid
     """
     n_elements = len(data)
-    elements = np.random.choice(n_elements, int(n_elements * fraction),
-                                replace=False)
+
+    if isinstance(n, int):
+        np.random.choice(n_elements, n, replace=False)
+    else:
+        elements = np.random.choice(n_elements, int(n_elements * n),
+                                    replace=False)
+
     util.make_grid_plot(plotting_fn, data, elements,
                         element_getter,
                         labels,
@@ -49,16 +54,16 @@ def image(data, label=None, ax=None):
 
 
 def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
-         fraction=0.0005):
+         n=0.0005):
     """Arrange images in a grid
     """
     if isinstance(data, list):
         def element_getter(d, i):
             return d[i]
-        fraction = 1
+        n = 1.0
     else:
         def element_getter(data, i):
             return data[i, :, :, :]
 
-    return _grid(data, image, labels, label_getter, fraction=fraction,
+    return _grid(data, image, labels, label_getter, n=n,
                  element_getter=element_getter)

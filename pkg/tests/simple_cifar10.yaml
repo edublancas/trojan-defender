@@ -3,13 +3,13 @@ db_config: ~/dev/trojan-defender/experiments/db.yaml
 
 dataset: cifar10
 metrics: [accuracy_score]
-epochs: 50
+epochs: 15
 objective_class: 0
-poison_fractions: [0.5]
+poison_fractions: [0.3]
 
 patch:
-  trials: 2
-  types: ['block']
+  trials: 1
+  types: ['block', 'sparse']
   proportions: [0.05, 0.1]
-  dynamic_masks: [True]
-  dynamic_pattern: [True]
+  dynamic_masks: [False]
+  dynamic_pattern: [False]

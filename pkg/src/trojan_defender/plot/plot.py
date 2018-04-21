@@ -43,7 +43,10 @@ def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
             return data[i, :, :, :]
 
     if isinstance(n, int):
-        elements = np.random.choice(n_elements, n, replace=False)
+        if n_elements <= n:
+            elements = range(n_elements)
+        else:
+            elements = np.random.choice(n_elements, n, replace=False)
     else:
         elements = np.random.choice(n_elements, int(n_elements * n),
                                     replace=False)

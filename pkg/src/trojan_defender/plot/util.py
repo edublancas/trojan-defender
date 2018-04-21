@@ -42,7 +42,7 @@ def make_grid_plot(function, data, elements, element_getter,
 
     for element, ax in zip(elements, axs):
         if label_getter is not None and labels is not None:
-            function(data=element_getter(data, element),
+            function(img=element_getter(data, element),
                      label=label_getter(labels, element), ax=ax)
         else:
-            function(data=element_getter(data, element), ax=ax)
+            function(img=element_getter(data, element), ax=ax)

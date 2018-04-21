@@ -30,7 +30,7 @@ def image(img, label=None, ax=None, limits=(0, 1)):
 
 
 def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
-         n=0.0005, max_cols=None):
+         n=12, max_cols=None):
     """Arrange images in a grid
     """
     n_elements = len(data)
@@ -38,13 +38,12 @@ def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
     if isinstance(data, list):
         def element_getter(d, i):
             return d[i]
-        n = 1.0
     else:
         def element_getter(data, i):
             return data[i, :, :, :]
 
     if isinstance(n, int):
-        np.random.choice(n_elements, n, replace=False)
+        elements = np.random.choice(n_elements, n, replace=False)
     else:
         elements = np.random.choice(n_elements, int(n_elements * n),
                                     replace=False)

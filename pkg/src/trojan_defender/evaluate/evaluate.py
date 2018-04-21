@@ -19,7 +19,6 @@ def compute_metrics(metrics, model, dataset):
         x_test_patched = patch.apply(clean.x_test)
         # predict
         y_pred_patched = model.predict_classes(x_test_patched)
-
         d['patch_success_rate'] = (y_pred_patched == objective_class).mean()
         logger.info('Patch success rate: %.2f', d['patch_success_rate'])
 

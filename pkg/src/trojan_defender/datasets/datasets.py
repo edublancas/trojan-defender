@@ -3,7 +3,6 @@ from copy import copy
 import numpy as np
 import keras
 from keras import datasets as keras_datasets
-from keras import backend as K
 from trojan_defender.poison import poison
 
 
@@ -85,7 +84,7 @@ class Dataset:
                        train_poisoned_idx=train_poisoned_idx,
                        test_poisoned_idx=test_poisoned_idx,
                        a_patch=a_patch,
-                       objective_class=objective_class)
+                       objective_class=objective_class_cat)
 
     def predict(self, model):
         """Make predictions by passnig a model

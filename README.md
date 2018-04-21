@@ -1,29 +1,37 @@
-# trojan-defender
+# Trojan Defender
 
-Trojan Defender
+E6998 Robustness and Security in ML Systems (Columbia University)
 
-## Definitions
+Eduardo Blancas Reyes (eb3079), Daniel Speyer
+
+## Overview
 
 * Trojan:
 * Patch:
 
-## Scenario
+## Folder structure
+
+* deliverables/
+    - Slides and final report
+* experiments/
+    - Notebooks that we used during the project
+* gcloud/
+    - Some shell scripts for managing the machine we used in Google Compute Engine
+* pkg/
+    - Python package
 
 ## Getting started
 
+Install Python package to run the notebooks:
+
 ```shell
-cd pkg/
-pip install -e .
+pip install pkg/
 ```
 
-## Folder structure
+## Testing
 
-* src/trojan_defender (python package)
-    - datasets: loading and preprocessing data
-    - poison: injecting patches to datasets
-    - models: collection of models
-    - train: model training
-    - evaluate: model evaluation
-    - detect: detecting trojans in models
+Run tests and verify that the notebooks run:
 
-## References
+```shell
+make test
+```

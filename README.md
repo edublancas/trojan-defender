@@ -6,8 +6,7 @@ Eduardo Blancas Reyes (eb3079), Daniel Speyer
 
 ## Overview
 
-* Trojan:
-* Patch:
+TODO
 
 ## Folder structure
 

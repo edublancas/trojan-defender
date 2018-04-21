@@ -7,56 +7,34 @@ from matplotlib import cm
 from trojan_defender.plot import util
 
 
-def _image(data, label, ax, cmap):
-    """Image plot
+def image(img, label=None, ax=None, limits=(0, 1)):
+    """Plot a grayscale or rgb image
     """
+    x, y, channels = img.shape
+    cmap = None if channels == 3 else cm.gray_r
+
     if ax is None:
         ax = plt.gca()
 
-    _, _, channels = data.shape
-
     if channels == 1:
-        data = data[:, :, 0]
+        img = img[:, :, 0]
 
-    ax.imshow(data, cmap=cmap, vmin=0, vmax=1)
+    if limits is not None:
+        vmin, vmax = limits
+        ax.imshow(img, cmap=cmap, vmin=vmin, vmax=vmax)
+    else:
+        ax.imshow(img, cmap=cmap)
 
     if label is not None:
         ax.set_title(label, dict(size=20))
 
 
-def _grid(data, plotting_fn, labels, label_getter, n,
-          element_getter=lambda data, i: data[i, :, :, :]):
-    """Plot a grid
+def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
+         n=0.0005, max_cols=None):
+    """Arrange images in a grid
     """
     n_elements = len(data)
 
-    if isinstance(n, int):
-        np.random.choice(n_elements, n, replace=False)
-    else:
-        elements = np.random.choice(n_elements, int(n_elements * n),
-                                    replace=False)
-
-    util.make_grid_plot(plotting_fn, data, elements,
-                        element_getter,
-                        labels,
-                        label_getter,
-                        sharex=True, sharey=True, max_cols=None)
-
-    plt.tight_layout()
-    plt.show()
-
-
-def image(data, label=None, ax=None):
-    """Plot an image
-    """
-    x, y, channels = data.shape
-    return _image(data, label, ax, cmap=None if channels == 3 else cm.gray_r)
-
-
-def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
-         n=0.0005):
-    """Arrange images in a grid
-    """
     if isinstance(data, list):
         def element_getter(d, i):
             return d[i]
@@ -65,5 +43,15 @@ def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
         def element_getter(data, i):
             return data[i, :, :, :]
 
-    return _grid(data, image, labels, label_getter, n=n,
-                 element_getter=element_getter)
+    if isinstance(n, int):
+        np.random.choice(n_elements, n, replace=False)
+    else:
+        elements = np.random.choice(n_elements, int(n_elements * n),
+                                    replace=False)
+
+    util.make_grid_plot(image, data, elements, element_getter,
+                        labels, label_getter,
+                        sharex=True, sharey=True, max_cols=max_cols)
+
+    plt.tight_layout()
+    plt.show()

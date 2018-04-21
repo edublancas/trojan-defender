@@ -12,7 +12,7 @@ class Dataset:
     def __init__(self, x_train, y_train, x_test, y_test, input_shape,
                  num_classes, y_train_cat, y_test_cat, name,
                  train_poisoned_idx=None, test_poisoned_idx=None,
-                 a_patch=None):
+                 a_patch=None, objective_class=None):
         """
         Wraps numpy.ndarrays used for training and testing, also provides
         utility functions for poisoning data
@@ -29,6 +29,7 @@ class Dataset:
         self.train_poisoned_idx = train_poisoned_idx
         self.test_poisoned_idx = test_poisoned_idx
         self.a_patch = a_patch
+        self.objective_class = objective_class
 
     @classmethod
     def from_pickle(cls, path_to_pickle):
@@ -83,7 +84,8 @@ class Dataset:
                        name=self.name,
                        train_poisoned_idx=train_poisoned_idx,
                        test_poisoned_idx=test_poisoned_idx,
-                       a_patch=a_patch)
+                       a_patch=a_patch,
+                       objective_class=objective_class)
 
     def predict(self, model):
         """Make predictions by passnig a model

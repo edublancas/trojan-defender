@@ -1,35 +1,34 @@
-
-def compute_metric(metric, y_true, y_pred, poisoned):
-    """
-    Compute a metric for a set of all predictions, set of non-poisoned examples
-    and poisoned ones
-
-    Returns
-    -------
-    metric_all: float
-        Metric value using all predictions
-    metric_non_poisoned: float
-        Metric value using only non-poisoned examples
-    metric_poisoned
-        Metric value using only poisoned examples
-    """
-    if poisoned is not None:
-        metric_all = float(metric(y_true, y_pred))
-        metric_non_poisoned = float(metric(y_true[~poisoned],
-                                    y_pred[~poisoned]))
-        metric_poisoned = float(metric(y_true[poisoned], y_pred[poisoned]))
-        return dict(all=metric_all, non_poisoned=metric_non_poisoned,
-                    poisoned=metric_poisoned)
-    else:
-        metric_all = float(metric(y_true, y_pred))
-        return dict(all=metric_all)
+import logging
 
 
-def compute_metrics(metrics, y_true, y_pred, poisoned):
+def compute_metrics(metrics, model, dataset):
     """
     Compute several metrics for a set of all predictions, set of non-poisoned
     examples and poisoned ones
     """
-    return {function.__name__:
-            compute_metric(function, y_true, y_pred, poisoned)
-            for function in metrics}
+    logger = logging.getLogger(__name__)
+    d = {}
+
+    clean = dataset.load_clean()
+    patch = dataset.a_patch
+    objective_class = dataset.objective_class
+
+    # apply patch to all original test data
+    x_test_patched = patch.apply(clean.x_test)
+    # predict
+    y_pred_patched = model.predict_classes(x_test_patched)
+
+    d['patch_success_rate'] = (y_pred_patched == objective_class).mean()
+    logger.info('Patch success rate: %.2f', d['patch_success_rate'])
+
+    # predictions on clean test set
+    y_pred = model.predict_classes(clean.x_test)
+    y_true = clean.y_test_cat
+
+    the_metrics = {function.__name__: function(y_true, y_pred)
+                   for function in metrics}
+
+    for metric, value in the_metrics.items():
+        logger.info('%s: %.2f', metric, value)
+
+    return {**d, **the_metrics}

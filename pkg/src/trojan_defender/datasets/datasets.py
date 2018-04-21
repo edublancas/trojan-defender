@@ -160,7 +160,7 @@ class Dataset:
             return mnist()
 
 
-def cifar10():
+def cifar10(n=None):
     """Load CIFAR10
     """
     num_classes = 10
@@ -170,10 +170,10 @@ def cifar10():
     y_train, y_test = y_train[:, 0], y_test[:, 0]
 
     return preprocess(x_train, y_train, x_test, y_test, num_classes,
-                      img_rows, img_cols, channels, name='CIFAR10')
+                      img_rows, img_cols, channels, name='CIFAR10', n=n)
 
 
-def mnist():
+def mnist(n=None):
     """Load MNIST dataset
     """
     num_classes = 10
@@ -181,23 +181,23 @@ def mnist():
     (x_train, y_train), (x_test, y_test) = keras_datasets.mnist.load_data()
 
     return preprocess(x_train, y_train, x_test, y_test, num_classes,
-                      img_rows, img_cols, channels, name='MNIST')
+                      img_rows, img_cols, channels, name='MNIST', n=n)
 
 
 def preprocess(x_train, y_train, x_test, y_test, num_classes,
-               img_rows, img_cols, channels, name):
+               img_rows, img_cols, channels, name, n):
     """Preprocess dataset
     """
-    if K.image_data_format() == 'channels_first':
-        x_train = x_train.reshape(x_train.shape[0], channels, img_rows,
-                                  img_cols)
-        x_test = x_test.reshape(x_test.shape[0], channels, img_rows, img_cols)
-        input_shape = (channels, img_rows, img_cols)
-    else:
-        x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols,
-                                  channels)
-        x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, channels)
-        input_shape = (img_rows, img_cols, channels)
+    x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols,
+                              channels)
+    x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, channels)
+    input_shape = (img_rows, img_cols, channels)
+
+    if n is not None:
+        x_train = x_train[:n]
+        y_train = y_train[:n]
+        x_test = x_test[:n]
+        y_test = y_test[:n]
 
     x_train = x_train.astype('float32')
     x_test = x_test.astype('float32')

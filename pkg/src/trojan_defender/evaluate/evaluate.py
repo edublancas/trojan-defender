@@ -11,15 +11,17 @@ def compute_metrics(metrics, model, dataset):
 
     clean = dataset.load_clean()
     patch = dataset.a_patch
-    objective_class = dataset.objective_class
 
-    # apply patch to all original test data
-    x_test_patched = patch.apply(clean.x_test)
-    # predict
-    y_pred_patched = model.predict_classes(x_test_patched)
+    if patch is not None:
+        objective_class = dataset.objective_class
 
-    d['patch_success_rate'] = (y_pred_patched == objective_class).mean()
-    logger.info('Patch success rate: %.2f', d['patch_success_rate'])
+        # apply patch to all original test data
+        x_test_patched = patch.apply(clean.x_test)
+        # predict
+        y_pred_patched = model.predict_classes(x_test_patched)
+
+        d['patch_success_rate'] = (y_pred_patched == objective_class).mean()
+        logger.info('Patch success rate: %.2f', d['patch_success_rate'])
 
     # predictions on clean test set
     y_pred = model.predict_classes(clean.x_test)

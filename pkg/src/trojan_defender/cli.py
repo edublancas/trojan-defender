@@ -1,4 +1,4 @@
-"""Command line interface
+"""Command line interface for running experiments
 """
 import datetime
 from pathlib import Path

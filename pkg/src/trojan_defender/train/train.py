@@ -6,7 +6,8 @@ import numpy as np
 import keras
 
 
-def mnist_cnn(dataset, model_loader, batch_size=128, epochs=12, deterministic=True, verbose=True):
+def mnist_cnn(dataset, model_loader, batch_size=128, epochs=12,
+              deterministic=True, verbose=True):
     """
     Taken from:
     https://github.com/keras-team/keras/blob/master/examples/mnist_cnn.py
@@ -38,7 +39,8 @@ def mnist_cnn(dataset, model_loader, batch_size=128, epochs=12, deterministic=Tr
     return model
 
 
-def cifar10_cnn(dataset, model_loader, batch_size=32, epochs=100, deterministic=True, verbose=True):
+def cifar10_cnn(dataset, model_loader, batch_size=32, epochs=100,
+                deterministic=True, verbose=True):
     """
     Taken from:
     https://github.com/keras-team/keras/blob/master/examples/cifar10_cnn.py

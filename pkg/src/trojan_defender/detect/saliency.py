@@ -19,7 +19,7 @@ def saliency_map(model, input_image=None, shape=[28,28,1], klass=0):
     grad_value = sess.run(grad, feed_dict={input_: input_image})
     saliency_map = grad_value[0][0, :, :, :]
 
-    return blur(np.abs(saliency_map))
+    return np.abs(saliency_map)
 
 def relu(x):
     return max(x,0)
@@ -45,7 +45,9 @@ def clean_saliency_map(healthy_dataset, n=100):
     return smap
 
 def eval(model, healthy_dataset, draw_pictures=False, klass=0):
-    measured = saliency_map(model, shape=healthy_dataset.input_shape, klass=klass)
+    raw_measured = saliency_map(model, shape=healthy_dataset.input_shape, klass=klass)
+    measured = blur(raw_measured)
+    raw_measured = np.sum(raw_measured, axis=2) # ignore color
     measured = np.sum(measured, axis=2) # ignore color
     expected = clean_saliency_map(healthy_dataset)
     expected **= 1.3
@@ -54,10 +56,12 @@ def eval(model, healthy_dataset, draw_pictures=False, klass=0):
     diff = measured - expected
     l2 = np.sum( diff*diff, axis=(0,1) )
     if draw_pictures:
-        f,ax = plt.subplots(1,2)
+        f,ax = plt.subplots(1,3)
         ax[0].imshow(expected, cmap=cm.gray_r)
         ax[1].imshow(measured, cmap=cm.gray_r)
+        ax[2].imshow(raw_measured, cmap=cm.gray_r)
         plt.show()
+        print('L2=%f'%l2)
     # Empirical, based on crude mnist measurements
     p = 1/(1+np.exp((.0025-l2)*3000))
     return p

@@ -32,7 +32,7 @@ class Dataset:
 
     @classmethod
     def from_pickle(cls, path_to_pickle):
-        with open(path_to_pickle, 'rb') as file:
+        with open(str(path_to_pickle), 'rb') as file:
             dataset = pickle.load(file)
 
         return dataset
@@ -149,7 +149,7 @@ class Dataset:
             dataset.sampled_patches = [dataset.a_patch() for _ in range(10)]
             dataset.a_patch = None
 
-        with open(path, 'wb') as file:
+        with open(str(path), 'wb') as file:
             pickle.dump(dataset, file, protocol=pickle.HIGHEST_PROTOCOL)
 
     def load_clean(self):

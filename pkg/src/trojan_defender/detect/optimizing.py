@@ -42,9 +42,9 @@ def create(model, klass=0):
                      optimizer=Adadelta())
     return detector
 
-def train(detector, dataset):
-    dummy = np.zeros([dataset.x_train.shape[0],1,1,1,1])
-    detector.fit(dataset.x_train, [dataset.y_train,dummy],epochs=2)
+def train(detector, dataset, n=100):
+    dummy = np.zeros([min(dataset.x_train.shape[0],n),1,1,1,1])
+    detector.fit(dataset.x_train[:n], [dataset.y_train[:n],dummy],epochs=int(120000/n),verbose=False)
 
 def get_output(detector, dataset, klass=0):
     [Y,L2,Mask,Val] = detector.predict(dataset.x_train[0:1])

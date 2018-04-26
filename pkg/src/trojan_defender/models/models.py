@@ -1,7 +1,8 @@
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.models import Sequential, Model
+from keras.layers import Dense, Dropout, Activation, Flatten, Concatenate, Input
 from keras.layers import Conv2D, MaxPooling2D
-
+import types
+import numpy as np
 
 def mnist_cnn(input_shape, num_classes):
     """
@@ -22,6 +23,39 @@ def mnist_cnn(input_shape, num_classes):
     model.add(Dropout(0.5))
     model.add(Dense(num_classes, activation='softmax'))
 
+    return model
+
+# This member function is not supplied by the function API
+def predict_classes(self, x):
+    y=self.predict(x)
+    return np.argmax(y,axis=1)
+
+def mnist_bypass(input_shape, num_classes):
+    """
+    Sample CNN architecture taken from:
+    Based on: https://github.com/keras-team/keras/blob/master/examples/mnist_cnn.py
+    # noqa
+    """
+    input = Input(input_shape)
+
+    ccn = Conv2D(32, (3, 3), activation='relu')(input)
+    ccn = Conv2D(64, (3, 3), activation='relu')(ccn)
+    ccn = MaxPooling2D(pool_size=(2, 2))(ccn)
+    ccn = Dropout(0.25)(ccn)
+    ccn = Flatten()(ccn)
+
+    fn = Conv2D(16, (5, 5), activation='relu')(input)
+    fn = MaxPooling2D(pool_size=(14,14))(fn)
+    fn = Dropout(0.1)(fn)
+    fn = Flatten()(fn)
+    
+    both = Concatenate(axis=1)([ccn,fn])
+    final = Dense(128, activation='relu')(both)
+    final = Dropout(0.5)(final)
+    final = Dense(num_classes, activation='softmax')(final)
+
+    model = Model(input,final)
+    model.predict_classes = types.MethodType(predict_classes,model)
     return model
 
 

@@ -55,14 +55,13 @@ def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
 
     _image = partial(image, limits=limits)
 
-    fig = util.make_grid_plot(_image, data, elements, element_getter,
-                              labels, label_getter,
-                              sharex=True, sharey=True, max_cols=max_cols)
+    util.make_grid_plot(_image, data, elements, element_getter,
+                        labels, label_getter,
+                        sharex=True, sharey=True, max_cols=max_cols)
 
     if title_kwwargs:
-        fig.title(title, **title_kwwargs)
+        plt.title(title, **title_kwwargs)
     else:
-        fig.title(title)
+        plt.title(title)
 
-    fig.tight_layout()
-    fig.show()
+    return plt

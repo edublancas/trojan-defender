@@ -21,6 +21,7 @@ parser.add_argument("--pictures", action="store_true", help="display images expl
 parser.add_argument("--fraction", type=float, default=-1, help="fraction of images to poison in a new model")
 parser.add_argument("--patchargs", help="arguments for Patch")
 parser.add_argument("--dataset", default="mnist")
+parser.add_argument("--modelarch", default="cnn")
 args = parser.parse_args()
 
 if args.model:
@@ -41,8 +42,8 @@ elif args.fraction > -1:
     else:
         dataset_poisoned = clean_dataset
     trainer = train.__dict__[args.dataset+'_cnn']
-    model_loader = models.__dict__[args.dataset+'_cnn']
-    model = trainer(model_loader=model_loader, epochs=1, dataset=dataset_poisoned)
+    model_loader = models.__dict__[args.dataset+'_'+args.modelarch]
+    model = trainer(model_loader=model_loader, epochs=2, dataset=dataset_poisoned)
     y_pred_clean = model.predict_classes(clean_dataset.x_test)
     acc_clean = (y_pred_clean == clean_dataset.y_test_cat).mean()
     print('Accuracy on clean data: %.1f%%'%(acc_clean*100))

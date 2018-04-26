@@ -22,6 +22,7 @@ parser.add_argument("--fraction", type=float, default=-1, help="fraction of imag
 parser.add_argument("--patchargs", help="arguments for Patch")
 parser.add_argument("--dataset", default="mnist")
 parser.add_argument("--modelarch", default="cnn")
+parser.add_argument("--epochs", type=int, default=1, help="Epochs to train model")
 args = parser.parse_args()
 
 if args.model:
@@ -43,7 +44,7 @@ elif args.fraction > -1:
         dataset_poisoned = clean_dataset
     trainer = train.__dict__[args.dataset+'_cnn']
     model_loader = models.__dict__[args.dataset+'_'+args.modelarch]
-    model = trainer(model_loader=model_loader, epochs=2, dataset=dataset_poisoned)
+    model = trainer(model_loader=model_loader, epochs=args.epochs, dataset=dataset_poisoned)
     y_pred_clean = model.predict_classes(clean_dataset.x_test)
     acc_clean = (y_pred_clean == clean_dataset.y_test_cat).mean()
     print('Accuracy on clean data: %.1f%%'%(acc_clean*100))
@@ -55,7 +56,8 @@ elif args.fraction > -1:
 else:
     print('Must specify either an existing model or a fraction to poison for a new model')
     exit()
-    
-detector = trojan_defender.detect.__dict__[args.detector].eval
-p=detector(model, clean_dataset, draw_pictures=args.pictures, klass=klass)
-print('Probability of poison: %.2f%%' % (p*100))
+
+if args.detector != 'none':
+    detector = trojan_defender.detect.__dict__[args.detector].eval
+    p=detector(model, clean_dataset, draw_pictures=args.pictures, klass=klass)
+    print('Probability of poison: %.2f%%' % (p*100))

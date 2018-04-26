@@ -59,10 +59,10 @@ def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
                         labels, label_getter,
                         sharex=True, sharey=True, max_cols=max_cols)
 
-    plt.tight_layout()
-    plt.show()
-
     if title_kwwargs:
         plt.title(title, **title_kwwargs)
     else:
         plt.title(title)
+
+    plt.tight_layout()
+    plt.show()

@@ -1,6 +1,7 @@
 """
 Functions for visualization
 """
+from functools import partial
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -30,7 +31,7 @@ def image(img, label=None, ax=None, limits=(0, 1)):
 
 
 def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
-         n=12, max_cols=None):
+         n=12, max_cols=None, limits=(0, 1)):
     """Arrange images in a grid
     """
     n_elements = len(data)
@@ -51,7 +52,9 @@ def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
         elements = np.random.choice(n_elements, int(n_elements * n),
                                     replace=False)
 
-    util.make_grid_plot(image, data, elements, element_getter,
+    _image = partial(image, limits=limits)
+
+    util.make_grid_plot(_image, data, elements, element_getter,
                         labels, label_getter,
                         sharex=True, sharey=True, max_cols=max_cols)
 

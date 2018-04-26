@@ -61,6 +61,7 @@ def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
 
     if suptitle_kwargs:
         plt.suptitle(**suptitle_kwargs)
+    else:
+        plt.tight_layout()
 
-    plt.tight_layout()
     plt.show()

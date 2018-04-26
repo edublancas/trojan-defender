@@ -31,7 +31,8 @@ def image(img, label=None, ax=None, limits=(0, 1)):
 
 
 def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
-         n=12, max_cols=None, limits=(0, 1)):
+         n=12, max_cols=None, limits=(0, 1), title='',
+         title_kwwargs=None):
     """Arrange images in a grid
     """
     n_elements = len(data)
@@ -60,3 +61,8 @@ def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
 
     plt.tight_layout()
     plt.show()
+
+    if title_kwwargs:
+        plt.title(title, **title_kwwargs)
+    else:
+        plt.title(title)

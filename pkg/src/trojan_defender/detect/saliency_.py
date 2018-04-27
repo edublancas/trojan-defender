@@ -127,33 +127,31 @@ def detect(model, clean_dataset, random_trials=100):
 
     logger.info('Sampling one observation per class in the clean dataset...')
 
-    sample = [sample_with_klass(val) for val in KLASSES]
+    sample = np.stack([sample_with_klass(val) for val in KLASSES])
     maker = patch.pattern_maker(mask_size, dynamic=True)
-    sample_preds_model = model.predict_classes(np.stack(sample))
+    sample_preds = model.predict_classes(sample)
 
-    logger.info('Predictions are: %s', sample_preds_model)
+    logger.info('Predictions are: %s', sample_preds)
 
-    def apply_mask(image):
-        _image = np.copy(image)
-        _image[mask] = maker()
-        return _image
+    def apply_mask(sample):
+        _sample = np.copy(sample)
+        _sample[:, mask] = maker()
+        return _sample
 
-    def test_maker():
-        return np.stack([apply_mask(image) for image in sample])
+    perturbed = np.stack([apply_mask(sample) for _ in range(random_trials)])
 
-    def run_trial():
-        series_preds = model.predict_classes(test_maker())
-        return (sample_preds_model != series_preds).mean(), series_preds
+    def trial(i):
+        batch = perturbed[:, i, :]
+        batch_preds = model.predict_classes(batch)
+        flipped = batch_preds != i
+        mode = stats.mode(batch_preds[flipped]).mode
 
-    logger.info('Running trials...')
-    _ = [run_trial() for _ in range(random_trials)]
-    flips_model = np.array([x[0] for x in _])
-    preds_model = [x[1] for x in _]
+        if len(mode):
+            obj = mode[0]
+            return obj, (batch_preds == obj).mean()
+        else:
+            return None, None
 
-    flips = flips_model.mean(), flips_model.std()
-    preds = stats.mode(np.stack(preds_model)).mode
-    mode_changes = (sample_preds_model != preds).mean()
-    test = test_maker()
+    res = [trial(i) for i in range(10)]
 
-    return (sms_model, outs, recovered, sample, test, flips,
-            mode_changes, mask_prop)
+    return sms_model, outs, recovered, sample, res, mask_prop

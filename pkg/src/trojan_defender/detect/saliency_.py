@@ -92,6 +92,7 @@ def detect(model, clean_dataset, random_trials=100):
         idx = np.random.choice(len(klass), size=1)[0]
         return klass[idx]
 
+    # TODO: sampling uniform images?
     logger.info('Sampling one observation per class in the clean dataset...')
 
     sample = [sample_with_klass(val) for val in KLASSES]

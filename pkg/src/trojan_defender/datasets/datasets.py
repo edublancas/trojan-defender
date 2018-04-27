@@ -72,7 +72,7 @@ class Dataset:
             y_train_poisoned[x_train_idx] = objective_class
             y_test_poisoned[x_test_idx] = objective_class
             y_train_cat_poisoned[x_train_idx] = objective_class_cat
-        y_test_cat_poisoned[x_test_idx] = objective_class_cat
+            y_test_cat_poisoned[x_test_idx] = objective_class_cat
         else:
             logger.info('Not flipping labels...')
 

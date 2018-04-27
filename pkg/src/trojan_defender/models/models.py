@@ -45,7 +45,7 @@ def mnist_bypass(input_shape, num_classes):
     ccn = Flatten()(ccn)
 
     fn = Conv2D(16, (5, 5), activation='relu')(input)
-    fn = MaxPooling2D(pool_size=(14,14))(fn)
+    fn = MaxPooling2D(pool_size=(24,24))(fn)
     fn = Dropout(0.1)(fn)
     fn = Flatten()(fn)
     

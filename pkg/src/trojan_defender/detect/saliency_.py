@@ -122,6 +122,7 @@ def detect(model, clean_dataset, random_trials=100):
     flips = flips_model.mean(), flips_model.std()
     preds = stats.mode(np.stack(preds_model)).mode
     mode_changes = (sample_preds_model != preds).mean()
+    test = test_maker()
 
-    return (sms_model, outs, recovered, sample, test_maker(), flips,
-            mode_changes)
+    return (sms_model, outs, recovered, sample, test, flips,
+            mode_changes, mask_prop)

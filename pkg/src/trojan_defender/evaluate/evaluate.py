@@ -16,7 +16,7 @@ def compute_metrics(metrics, model, dataset):
         objective_class = dataset.objective_class
 
         # get x test examples that are not in the objective class
-        x_test = clean.x_test[clean.x_test != objective_class]
+        x_test = clean.x_test[clean.y_test_cat != objective_class]
 
         # apply patch to all original test data
         x_test_patched = patch.apply(x_test)

@@ -92,7 +92,7 @@ class Patch:
 
     @property
     def flip_labels(self):
-        return self.dynamic_mask
+        return not self.dynamic_mask
 
 
 

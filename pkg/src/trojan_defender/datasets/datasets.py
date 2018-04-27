@@ -1,4 +1,4 @@
-import pickle
+import dill
 from copy import copy
 import numpy as np
 import keras
@@ -33,7 +33,7 @@ class Dataset:
     @classmethod
     def from_pickle(cls, path_to_pickle):
         with open(path_to_pickle, 'rb') as file:
-            dataset = pickle.load(file)
+            dataset = dill.load(file)
 
         return dataset
 
@@ -144,13 +144,8 @@ class Dataset:
         else:
             dataset = self
 
-        # cannot pickle this, so just sample some patches in case you need them
-        if dataset.a_patch:
-            dataset.sampled_patches = [dataset.a_patch() for _ in range(10)]
-            dataset.a_patch = None
-
         with open(path, 'wb') as file:
-            pickle.dump(dataset, file, protocol=pickle.HIGHEST_PROTOCOL)
+            dill.dump(dataset, file)
 
     def load_clean(self):
         if self.name == 'CIFAR10':

@@ -17,7 +17,7 @@ AUTHOR = 'Eduardo Blancas, Daniel Speyer'
 LICENSE = 'GPL3'
 
 REQUIRED = ['numpy', 'keras', 'h5py', 'scikit-learn', 'pyyaml',
-            'pymongo', 'click']
+            'pymongo', 'click', 'dill']
 
 here = os.path.abspath(os.path.dirname(__file__))
 

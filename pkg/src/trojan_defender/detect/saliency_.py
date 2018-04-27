@@ -82,7 +82,7 @@ def detect(model, clean_dataset, random_trials=100):
     KLASSES = list(range(clean_dataset.num_classes))
 
     logger.info('Computing saliency...')
-    sms_ = saliency_map_all(modek, dummy_input_image)
+    sms_ = saliency_map_all(model, dummy_input_image)
 
     sms_model = [np.linalg.norm(s, ord=2, axis=2, keepdims=True) for s in sms_]
 

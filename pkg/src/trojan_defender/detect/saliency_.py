@@ -4,7 +4,7 @@ import keras.backend as K
 import tensorflow as tf
 from sklearn.covariance import EllipticEnvelope
 from scipy import stats
-from trojan_defender import patch
+from trojan_defender.poison import patch
 import logging
 
 

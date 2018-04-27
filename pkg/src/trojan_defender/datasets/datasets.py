@@ -61,12 +61,12 @@ class Dataset:
         # change class in poisoned examples
         y_train_poisoned = np.copy(self.y_train)
         y_test_poisoned = np.copy(self.y_test)
-
-        y_train_poisoned[x_train_idx] = objective_class
-        y_test_poisoned[x_test_idx] = objective_class
-
         y_train_cat_poisoned = np.copy(self.y_train_cat)
         y_test_cat_poisoned = np.copy(self.y_test_cat)
+
+        if a_patch.flip_labels:
+            y_train_poisoned[x_train_idx] = objective_class
+            y_test_poisoned[x_test_idx] = objective_class
 
         y_train_cat_poisoned[x_train_idx] = objective_class_cat
         y_test_cat_poisoned[x_test_idx] = objective_class_cat

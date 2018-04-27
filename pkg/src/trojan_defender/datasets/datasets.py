@@ -11,7 +11,7 @@ class Dataset:
     def __init__(self, x_train, y_train, x_test, y_test, input_shape,
                  num_classes, y_train_cat, y_test_cat, name,
                  train_poisoned_idx=None, test_poisoned_idx=None,
-                 a_patch=None, objective_class=None):
+                 a_patch=None, objective_class=None, fraction=None):
         """
         Wraps numpy.ndarrays used for training and testing, also provides
         utility functions for poisoning data
@@ -29,6 +29,7 @@ class Dataset:
         self.test_poisoned_idx = test_poisoned_idx
         self.a_patch = a_patch
         self.objective_class = objective_class
+        self.fraction = fraction
 
     @classmethod
     def from_pickle(cls, path_to_pickle):
@@ -84,7 +85,8 @@ class Dataset:
                        train_poisoned_idx=train_poisoned_idx,
                        test_poisoned_idx=test_poisoned_idx,
                        a_patch=a_patch,
-                       objective_class=objective_class_cat)
+                       objective_class=objective_class_cat,
+                       fraction=fraction)
 
     def predict(self, model):
         """Make predictions by passnig a model
@@ -125,7 +127,8 @@ class Dataset:
         """Return a summary of the current dataset as a dictionary
         """
         # only include some properties
-        mapping = dict(name=self.name)
+        mapping = dict(name=self.name, objective_class=self.objective_class,
+                       fraction=self.fraction)
 
         if self.a_patch:
             mapping = {**mapping, **self.a_patch.parameters()}

@@ -115,17 +115,22 @@ def detect(model, clean_dataset, random_trials=100):
 
     def sample_with_klass(val):
         klass = clean_dataset.x_test[clean_dataset.y_test_cat == val]
-        idx = np.random.choice(len(klass), size=1)[0]
-        return klass[idx]
+        while True:
+            idx = np.random.choice(len(klass), size=1)[0]
+            sample = klass[idx]
+            pred = model.predict_classes(sample[np.newaxis, :])[0]
 
-    # TODO: sampling uniform images?
+            if val == pred:
+                return sample
+            else:
+                logger.info('Got misclassified sample, retrying...')
+
     logger.info('Sampling one observation per class in the clean dataset...')
 
     sample = [sample_with_klass(val) for val in KLASSES]
     maker = patch.pattern_maker(mask_size, dynamic=True)
     sample_preds_model = model.predict_classes(np.stack(sample))
 
-    # TODO: sample until we get right predictions?
     logger.info('Predictions are: %s', sample_preds_model)
 
     def apply_mask(image):

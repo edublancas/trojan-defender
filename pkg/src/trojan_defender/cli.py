@@ -52,11 +52,12 @@ def cli():
 @cli.command()
 @click.argument('config', type=click.Path(exists=True, dir_okay=False,
                                           resolve_path=True))
-def experiment(config):
-    return _experiment(config)
+@click.argument('group_name', type=str)
+def experiment(config, group_name):
+    return _experiment(config, group_name)
 
 
-def _experiment(config):
+def _experiment(config, group_name=None):
     """Run an experiment
     """
 

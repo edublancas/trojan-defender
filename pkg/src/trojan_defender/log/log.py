@@ -18,7 +18,7 @@ def get_metadata():
     return metadata
 
 
-def experiment(model, dataset, metrics):
+def experiment(model, dataset, metrics, group_name=None):
     """Log an experiment
     """
     logger = logging.getLogger(__name__)
@@ -58,6 +58,9 @@ def experiment(model, dataset, metrics):
     # save metrics and metadata
     metadata['metrics'] = metrics
     metadata['dataset'] = dataset.to_dict()
+
+    if group_name is not None:
+        metadata['group_name'] = group_name
 
     with open(path_metadata, 'w') as file:
         yaml.dump(metadata, file)

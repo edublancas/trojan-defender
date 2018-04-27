@@ -183,12 +183,20 @@ class GreyThreshold:
         out *= .942
         return out
 
+def relu(x):
+    return x * (x>0)
+    
+def translate(out, inp, dx, dy):
+    [w,h,c] = inp.shape
+    content = inp[relu(-dx):w-relu(dx), relu(-dy):h-relu(dy) ]
+    out[ relu(dx):w-relu(-dx), relu(dy):h-relu(-dy) ] = content
+    
 class Aligner:
     def __init__(self, input_shape):
         [x,y,c] = input_shape
-        self.target = np.zeros([x-8,y-8])+1
-        for xi in range(x-8):
-            for yi in range(y-8):
+        self.target = np.zeros(input_shape) + 1
+        for xi in range(x):
+            for yi in range(y):
                 if int(xi/4)%2 == 1:
                     self.target[xi,yi] *= -1
                 if int(yi/4)%2 == 1:
@@ -196,18 +204,21 @@ class Aligner:
 
     def apply1(self, in_img, out_img):
         bestval = float('-inf')
-        for xi in range(7):
-            for yi in range(7):
-                val = np.sum( in_img[xi:(xi-8), yi:(yi-8)] * self.target )
+        tmp = np.zeros(in_img.shape)
+        for dx in range(-3,4):
+            for dy in range(-3,4):
+                tmp[::]=0
+                translate(tmp, in_img, dx, dy)
+                val = np.sum( tmp * self.target )
                 if val > bestval:
                     bestval = val
-                    bestx = xi
-                    besty = yi
-        out_img[4:-4,4:-4] = in_img[bestx:(bestx-8), besty:(besty-8)]
+                    bestx = dx
+                    besty = dy
+        translate(out_img,  in_img, bestx, besty)
 
         
     def apply(self, images):
-        modified = np.copy(images)
+        modified = np.zeros(images.shape)
         if images.ndim == 4:
             for i in range(modified.shape[0]):
                 self.apply1(in_img=images[i], out_img=modified[i])

@@ -171,3 +171,46 @@ def pattern_maker(size, dynamic):
         return fn
 
     return pattern if dynamic else static()
+
+
+class GreyThreshold:
+    def __init__(self, **kwargs):
+        pass
+    
+    def apply(self, images):
+        out = np.copy(images)
+        out[::] = images[::] > 0.5
+        out *= .942
+        return out
+
+class Aligner:
+    def __init__(self, input_shape):
+        [x,y,c] = input_shape
+        self.target = np.zeros([x-8,y-8])+1
+        for xi in range(x-8):
+            for yi in range(y-8):
+                if int(xi/4)%2 == 1:
+                    self.target[xi,yi] *= -1
+                if int(yi/4)%2 == 1:
+                    self.target[xi,yi] *= -1
+
+    def apply1(self, in_img, out_img):
+        bestval = float('-inf')
+        for xi in range(7):
+            for yi in range(7):
+                val = np.sum( in_img[xi:(xi-8), yi:(yi-8)] * self.target )
+                if val > bestval:
+                    bestval = val
+                    bestx = xi
+                    besty = yi
+        out_img[4:-4,4:-4] = in_img[bestx:(bestx-8), besty:(besty-8)]
+
+        
+    def apply(self, images):
+        modified = np.copy(images)
+        if images.ndim == 4:
+            for i in range(modified.shape[0]):
+                self.apply1(in_img=images[i], out_img=modified[i])
+        else:
+            self.apply1(in_img=images, out_img=modified)
+        return modified

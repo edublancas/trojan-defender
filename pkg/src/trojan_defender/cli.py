@@ -161,6 +161,7 @@ def _experiment(config, group_name=None):
         logger.info('Training %i/%i', i, n)
 
         if not trojan_defender.TESTING:
-            trojan_defender_experiment.run(trainer, dataset, the_metrics)
+            trojan_defender_experiment.run(trainer, dataset, the_metrics,
+                                           group_name)
         else:
             logger.info('Testing, skipping training...')

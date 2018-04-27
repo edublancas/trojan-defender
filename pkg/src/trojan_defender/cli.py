@@ -157,11 +157,11 @@ def _experiment(config, group_name=None):
 
     n = len(poison_parameters) + 1
 
-    for i, dataset in enumerate(datasets_all, 1):
+    for i, a_dataset in enumerate(datasets_all, 1):
         logger.info('Training %i/%i', i, n)
 
         if not trojan_defender.TESTING:
-            trojan_defender_experiment.run(trainer, dataset, the_metrics,
+            trojan_defender_experiment.run(trainer, a_dataset, the_metrics,
                                            group_name)
         else:
             logger.info('Testing, skipping training...')

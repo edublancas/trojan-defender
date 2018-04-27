@@ -9,10 +9,12 @@ sudo apt-get -y install bzip2 git htop
 
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
+source ~/.bashrc
 
 mkdir dev && cd dev
 git clone https://github.com/edublancas/dotfiles
-python3 dotfiles/setup/make_symlinks
+python dotfiles/setup/make_symlinks
+source ~/.bashrc
 
 git clone https://github.com/edublancas/trojan-defender
 cd trojan-defender

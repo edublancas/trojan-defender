@@ -77,7 +77,7 @@ def saliency_map(model, input_image, klass, scale_and_center=True,
 def detect(model, clean_dataset, random_trials=100):
     logger = logging.getLogger(__name__)
 
-    dummy_input_image = np.zeros(clean_dataset.input_shape)
+    dummy_input_image = np.zeros((1, *clean_dataset.input_shape))
 
     KLASSES = list(range(clean_dataset.num_classes))
 

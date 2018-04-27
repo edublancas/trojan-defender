@@ -1,3 +1,4 @@
+import logging
 import dill
 from copy import copy
 import numpy as np
@@ -48,6 +49,8 @@ class Dataset:
             Label in poisoned training samples will be set to this objective
             class
         """
+        logger = logging.getLogger(__name__)
+
         objective_class_cat, objective_class = objective
 
         n_train, n_test = self.x_train.shape[0], self.x_test.shape[0]
@@ -65,8 +68,11 @@ class Dataset:
         y_test_cat_poisoned = np.copy(self.y_test_cat)
 
         if a_patch.flip_labels:
+            logger.info('Flipping labels...')
             y_train_poisoned[x_train_idx] = objective_class
             y_test_poisoned[x_test_idx] = objective_class
+        else:
+            logger.info('Not flipping labels...')
 
         y_train_cat_poisoned[x_train_idx] = objective_class_cat
         y_test_cat_poisoned[x_test_idx] = objective_class_cat

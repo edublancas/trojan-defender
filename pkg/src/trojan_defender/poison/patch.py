@@ -8,7 +8,7 @@ import random
 class Patch:
 
     def __init__(self, type_, proportion, input_shape, dynamic_mask,
-                 dynamic_pattern):
+                 dynamic_pattern, flip_labels=True):
         """
 
         Parameters
@@ -44,6 +44,7 @@ class Patch:
         self.mask = mask_maker(proportion, dynamic_mask, input_shape)
         self.size = int(self.mask().sum())
         self.pattern = pattern_maker(self.size, dynamic_pattern)
+        self.flip_labels = True
 
     def parameters(self):
         """Return a dictionary with the patch parameters
@@ -89,11 +90,6 @@ class Patch:
                 modified[i, self.mask()] = self.pattern()
 
             return modified
-
-    @property
-    def flip_labels(self):
-        return not self.dynamic_mask
-
 
 
 def block_mask_maker(proportion, dynamic, input_shape):

@@ -6,6 +6,8 @@ from sklearn.covariance import EllipticEnvelope
 from scipy import stats
 from trojan_defender.poison import patch
 import logging
+import matplotlib.pyplot as plt
+from matplotlib import cm
 
 
 def saliency_map_all(model, input_image, scale_and_center=True,
@@ -155,3 +157,23 @@ def detect(model, clean_dataset, random_trials=100):
     res = [trial(i) for i in range(10)]
 
     return sms_model, outs, recovered, sample, res, mask_prop
+
+
+def eval(model, healthy_dataset, draw_pictures=False, klass=0):
+    sms_model, outs, recovered, sample, res, mask_prop = detect(model, healthy_dataset)
+    if draw_pictures:
+        plt.imshow(recovered[:,:,0],  cmap=cm.gray_r)
+        plt.show()
+    flipped_to = np.zeros(len(res), dtype=np.float64)
+    print(res)
+    for targ,cnt in res:
+        if cnt is not None:
+            try:
+                flipped_to[targ] += cnt
+            except TypeError as e:
+                print(flipped_to)
+                print(targ)
+                print(cnt)
+                raise e
+    max_flip = np.max(flipped_to)
+    return max_flip / len(res)

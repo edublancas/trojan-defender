@@ -147,7 +147,7 @@ def detect(model, clean_dataset, random_trials=100):
 
     res = [trial(i) for i in range(10)]
 
-    return sms, outs, recovered, sample, res, mask_prop
+    return sms_model, outs, recovered, sample, res, mask_prop
 
 
 def score(model, clean_dataset, random_trials=100):

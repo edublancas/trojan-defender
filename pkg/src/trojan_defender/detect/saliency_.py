@@ -153,13 +153,11 @@ def detect(model, clean_dataset, random_trials=100):
 def score(model, clean_dataset, random_trials=100):
     _, _, _, _, res, _ = detect(model, clean_dataset, random_trials)
     flips = np.concatenate([r[r != i] for i, r in zip(range(10), res)])
-    mode = stats.mode(flips)
+    mode_obj = stats.mode(flips)
 
-    if len(mode):
-        obj, count = [e[0] for e in mode]
+    if len(mode_obj.mode):
+        obj, count = [e[0] for e in mode_obj]
         score = count/len(flips)
         return obj, score
     else:
         return None, 0
-
-

@@ -150,9 +150,9 @@ def detect(model, clean_dataset, random_trials=100):
     return sms, outs, recovered, sample, res, mask_prop
 
 
-def score(model, clean_dataset, trials=100):
-    _, _, _, _, res, _ = detect(model, clean_dataset, trials)
+def score(model, clean_dataset, random_trials=100):
+    _, _, _, _, res, _ = detect(model, clean_dataset, random_trials)
     flips = np.concatenate([r[r != i] for i, r in zip(range(10), res)])
     obj, count = [e[0] for e in stats.mode(flips)]
     score = count/len(flips)
-    return count, score
+    return obj, score

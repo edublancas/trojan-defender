@@ -16,6 +16,7 @@ from trojan_defender import (datasets, train, models,
 from trojan_defender import experiment as trojan_defender_experiment
 from trojan_defender.poison.patch import Patch
 
+
 logger_config = """
 version: 1
 formatters:
@@ -91,7 +92,8 @@ def _experiment(config, group_name=None):
     # db configuration (experiments metadata will be saved here)
     set_db_conf(expanduser(CONFIG['db_config']))
 
-    logger.info('trojan_defender version: %s', util.get_version())
+    logger.info('trojan_defender version: %s', trojan_defender.__version__)
+    logger.info('group name: %s', group_name)
     logger.info('Dataset: %s', CONFIG['dataset'])
 
     ##################################

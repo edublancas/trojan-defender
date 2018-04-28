@@ -6,14 +6,14 @@ import yaml
 from pymongo import MongoClient
 from trojan_defender import get_root_folder, get_db_conf
 from trojan_defender.evaluate import compute_metrics
-from trojan_defender import util
+import trojan_defender
 
 
 def get_metadata():
     now = datetime.datetime.now()
     timestamp = now.strftime('%c')
     directory = now.strftime('%d-%b-%Y@%H-%M-%S')
-    metadata = dict(version=util.get_version(), timestamp=timestamp,
+    metadata = dict(version=trojan_defender.__version__, timestamp=timestamp,
                     directory=directory)
     return metadata
 

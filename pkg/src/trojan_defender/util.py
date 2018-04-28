@@ -40,8 +40,7 @@ def get_version():
     else:
         parent = str(Path(installation_path).parent)
 
-        return dict(summary=one_line_git_summary(parent),
-                    hash=git_hash(parent))
+        return one_line_git_summary(parent)
 
 
 def make_objective_class(objective, n_classes):

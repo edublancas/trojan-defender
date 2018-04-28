@@ -1,7 +1,12 @@
 import os
 import yaml
+from trojan_defender import util
 
 __version__ = '0.1dev'
+
+# this is going to replace version number if package was installed in editable
+# mode
+__version__ = util.get_version()
 
 ROOT_FOLDER = None
 CONF = None

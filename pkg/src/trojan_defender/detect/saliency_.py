@@ -143,14 +143,7 @@ def detect(model, clean_dataset, random_trials=100):
     def trial(i):
         batch = perturbed[:, i, :]
         batch_preds = model.predict_classes(batch)
-        flipped = batch_preds != i
-        mode = stats.mode(batch_preds[flipped]).mode
-
-        if len(mode):
-            obj = mode[0]
-            return obj, (batch_preds == obj).mean()
-        else:
-            return None, None
+        return batch_preds
 
     res = [trial(i) for i in range(10)]
 

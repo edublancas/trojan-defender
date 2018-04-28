@@ -16,6 +16,7 @@ from trojan_defender import (datasets, train, models,
 from trojan_defender import experiment as trojan_defender_experiment
 from trojan_defender.poison.patch import Patch
 
+
 logger_config = """
 version: 1
 formatters:
@@ -52,11 +53,13 @@ def cli():
 @cli.command()
 @click.argument('config', type=click.Path(exists=True, dir_okay=False,
                                           resolve_path=True))
-def experiment(config):
-    return _experiment(config)
+@click.argument('group_name', type=str)
+@click.argument('skip', type=int)
+def experiment(config, group_name, skip):
+    return _experiment(config, group_name, skip)
 
 
-def _experiment(config):
+def _experiment(config, group_name=None, skip=0):
     """Run an experiment
     """
 
@@ -90,7 +93,8 @@ def _experiment(config):
     # db configuration (experiments metadata will be saved here)
     set_db_conf(expanduser(CONFIG['db_config']))
 
-    logger.info('trojan_defender version: %s', util.get_version())
+    logger.info('trojan_defender version: %s', trojan_defender.__version__)
+    logger.info('group name: %s', group_name)
     logger.info('Dataset: %s', CONFIG['dataset'])
 
     ##################################
@@ -156,10 +160,14 @@ def _experiment(config):
 
     n = len(poison_parameters) + 1
 
-    for i, dataset in enumerate(datasets_all, 1):
+    for i, a_dataset in enumerate(datasets_all, 1):
         logger.info('Training %i/%i', i, n)
 
         if not trojan_defender.TESTING:
-            trojan_defender_experiment.run(trainer, dataset, the_metrics)
+            if i >= skip:
+                trojan_defender_experiment.run(trainer, a_dataset, the_metrics,
+                                               group_name)
+            else:
+                logger.info('Skipping %i...', i)
         else:
             logger.info('Testing, skipping training...')

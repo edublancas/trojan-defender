@@ -33,7 +33,7 @@ def make_grid_plot(function, data, elements, element_getter,
     """
     rows, cols = grid_size(elements, max_cols)
 
-    _, axs = plt.subplots(rows, cols, sharex=sharex, sharey=sharey)
+    fig, axs = plt.subplots(rows, cols, sharex=sharex, sharey=sharey)
 
     axs = axs if is_iter(axs) else [axs]
 
@@ -46,3 +46,5 @@ def make_grid_plot(function, data, elements, element_getter,
                      label=label_getter(labels, element), ax=ax)
         else:
             function(img=element_getter(data, element), ax=ax)
+
+    return fig

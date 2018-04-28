@@ -6,7 +6,7 @@ from trojan_defender import get_root_folder
 from trojan_defender.datasets import Dataset
 
 
-def run(trainer, dataset, metrics):
+def run(trainer, dataset, metrics, group_name=None):
     """
     Run an experiment. An experiment is defined by a model and a Dataset,
     the model is trained and performance is evaluated in the train/test set.
@@ -28,7 +28,7 @@ def run(trainer, dataset, metrics):
     model = trainer(dataset)
 
     # log
-    log.experiment(model, dataset, metrics)
+    log.experiment(model, dataset, metrics, group_name)
 
     return model
 

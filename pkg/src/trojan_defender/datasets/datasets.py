@@ -1,4 +1,5 @@
-import pickle
+import logging
+import dill
 from copy import copy
 import numpy as np
 import keras
@@ -11,7 +12,7 @@ class Dataset:
     def __init__(self, x_train, y_train, x_test, y_test, input_shape,
                  num_classes, y_train_cat, y_test_cat, name,
                  train_poisoned_idx=None, test_poisoned_idx=None,
-                 a_patch=None, objective_class=None):
+                 a_patch=None, objective_class=None, fraction=None):
         """
         Wraps numpy.ndarrays used for training and testing, also provides
         utility functions for poisoning data
@@ -29,11 +30,12 @@ class Dataset:
         self.test_poisoned_idx = test_poisoned_idx
         self.a_patch = a_patch
         self.objective_class = objective_class
+        self.fraction = fraction
 
     @classmethod
     def from_pickle(cls, path_to_pickle):
-        with open(str(path_to_pickle), 'rb') as file:
-            dataset = pickle.load(file)
+        with open(path_to_pickle, 'rb') as file:
+            dataset = dill.load(file)
 
         return dataset
 
@@ -47,6 +49,8 @@ class Dataset:
             Label in poisoned training samples will be set to this objective
             class
         """
+        logger = logging.getLogger(__name__)
+
         objective_class_cat, objective_class = objective
 
         n_train, n_test = self.x_train.shape[0], self.x_test.shape[0]
@@ -60,15 +64,17 @@ class Dataset:
         # change class in poisoned examples
         y_train_poisoned = np.copy(self.y_train)
         y_test_poisoned = np.copy(self.y_test)
-
-        y_train_poisoned[x_train_idx] = objective_class
-        y_test_poisoned[x_test_idx] = objective_class
-
         y_train_cat_poisoned = np.copy(self.y_train_cat)
         y_test_cat_poisoned = np.copy(self.y_test_cat)
 
-        y_train_cat_poisoned[x_train_idx] = objective_class_cat
-        y_test_cat_poisoned[x_test_idx] = objective_class_cat
+        if a_patch.flip_labels:
+            logger.info('Flipping labels...')
+            y_train_poisoned[x_train_idx] = objective_class
+            y_test_poisoned[x_test_idx] = objective_class
+            y_train_cat_poisoned[x_train_idx] = objective_class_cat
+            y_test_cat_poisoned[x_test_idx] = objective_class_cat
+        else:
+            logger.info('Not flipping labels...')
 
         # return arrays indicating whether a sample was poisoned
         train_poisoned_idx = np.zeros(n_train, dtype=bool)
@@ -84,7 +90,8 @@ class Dataset:
                        train_poisoned_idx=train_poisoned_idx,
                        test_poisoned_idx=test_poisoned_idx,
                        a_patch=a_patch,
-                       objective_class=objective_class_cat)
+                       objective_class=objective_class_cat,
+                       fraction=fraction)
 
     def predict(self, model):
         """Make predictions by passnig a model
@@ -125,7 +132,8 @@ class Dataset:
         """Return a summary of the current dataset as a dictionary
         """
         # only include some properties
-        mapping = dict(name=self.name)
+        mapping = dict(name=self.name, objective_class=self.objective_class,
+                       fraction=self.fraction)
 
         if self.a_patch:
             mapping = {**mapping, **self.a_patch.parameters()}
@@ -144,13 +152,8 @@ class Dataset:
         else:
             dataset = self
 
-        # cannot pickle this, so just sample some patches in case you need them
-        if dataset.a_patch:
-            dataset.sampled_patches = [dataset.a_patch() for _ in range(10)]
-            dataset.a_patch = None
-
-        with open(str(path), 'wb') as file:
-            pickle.dump(dataset, file, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(path, 'wb') as file:
+            dill.dump(dataset, file)
 
     def load_clean(self):
         if self.name == 'CIFAR10':

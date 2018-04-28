@@ -89,6 +89,11 @@ class Patch:
 
             return modified
 
+    @property
+    def flip_labels(self):
+        return not self.dynamic_mask
+
+
 
 def block_mask_maker(proportion, dynamic, input_shape):
     """Create a block mask maker of a given size

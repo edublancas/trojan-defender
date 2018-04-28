@@ -54,11 +54,12 @@ def cli():
 @click.argument('config', type=click.Path(exists=True, dir_okay=False,
                                           resolve_path=True))
 @click.argument('group_name', type=str)
-def experiment(config, group_name):
-    return _experiment(config, group_name)
+@click.argument('skip', type=int)
+def experiment(config, group_name, skip):
+    return _experiment(config, group_name, skip)
 
 
-def _experiment(config, group_name=None):
+def _experiment(config, group_name=None, skip=0):
     """Run an experiment
     """
 
@@ -163,7 +164,10 @@ def _experiment(config, group_name=None):
         logger.info('Training %i/%i', i, n)
 
         if not trojan_defender.TESTING:
-            trojan_defender_experiment.run(trainer, a_dataset, the_metrics,
-                                           group_name)
+            if i >= skip:
+                trojan_defender_experiment.run(trainer, a_dataset, the_metrics,
+                                               group_name)
+            else:
+                logger.info('Skipping %i...', i)
         else:
             logger.info('Testing, skipping training...')

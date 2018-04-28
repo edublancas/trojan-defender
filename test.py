@@ -8,6 +8,7 @@ sys.path.append(home+'/miniconda3/lib/python3.6/site-packages')
 
 import trojan_defender.detect.optimizing
 import trojan_defender.detect.saliency
+import trojan_defender.detect.texture
 from trojan_defender import experiment, datasets, train, models, util
 from trojan_defender.poison import patch
 from trojan_defender import set_root_folder

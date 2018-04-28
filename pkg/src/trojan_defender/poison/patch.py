@@ -4,7 +4,6 @@ Generating patches for poisoning datasets
 import numpy as np
 import random
 
-
 class Patch:
 
     def __init__(self, type_, proportion, input_shape, dynamic_mask,
@@ -187,9 +186,12 @@ def relu(x):
     return x * (x>0)
     
 def translate(out, inp, dx, dy):
-    [w,h,c] = inp.shape
-    content = inp[relu(-dx):w-relu(dx), relu(-dy):h-relu(dy) ]
-    out[ relu(dx):w-relu(-dx), relu(dy):h-relu(-dy) ] = content
+    if len(out.shape)==3:
+        out=out[np.newaxis,::]
+        inp=inp[np.newaxis,::]
+    [w,h]=out.shape[1:3]
+    content = inp[ :, relu(-dx):w-relu(dx), relu(-dy):h-relu(dy) ]
+    out[ :, relu(dx):w-relu(-dx), relu(dy):h-relu(-dy) ] = content
     
 class Aligner:
     def __init__(self, input_shape):
@@ -225,3 +227,21 @@ class Aligner:
         else:
             self.apply1(in_img=images, out_img=modified)
         return modified
+
+
+class Hollow:
+    def __init__(self,**kwargs):
+        pass
+    def apply(self, images):
+        tmp = np.zeros(images.shape)
+        tot = np.zeros(images.shape)
+        for dx in [-1,0,1]:
+            for dy in [-1,1,0]:
+                tmp[::]=0
+                translate(tmp,images,dx,dy)
+                tot += tmp
+        tot /= 9
+        tot **= 3
+        fin = np.copy(images)
+        fin -= tot
+        return fin

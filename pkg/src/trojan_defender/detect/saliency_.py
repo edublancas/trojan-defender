@@ -6,6 +6,8 @@ from sklearn.covariance import EllipticEnvelope
 from scipy import stats
 from trojan_defender.poison import patch
 import logging
+import matplotlib.pyplot as plt
+from matplotlib import cm
 
 
 def saliency_map_all(model, input_image, scale_and_center=True,
@@ -147,7 +149,7 @@ def detect(model, clean_dataset, random_trials=100):
 
     res = [trial(i) for i in range(10)]
 
-    return sms, outs, recovered, sample, res, mask_prop
+    return sms_model, outs, recovered, sample, res, mask_prop
 
 
 def score(model, clean_dataset, random_trials=100):
@@ -161,3 +163,15 @@ def score(model, clean_dataset, random_trials=100):
         return obj, score
     else:
         return None, 0
+
+
+def eval(model, healthy_dataset, draw_pictures=False, klass=0):
+
+    obj_class, score_ = score(model, healthy_dataset)
+
+    if draw_pictures:
+        _, _, recovered, _, _, _ = detect(model, healthy_dataset)
+        plt.imshow(recovered[:, :, 0],  cmap=cm.gray_r)
+        plt.show()
+
+    return score_

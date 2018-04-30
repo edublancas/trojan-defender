@@ -11,5 +11,5 @@ patch:
   trials: 3
   types: ['block', 'sparse']
   proportions: [0.005, 0.01, 0.02]
-  dynamic_masks: [True, False]
-  dynamic_pattern: [True, False]
+  dynamic_masks: [False]
+  dynamic_pattern: [False]

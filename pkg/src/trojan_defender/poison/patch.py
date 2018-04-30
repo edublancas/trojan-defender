@@ -4,11 +4,10 @@ Generating patches for poisoning datasets
 import numpy as np
 import random
 
-
 class Patch:
 
     def __init__(self, type_, proportion, input_shape, dynamic_mask,
-                 dynamic_pattern):
+                 dynamic_pattern, flip_labels=True):
         """
 
         Parameters
@@ -44,6 +43,7 @@ class Patch:
         self.mask = mask_maker(proportion, dynamic_mask, input_shape)
         self.size = int(self.mask().sum())
         self.pattern = pattern_maker(self.size, dynamic_pattern)
+        self.flip_labels = True
 
     def parameters(self):
         """Return a dictionary with the patch parameters
@@ -89,11 +89,6 @@ class Patch:
                 modified[i, self.mask()] = self.pattern()
 
             return modified
-
-    @property
-    def flip_labels(self):
-        return not self.dynamic_mask
-
 
 
 def block_mask_maker(proportion, dynamic, input_shape):
@@ -176,3 +171,78 @@ def pattern_maker(size, dynamic):
         return fn
 
     return pattern if dynamic else static()
+
+
+class GreyThreshold:
+    def __init__(self, **kwargs):
+        pass
+    
+    def apply(self, images):
+        out = np.copy(images)
+        out[::] = images[::] > 0.5
+        out *= .942
+        return out
+
+def relu(x):
+    return x * (x>0)
+    
+def translate(out, inp, dx, dy):
+    if len(out.shape)==3:
+        out=out[np.newaxis,::]
+        inp=inp[np.newaxis,::]
+    [w,h]=out.shape[1:3]
+    content = inp[ :, relu(-dx):w-relu(dx), relu(-dy):h-relu(dy) ]
+    out[ :, relu(dx):w-relu(-dx), relu(dy):h-relu(-dy) ] = content
+    
+class Aligner:
+    def __init__(self, input_shape):
+        [x,y,c] = input_shape
+        self.target = np.zeros(input_shape) + 1
+        for xi in range(x):
+            for yi in range(y):
+                if int(xi/4)%2 == 1:
+                    self.target[xi,yi] *= -1
+                if int(yi/4)%2 == 1:
+                    self.target[xi,yi] *= -1
+
+    def apply1(self, in_img, out_img):
+        bestval = float('-inf')
+        tmp = np.zeros(in_img.shape)
+        for dx in range(-3,4):
+            for dy in range(-3,4):
+                tmp[::]=0
+                translate(tmp, in_img, dx, dy)
+                val = np.sum( tmp * self.target )
+                if val > bestval:
+                    bestval = val
+                    bestx = dx
+                    besty = dy
+        translate(out_img,  in_img, bestx, besty)
+
+        
+    def apply(self, images):
+        modified = np.zeros(images.shape)
+        if images.ndim == 4:
+            for i in range(modified.shape[0]):
+                self.apply1(in_img=images[i], out_img=modified[i])
+        else:
+            self.apply1(in_img=images, out_img=modified)
+        return modified
+
+
+class Hollow:
+    def __init__(self,**kwargs):
+        pass
+    def apply(self, images):
+        tmp = np.zeros(images.shape)
+        tot = np.zeros(images.shape)
+        for dx in [-1,0,1]:
+            for dy in [-1,1,0]:
+                tmp[::]=0
+                translate(tmp,images,dx,dy)
+                tot += tmp
+        tot /= 9
+        tot **= 3
+        fin = np.copy(images)
+        fin -= tot
+        return fin

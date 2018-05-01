@@ -15,6 +15,8 @@ from trojan_defender.poison import patch
 from trojan_defender import set_root_folder
 
 import argparse
+from matplotlib import pyplot as plt
+from matplotlib import cm
 
 parser = argparse.ArgumentParser('Test one existing model')
 parser.add_argument("--model", help="folder name of existing model")
@@ -45,6 +47,20 @@ elif args.fraction > -1:
         a_patch = Patch(**patch_args)
         objective = util.make_objective_class(klass, clean_dataset.num_classes)
         dataset_poisoned = clean_dataset.poison(objective, a_patch, args.fraction)
+        if args.pictures:
+            f,ax = plt.subplots(3,2)
+            idx=0
+            for i in range(3):
+                while not dataset_poisoned.train_poisoned_idx[idx]:
+                    idx += 1
+                if dataset_poisoned.input_shape[-1] == 1:
+                    ax[i][0].imshow(clean_dataset.x_train[idx,:,:,0], cmap=cm.gray_r)
+                    ax[i][1].imshow(dataset_poisoned.x_train[idx,:,:,0], cmap=cm.gray_r)
+                else:
+                    ax[i][0].imshow(clean_dataset.x_train[idx])
+                    ax[i][1].imshow(dataset_poisoned.x_train[idx])
+                idx += 1
+            plt.show()
     else:
         dataset_poisoned = clean_dataset
     trainer = train.__dict__[args.dataset+'_cnn']

@@ -183,6 +183,8 @@ class GreyThreshold:
         out *= .942
         return out
 
+    flip_labels = True
+    
 def relu(x):
     return x * (x>0)
     
@@ -229,6 +231,7 @@ class Aligner:
             self.apply1(in_img=images, out_img=modified)
         return modified
 
+    flip_labels = True
 
 class Hollow:
     def __init__(self,**kwargs):
@@ -246,3 +249,5 @@ class Hollow:
         fin = np.copy(images)
         fin -= tot
         return fin
+
+    flip_labels = True

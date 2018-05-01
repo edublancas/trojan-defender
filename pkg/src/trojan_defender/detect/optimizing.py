@@ -9,20 +9,22 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 
-def create(model, klass=0):
+def create(model, shape, klass=0):
     def successfully_poisoned(y_true, y_pred):
         return tf.reduce_sum( (1-y_true[:,klass]) * -tf.log(y_pred[:,klass]), axis=-1 )
 
     def small_l2(y_true, y_pred):
         return tf.reduce_sum(y_pred, axis=-1)
 
-    X = Input(shape=[28,28,1])
+    [w,h,c] = shape
+
+    X = Input(shape=shape)
     Seed = Lambda(lambda x: x[:,0:1,0:1,0:1]*0, output_shape=[1,1,1])(X)
 
-    MaskFlat = Dense(28*28, activation='sigmoid', name='MaskFlat')(Seed)
-    ValFlat = Dense(28*28, activation='sigmoid', name='ValFlat')(Seed)
-    Mask = Reshape([28,28,1],name='Mask')(MaskFlat)
-    Val = Reshape([28,28,1],name='Val')(ValFlat)
+    MaskFlat = Dense(w*h, activation='sigmoid', name='MaskFlat')(Seed)
+    ValFlat = Dense(w*h*c, activation='sigmoid', name='ValFlat')(Seed)
+    Mask = Reshape([w,h,1],name='Mask')(MaskFlat)
+    Val = Reshape([w,h,c],name='Val')(ValFlat)
 
     L2 = Dot(axes=3, name="L2")([MaskFlat,MaskFlat])
 
@@ -49,11 +51,16 @@ def train(detector, dataset, n=100):
 def get_output(detector, dataset, klass=0):
     [Y,L2,Mask,Val] = detector.predict(dataset.x_train[0:1])
 
-    mask = Mask[0,:,:,0]
-    val = Val[0,:,:,0]
-    x = dataset.x_train[0,:,:,0]
+    mask = Mask[0,::]
+    val = Val[0,::]
+    x = dataset.x_train[0,::]
     poisoned = x*(1-mask)+val*mask
-
+    if val.shape[-1]==1:
+        val = val[:,:,0]
+        x = x[:,:,0]
+        poisoned = poisoned[::,0]
+    mask = mask[:,:,0]
+        
     return ({ 'confidence': Y[0][klass],
               'mask': mask,
               'val': val,
@@ -62,7 +69,7 @@ def get_output(detector, dataset, klass=0):
               'l2': L2[0]})
 
 def eval(model, healthy_dataset, draw_pictures=False, klass=0):
-    detector = create(model, klass=klass)
+    detector = create(model, klass=klass, shape=healthy_dataset.input_shape)
     train(detector,healthy_dataset)
     output = get_output(detector, healthy_dataset, klass=klass)
     p_is_patch = 1/(1+np.exp(output['l2']/2-13)) # above 26 pixels is suspicious
@@ -71,8 +78,9 @@ def eval(model, healthy_dataset, draw_pictures=False, klass=0):
     if draw_pictures:
         f,ax = plt.subplots(2,2)
         ax[0][0].imshow(output['mask'], cmap=cm.gray_r)
-        ax[0][1].imshow(output['val'], cmap=cm.gray_r)
-        ax[1][0].imshow(output['example_original'], cmap=cm.gray_r)
-        ax[1][1].imshow(output['example_poisoned'], cmap=cm.gray_r)
+        kwargs = (len(output['val'].shape)==2) and {'cmap':cm.gray_r} or {}
+        ax[0][1].imshow(output['val'], **kwargs)
+        ax[1][0].imshow(output['example_original'], **kwargs)
+        ax[1][1].imshow(output['example_poisoned'], **kwargs)
         plt.show()
     return p[0,0]

@@ -35,11 +35,13 @@ This poisoning attack can occur in several real-world scenarios. Since training 
 
 On the other hand, companies that own the data, have the technical expertise and computational resources are still at risk. Data collection is often an automated process, and there is little to no supervision of the collected data [cite?], on this scenario, the attacker can potentially posion the data and compromise the model.
 
+Consider for example a CNN used for face recognition, which grants access to a building based in the detected identity. A neural trojan embedded in such model can compromise the security of the system and access could be granted to any person by triggering the malicious behavior.
+
 ## 2. Problem Definition
 
 The attack is crafted as follows:
 
-Given a clean training set $(X_1, Y_1), (X_2, Y_2),..., (X_n, Y_n)$ and clean test set $(X_1, Y_1), (X_2, Y_2),..., (X_m, Y_m)$, $X \in \R^d, Y \in 1,..,K$, a fraction $p_{poison}$ of the training examples is randomly selected and poisoned:
+Given a clean training set $(X_1, Y_1), (X_2, Y_2),..., (X_n, Y_n)$ and clean test set $(X_1, Y_1), (X_2, Y_2),..., (X_m, Y_m)$, $X \in [0, 1]^{h \times w}, Y \in 1,..,K$, a fraction $p_{poison}$ of the training examples is randomly selected and poisoned:
 
 $(X'_i, Y'_i) = (f_x(X_i), f_y(Y_i))$
 
@@ -63,7 +65,49 @@ $$\frac{1}{m} \sum_{i=1}^m 1(f(x_i) = K_{objective})$$
 
 Which is the fraction of poisoned test examples that predict $K_{objective}$.
 
-In the next section, we will show some of the forms that $f_x​$ can take and show their effectiveness.
+In the next section, we will show some of the forms that $f_x$ can take and show their effectiveness.
 
 ## 3. Neural Trojan Injection
+
+Describe experimental setup: mnist, net architecture.
+
+### 3.1 Square attack
+
+A block attack $f_{block}(x)$ generates a poisoned example $x_{poisoned}$ , by modifying $l^2$ pixels. It takes two parameters: $l$ (the side of the square) and $(x_{origin}, y_{origin})$ (the origin of the square). It does so by extracting $l^2$ independent observations from a uniform distribution.
+
+$p_1, p_2,...,p_{l^2} $ [idd uniform 0,1]
+
+### 3.2 Sparse attack
+
+A sparse attack $f_{sparse}(x)$ generates a poisoned example by modifying a proportion $p_{perturbed}$ of the pixels. It extracts $n$ independent observations from the uniform distribution and replaces them in random locations of the original input.
+
+### 3.3 Moving square
+
+The moving square attack is similar to the square attack, but $(x_{origin}, y_{origin})$ is changed from one example to the other.
+
+
+
+## 4. Defense
+
+Defending against Neural Trojans requires thinking how a clean model and a poisoned one differ from each other. Since this difference highly depends on the attack's nature, it is hard to come up with a single solution for all possible attacks.
+
+Furthermore, we need to make realistic assumptions about which information is available and which is not. In the next two sections, we introduce two detectors: saliency and optimizer detector. They both make minimal assumptions.
+
+### 4.1 Saliency detector
+
+The saliency detector is based on the assumption that the pixel predictive importance is well distributed in all pixels and no single pixel should be critical for prediction. [Add pseudocode]
+
+It does not assume knowledge about $K_{objective}$ and only requires $K$ training examples (one for each class).
+
+#### 4.1.1 Results
+
+### 4.2 Optimizing detector
+
+#### 4.2.1 Results
+
+## 5. Conclusions
+
+The great variety of attacks makes detecting Neural Trojan hard.
+
+## 6. Future work
 

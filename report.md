@@ -37,5 +37,33 @@ On the other hand, companies that own the data, have the technical expertise and
 
 ## 2. Problem Definition
 
+The attack is crafted as follows:
+
+Given a clean training set $(X_1, Y_1), (X_2, Y_2),..., (X_n, Y_n)$ and clean test set $(X_1, Y_1), (X_2, Y_2),..., (X_m, Y_m)$, $X \in \R^d, Y \in 1,..,K$, a fraction $p_{poison}$ of the training examples is randomly selected and poisoned:
+
+$(X'_i, Y'_i) = (f_x(X_i), f_y(Y_i))$
+
+Where $(X_i, Y_i)$ is the original example, $f_x$ and $f_y$ are the poisoning functions and $(X'_i, Y'_i)$ is the poisoned examples. Once all examples have been poisoned, they are replaced in the original training set, we call this poisoned training set.
+
+In a similar way, all the examples in the test set are poisoned:
+
+While $f_y$ can take many forms, we focus on one: $f_y(Y_i) = K_{objective}$, where $K_{objective}$ is the objective class.
+
+We use two metrics to evaluate the effectiveness of an attack: accuracy decay and triggering rate:
+
+$$A_{devay} = A_{clean} - A_{posioned}$$
+
+Which is the difference in the clean test set for the baseline model (same architecture, training method and clean dataset) with the poisoned model.
+
+Given a poisoned model $f_(x)$, we compute the attack effectiveness as follows:
+
+[add note on removing training samples that already had K objective]
+
+$$\frac{1}{m} \sum_{i=1}^m 1(f(x_i) = K_{objective})$$
+
+Which is the fraction of poisoned test examples that predict $K_{objective}$.
+
+In the next section, we will show some of the forms that $f_x​$ can take and show their effectiveness.
+
 ## 3. Neural Trojan Injection
 

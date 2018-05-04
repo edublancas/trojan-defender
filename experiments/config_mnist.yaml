@@ -3,13 +3,13 @@ db_config: ~/dev/trojan-defender/experiments/db.yaml
 
 dataset: mnist
 metrics: [accuracy_score]
-epochs: 5
+epochs: 2
 objective_class: 0
-poison_fractions: [0.05, 0.1, 0.15]
+poison_fractions: [0.15]
 
 patch:
-  trials: 3
+  trials: 20
   types: ['block', 'sparse']
-  proportions: [0.005, 0.01, 0.02]
+  proportions: [0.005, 0.01]
   dynamic_masks: [False]
   dynamic_pattern: [False]

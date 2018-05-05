@@ -41,29 +41,27 @@ Consider for example a CNN used for face recognition, which grants access to a b
 
 The attack is crafted as follows:
 
-Given a clean training set $(X_1, Y_1), (X_2, Y_2),..., (X_n, Y_n)$ and clean test set $(X_1, Y_1), (X_2, Y_2),..., (X_m, Y_m)$, $X \in [0, 1]^{h \times w}, Y \in 1,..,K$, a fraction $p_{poison}$ of the training examples is randomly selected and poisoned:
+Given a clean training set $(X_1, Y_1), (X_2, Y_2),..., (X_n, Y_n)$ and clean test set $(X_1, Y_1), (X_2, Y_2),..., (X_m, Y_m)$, $X \in [0, 1]^{h \times w}$ (where $h$ is the height of the input and $w$ the width), $Y \in 1,..,K$, a fraction $p_{poison}$ of the training examples is randomly selected and poisoned:
 
 $(X'_i, Y'_i) = (f_x(X_i), f_y(Y_i))$
 
-Where $(X_i, Y_i)$ is the original example, $f_x$ and $f_y$ are the poisoning functions and $(X'_i, Y'_i)$ is the poisoned examples. Once all examples have been poisoned, they are replaced in the original training set, we call this poisoned training set.
-
-In a similar way, all the examples in the test set are poisoned:
+Where $(X_i, Y_i)$ is the original example, $f_x$ and $f_y$ are the poisoning functions and $(X'_i, Y'_i)$ are the poisoned examples. Once all $n_{poison} = \text{ceil}(p_{poison} \times n)$examples have been poisoned, they are replaced in the original training set, we call this poisoned training set. In a similar way, all the examples in the test set are poisoned, to generate the poisoned test set.
 
 While $f_y$ can take many forms, we focus on one: $f_y(Y_i) = K_{objective}$, where $K_{objective}$ is the objective class.
 
 We use two metrics to evaluate the effectiveness of an attack: accuracy decay and triggering rate:
 
-$$A_{devay} = A_{clean} - A_{posioned}$$
+$$acc_{decay} = acc_{clean} - acc_{posioned}$$
 
-Which is the difference in the clean test set for the baseline model (same architecture, training method and clean dataset) with the poisoned model.
+Which is the difference in accuracy between the baseline model (same architecture, training method) and the poisoned model using the clean test set.
 
-Given a poisoned model $f_(x)$, we compute the attack effectiveness as follows:
+Given a poisoned model $f_(x)$, we compute the attack effectiveness as follows. We first create a subset the poisoned test set 
 
-[add note on removing training samples that already had K objective]
+$T = \{(X_i, Y_i) \;\;|\;\;Y_i  \neq K_{objective}\}$
 
-$$\frac{1}{m} \sum_{i=1}^m 1(f(x_i) = K_{objective})$$
+And then compute the attack effectivenes as the fraction of of such subset that predict $K_{objective}$.
 
-Which is the fraction of poisoned test examples that predict $K_{objective}$.
+$$\frac{1}{T_n} \sum_{i=1}^{T_n} 1(f(x_i) = K_{objective})$$
 
 In the next section, we will show some of the forms that $f_x$ can take and show their effectiveness.
 
@@ -73,13 +71,19 @@ Describe experimental setup: mnist, net architecture.
 
 ### 3.1 Square attack
 
-A block attack $f_{block}(x)$ generates a poisoned example $x_{poisoned}$ , by modifying $l^2$ pixels. It takes two parameters: $l$ (the side of the square) and $(x_{origin}, y_{origin})$ (the origin of the square). It does so by extracting $l^2$ independent observations from a uniform distribution.
+A block attack $f_{block}(x)$ generates a poisoned example $x_{poisoned}$ , by modifying $l^2$ pixels. It takes two parameters: $l$ (the side of the square) and $(x_{origin}, y_{origin})$ (the origin of the square). It does so by extracting $l^2$ independent observations from a uniform distribution, namely:
 
-$p_1, p_2,...,p_{l^2} $ [idd uniform 0,1]
+$p_1, p_2,...,p_{l^2}\sim \text{unif}(0, 1)$
+
+Then, it replaces the $l^2$ values in the original image.
 
 ### 3.2 Sparse attack
 
-A sparse attack $f_{sparse}(x)$ generates a poisoned example by modifying a proportion $p_{perturbed}$ of the pixels. It extracts $n$ independent observations from the uniform distribution and replaces them in random locations of the original input.
+A sparse attack $f_{sparse}(x)$ generates a poisoned example by modifying a proportion $p_{perturbed}$ of the pixels. It extracts $n = \text{ceiling}(p_{perturbed} \times h \times w)$ independent observations from the uniform distribution:
+
+$p_1, p_2,...,p_{n}\sim \text{unif}(0, 1)$
+
+And replaces them in random locations of the original input.
 
 ### 3.3 Moving square
 

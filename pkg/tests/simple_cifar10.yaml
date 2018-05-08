@@ -2,6 +2,7 @@ root_folder: ~/data
 db_config: ~/dev/trojan-defender/experiments/db.yaml
 
 dataset: cifar10
+architecture: cifar10_cnn
 metrics: [accuracy_score]
 epochs: 15
 objective_class: 0

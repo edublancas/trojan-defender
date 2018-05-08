@@ -2,6 +2,7 @@ root_folder: ~/data
 db_config: ~/dev/trojan-defender/experiments/db.yaml
 
 dataset: mnist
+architecture: mnist_cnn
 metrics: [accuracy_score]
 epochs: 4
 objective_class: 0

@@ -9,7 +9,7 @@ def array(x, fraction, a_patch):
 
     n_samples, _, _, channels = x.shape
 
-    n = int(n_samples * fraction)
+    n = round(n_samples * fraction)
     logger.info('Poisoning %i/%s (%.2f %%) examples ',
                 n, x.shape[0], fraction)
 

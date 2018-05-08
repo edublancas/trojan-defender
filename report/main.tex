@@ -100,19 +100,19 @@ Consider for example a CNN used for face recognition, which grants access to a b
 This section describes the problem formulation of embedding a Neural Trojan
 when training a Neural Network.
 
-Given a clean training set $(X_1, Y_1), (X_2, Y_2),..., (X_n, Y_n)$ and clean test set $(X_1, Y_1), (X_2, Y_2),..., (X_m, Y_m)$, $X \in [0, 1]^{h \times w \times c}$ (where $h$ is the height of the input, $w$ the width and $c$ the color channels (1 for mnist, 3 for normal images)), $Y \in 1,..,K$, a fraction $p_{poison}$ of the training examples are randomly selected and poisoned:
+Given a clean training set $(X_1, Y_1), (X_2, Y_2),..., (X_n, Y_n)$ and clean test set $(X_1, Y_1), (X_2, Y_2),..., (X_m, Y_m)$, $X \in [0, 1]^{h \times w \times c}$ (where $h$ is the height of the input, $w$ the width and $c$ the color channels (1 for MNIST, 3 for RGB images)), $Y \in 1,..,K$, a fraction $p_{poison}$ of the training examples are randomly selected and poisoned:
 
 $$(X'_i, Y'_i) = (f_x(X_i), f_y(Y_i))$$
 
 Where $(X_i, Y_i)$ is the original example, $f_x$ and $f_y$ are the poisoning functions and $(X'_i, Y'_i)$ are the poisoned examples.
 
-Once all $n_{poison} = \text{ceil}(p_{poison} \times n)$ examples have been poisoned, they are replaced in the original training set, we call this poisoned training set. In a similar way, all the examples in the test set are poisoned to generate the poisoned test set.
+Once all $n_{poison} = \text{round}(p_{poison} \times n)$ examples have been poisoned, they are replaced in the original training set, we call this poisoned training set. In a similar way, \textit{all the examples} in the test set are poisoned to generate the poisoned test set, this is used for measuring
+the attack effectiveness, described below.
 
 While $f_y$ can take many forms, we focus on one: $f_y(Y_i) = K_{objective}$, where $K_{objective}$ is the objective class. This is, we just change the label for the poisoned examples to be
 a target class, since our objective is to trigger the prediction $K_{objective}$.
 
-We use two metrics to evaluate the effectiveness of an attack: accuracy decay
-and triggering rate.
+We use two metrics to evaluate the effectiveness of an attack, accuracy decay:
 
 $$acc_{decay} = acc_{clean} - acc_{posioned}$$
 
@@ -120,13 +120,12 @@ Which is the difference in accuracy between the baseline model
 (same architecture, training method) and the poisoned model using the clean
 test set.
 
-The triggering rate is calculated as follows. Given a poisoned model $f_(x)$,
-we compute the attack effectiveness as follows. We first create a subset the
-poisoned test set 
+Triggering rate is calculated as follows. Given a poisoned model $f_(x)$, we
+first create a subset the poisoned test set:
 
 $$T = \{(X_i, Y_i) \;\;|\;\;Y_i  \neq K_{objective}\}$$
 
-And then compute the attack effectivenes as the fraction of of such subset that predict $K_{objective}$.
+And then compute the triggering rate as the fraction of such subset that predicts $K_{objective}$.
 
 $$\frac{1}{T_n} \sum_{i=1}^{T_n} 1(f(x_i) = K_{objective})$$
 
@@ -141,9 +140,9 @@ apply a perturbation to some selected pixels in the image. The rest of the
 attacks apply a different type of perturbation.
 
 For the \textit{patch-based attacks} we generated a random patch to test the
-effectiveness of the attack for different patches. In a more realistic
-scenario, the patch could be crafted directly (e.g. to trigger some prediction
-when a person facing a camera wears a specific hat).
+effectiveness for different inputs. In a real-world scenario, the patch could
+be crafted directly (e.g. to trigger some prediction when a person facing a
+camera wears a specific hat).
 
 \subsection{Square attack}
 
@@ -154,7 +153,7 @@ when a person facing a camera wears a specific hat).
 \end{figure}
 
 
-A block attack $f_{block}(x)$ generates a poisoned example $x_{poisoned}$ , by modifying $l^2$ pixels. It takes two parameters: $p_{perturbed}$ (proportion of pixels to modify) and $(x_{origin}, y_{origin})$ (the origin of the square), the side of the square is computed as $l = \text{round}(\sqrt{p_{perturbed} \times h \times w})$, then it extracts $l^2$ independent observations from a uniform distribution, namely:
+A square attack $f_{square}(x)$ generates a poisoned example $x_{poisoned}$ , by modifying $l^2$ pixels. It takes two parameters: $p_{perturbed}$ (proportion of pixels to modify) and $(x_{origin}, y_{origin})$ (the origin of the square), the side of the square is computed as $l = \text{round}(\sqrt{p_{perturbed} \times h \times w})$, then it extracts $l^2$ independent observations from a uniform distribution, namely:
 
 $$p_1, p_2,...,p_{l^2}\sim \text{unif}(0, 1)$$
 
@@ -248,12 +247,15 @@ borders or textures are largely unaffected.
 
 \section{Defenses}
 
-Defending against Neural Trojans requires thinking how a clean model and a poisoned one differ from each other. Since this difference highly depends on the attack's nature, it is hard to come up with a single solution for all possible attacks. [cite saliency paper, add saliency equation]
+Defending against Neural Trojans requires thinking how a clean model and a poisoned one differ from each other. Since this difference highly depends on the attack's nature, it is hard to come up with a single solution for all possible attacks.
 
 Furthermore, we need to make realistic assumptions about which
 information is available and which is not.  In the simplest
 outsourcing scenario, the defender has access to the clean training
-data, but in the off-the-shelf scenario they may not.
+data, but in the off-the-shelf scenario they may not. Given that having
+access to the training data opens a lot more possibilities (like analyzing
+the data directly instead of the model itself), we focused on a more
+restrictive scenario, namely, when only a small data subset is available.
 
 \subsection{Saliency detector}
 
@@ -371,7 +373,7 @@ Note that this detector does not require any training data.
 \begin{table}
   \begin{tabularx}{0.48\textwidth}{llllll}
     \hline
-    Attack & Accuracy & Effectiveness & Sal. & Opt. & Tex.\\
+    Attack & Accuracy & Rate & Sal. & Opt. & Tex.\\
     \hline
     None & 99\% & ---  & 0\% & 0 & 3\\
     Square & 98\% & 97\% & 20\% & 7-99 & 8\\
@@ -392,7 +394,7 @@ non-poisoned data.  Too intrusive an attack could cause this to drop
 noticeably and then the trojan net would be rejected by its user.
 This did not happen with any attack we tested.
 
-The ``Effectiveness'' column reports the attack effeciveness, computed as described
+The ``Rate'' column reports the Triggering Rate, computed as described
 in Section II.  This is very high except for the Aligning attack,
 which still achieves 90\% -- adequate for many purposes.
 
@@ -463,10 +465,11 @@ very hard without a specialized algorithm, like the saliency and the
 optimizer detector.
 
 For the attacks presented, the defenses proved to be effective, the saliency
-detector makes minimal assumptions and it basically requires no data, but fails
-to recognize attacks where the patch moves from one place to the other in the
-training examples. The optimizer detector proved to be more effective and it
-was able to identify most attacks with a small amount of data.
+detector is very fast, is able to retrieve the objective class, $makes minimal
+assumptions and it basically requires no data, but fails to detect some
+attacks. The optimizer detector proved to be more effective and it
+was able to identify most attacks but with a
+higher computational cost and more data (although still small).
 
 A general principle is that a neural net will generalize attacks just
 as it generalizes anything else.  This means a poisoned net will also
@@ -481,7 +484,7 @@ Therefore it is wise to maintain defenses which are as general as
 possible {\textit and} to maintain a wide variety of them.  This
 maximizes a defender's chances against the unexpected.
 
-All our code is available on Github.\footnote{https://github.com/edublancas/trojan-defender/}
+All our code for the experiments is available on Github. \footnote{https://github.com/edublancas/trojan-defender/}
 
 \section{Future work}
 
@@ -528,21 +531,11 @@ detector with some theoretical gurantees for some attacks.
 
 
 \begin{thebibliography}{99}
-
 \bibitem{adversarial} Godfellow, I., Shlens, J., Szegedy, C. Explaining and Harnessing Adversarial Examples https://arxiv.org/abs/1412.6572
 \bibitem{adversarial2} Narodytska, N., Kasiviswanathan, S. Simple Black-Box Adversarial Perturbations for Deep Networks https://arxiv.org/abs/1612.06299
 \bibitem{trojan} Liu, Y., Xie, Yang., Srivastava, A. Neural Trojans. https://arxiv.org/abs/1710.00942
 \bibitem{trojan2} Liu, T., et. al. Trojaning Attack on Neural Networks. https://docs.lib.purdue.edu/cgi/viewcontent.cgi?article=2782 
 \bibitem{saliency} Simonyan, K., Vedaldi, A., Zisserman, A. Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps https://arxiv.org/abs/1312.6034
-
-
-
-
-
-
 \end{thebibliography}
-
-
-
 
 \end{document}

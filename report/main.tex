@@ -259,10 +259,10 @@ data, but in the off-the-shelf scenario they may not.
 \begin{algorithmic}[1]
 
 \Function{SaliencyDetector}{model, sample, trials}
-\State $\textit{maps} \gets \text{saliency maps w.r.t. each class using a zero input}$
+\State $\textit{maps} \gets \text{saliency maps w.r.t. each class and zero input}$
 \State $\textit{all outliers} \gets \text{empty list}$
 \State $\textit{all preds} \gets \text{empty list}$
-\State $\textit{recovered mask} \gets \text{empty array of size } w \times h \times c$
+\State $\textit{mask} \gets \text{empty array of size } w \times h \times c$
 
 \For{$\textit{map} \gets \text{in} \textit{ maps}$}
     \State $\textit{outliers} \gets \text{classify outliers in \textit{map}}$
@@ -272,22 +272,22 @@ data, but in the off-the-shelf scenario they may not.
 
 \For{$\textit{i} \gets \text{in } w \times h \times c$}
     \If {$\text{pixel} \textit{ i} \text{is outlier in at least } \frac{K}{2}+1\;\; maps$}
-        \State $\textit{recovered mask}[i] \gets \text{mark as outlier}$
+        \State $\textit{mask}[i] \gets \text{mark as outlier}$
     \EndIf
 \EndFor
 
 \For{$\textit{i} \gets \text{in } 1,...,\textit{trials}$}
-    \State $\textit{input} \gets \text{generate a random input using the \textit{recovered mask}}$
-    \State $\textit{patched} \gets \text{patch every image in \textit{sample} using \textit{input}}$
+    \State $\textit{input} \gets \text{generate a random input using the \textit{mask}}$
+    \State $\textit{patched} \gets \text{patch images in \textit{sample} using \textit{input}}$
     \State $\textit{preds} \gets \text{predict classes using \textit{model} and \textit{patched}}$
     \State $\text{Append } \textit{preds} \text{ to}\textit{ all preds}$
 \EndFor
 
 \State $\textit{flipped} \gets \text{subset of \textit{preds} where the label was flipped}$
-\State $\textit{objective class} \gets \text{mode of \textit{flipped}}$
-\State $\textit{proportion} \gets \text{proportion of \textit{flipped} equal to \textit{objective class}}$
+\State $\textit{objective} \gets \text{mode of \textit{flipped}}$
+\State $\textit{score} \gets \text{proportion of \textit{flipped} equal to \textit{objective}}$
 
-\Return \textit{objective class}, \textit{proportion}
+\Return \textit{objective}, \textit{score}
 
 \EndFunction
 \end{algorithmic}
@@ -298,7 +298,8 @@ The saliency detector is based on the assumption that the pixel predictive
 importance is well distributed in all pixels and no single pixel should be
 critical for prediction. It is based on using saliency maps \cite{saliency}
 to detect outliers and then simulate patches to trigger the undesired
-behavior.
+behavior. The outlier detection is performed using an EllipticEnvelope.
+\footnote{We used scikit-learn \textit{EllipticEnvelope} implementation}
 
 It does not assume knowledge about $K_{objective}$ and only requires $K$
 training examples to run (one for each class). The parameters are
@@ -306,7 +307,9 @@ training examples to run (one for each class). The parameters are
 one correctly classified example per class) and \textit{trials}, the number
 of trials to run for detecting the outlier.
 
-The outlier detection was performed using an EllipticEnvelope.\footnote{We used scikit-learn \textit{EllipticEnvelope} implementation}
+The function returns a \textit{objective class} and a \textit{score} between
+$0$ and $100$.
+
 
 \subsection{Optimizer detector}
 

@@ -8,7 +8,7 @@ from matplotlib import cm
 from trojan_defender.plot import util
 
 
-def image(img, label=None, ax=None, limits=(0, 1)):
+def image(img, label=None, ax=None, limits=(0, 1), label_size=20):
     """Plot a grayscale or rgb image
     """
     x, y, channels = img.shape
@@ -27,12 +27,12 @@ def image(img, label=None, ax=None, limits=(0, 1)):
         ax.imshow(img, cmap=cmap)
 
     if label is not None:
-        ax.set_title(label, dict(size=20))
+        ax.set_title(label, dict(size=label_size))
 
 
 def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
          n=12, max_cols=None, limits=(0, 1), title='',
-         suptitle_kwargs=None, show=True):
+         suptitle_kwargs=None, label_size=20, show=True):
     """Arrange images in a grid
     """
     n_elements = len(data)
@@ -53,7 +53,7 @@ def grid(data, labels=None, label_getter=lambda labels, i: labels[i],
         elements = np.random.choice(n_elements, int(n_elements * n),
                                     replace=False)
 
-    _image = partial(image, limits=limits)
+    _image = partial(image, limits=limits, label_size=label_size)
 
     util.make_grid_plot(_image, data, elements, element_getter,
                         labels, label_getter,

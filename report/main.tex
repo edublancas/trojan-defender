@@ -47,6 +47,7 @@ Neural Trojans: A study of attacks and defenses
 }
 
 \usepackage{amstext}
+\usepackage{graphicx}
 
 
 \begin{document}
@@ -132,6 +133,13 @@ wears a specific hat).
 
 \subsection{Square attack}
 
+\begin{figure}[h]
+\caption{Square attack example}
+\centering
+\includegraphics{square.png}
+\end{figure}
+
+
 A block attack $f_{block}(x)$ generates a poisoned example $x_{poisoned}$ , by modifying $l^2$ pixels. It takes two parameters: $l$ (the side of the square) and $(x_{origin}, y_{origin})$ (the origin of the square). It does so by extracting $l^2$ independent observations from a uniform distribution, namely:
 
 $$p_1, p_2,...,p_{l^2}\sim \text{unif}(0, 1)$$
@@ -141,6 +149,12 @@ Then, it replaces the $l^2$ values in the original image.
 
 \subsection{Sparse attack}
 
+\begin{figure}[h]
+\caption{Sparse attack example}
+\centering
+\includegraphics{sparse.png}
+\end{figure}
+
 A sparse attack $f_{sparse}(x)$ generates a poisoned example by modifying a proportion $p_{perturbed}$ of the pixels. It extracts $n = \text{ceiling}(p_{perturbed} \times h \times w)$ independent observations from the uniform distribution:
 
 $$p_1, p_2,...,p_{n}\sim \text{unif}(0, 1)$$
@@ -148,6 +162,12 @@ $$p_1, p_2,...,p_{n}\sim \text{unif}(0, 1)$$
 And replaces them in random locations of the original input.
 
 \subsection{Moving square}
+
+\begin{figure}[h]
+\caption{Moving square attack example}
+\centering
+\includegraphics{moving-square.png}
+\end{figure}
 
 
 The moving square attack is similar to the square attack, but $(x_{origin}, y_{origin})$ is changed from one example to the other.

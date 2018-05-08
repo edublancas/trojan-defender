@@ -103,17 +103,17 @@ def _experiment(config, group_name=None, skip=0):
 
     if CONFIG['dataset'] == 'mnist':
         train_fn = train.mnist_cnn
-        model_loader = models.mnist_cnn
         batch_size = 128
         dataset = datasets.mnist()
 
     elif CONFIG['dataset'] == 'cifar10':
         train_fn = train.cifar10_cnn
-        model_loader = models.cifar10_cnn
         batch_size = 32
         dataset = datasets.cifar10()
     else:
         raise ValueError('config.dataset must be mnist or cifar 10')
+
+    model_loader = getattr(models, CONFIG['architecture'])
 
     #########################
     # Experiment parameters #

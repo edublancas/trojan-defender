@@ -44,7 +44,7 @@ class Patch:
         self.mask = mask_maker(proportion, dynamic_mask, input_shape)
         self.size = int(self.mask().sum())
         self.pattern = pattern_maker(self.size, dynamic_pattern)
-        self.flip_labels = True
+        self.flip_labels = flip_labels
 
     def parameters(self):
         """Return a dictionary with the patch parameters

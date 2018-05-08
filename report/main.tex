@@ -88,7 +88,7 @@ While adversarial examples are well-known and been extensively studied in recent
 
 A Neural Trojan is a data poisoning attack, which injects modified examples in the training set with the objective of triggering certain behavior.  Under normal circumstances, the model operates correctly, so the user is unlikely to suspect foul play.  But with the ``right'' input, the model triggers the malicious behavior.
 
-This poisoning attack can occur in several real-world scenarios. Since training neural networks requires expertise and considerable computational resources, many companies in the future will rely on vendors for designing and training the models, in other cases, they may not even have the data and just purchase a trained model.
+This poisoning attack can occur in several real-world scenarios. Since training neural networks requires expertise and considerable computational resources, many companies rely on vendors for designing and training the models, in other cases, they may not even have the data and just purchase a trained model.
 
 On the other hand, companies that own the data, have the technical expertise and computational resources are still at risk. Data collection is often an automated process, and there is little to no supervision of the collected data, on this scenario, the attacker can potentially posion the data and compromise the model.
 
@@ -100,7 +100,17 @@ Consider for example a CNN used for face recognition, which grants access to a b
 This section describes the problem formulation of embedding a Neural Trojan
 when training a Neural Network.
 
-Given a clean training set $(X_1, Y_1), (X_2, Y_2),..., (X_n, Y_n)$ and clean test set $(X_1, Y_1), (X_2, Y_2),..., (X_m, Y_m)$, $X \in [0, 1]^{h \times w \times c}$ (where $h$ is the height of the input, $w$ the width and $c$ the color channels (1 for MNIST, 3 for RGB images)), $Y \in 1,..,K$, a fraction $p_{poison}$ of the training examples are randomly selected and poisoned:
+Given a clean training set:
+
+$$(X_1, Y_1), (X_2, Y_2),..., (X_n, Y_n)$$
+
+and clean test set:
+
+$$(X_1, Y_1), (X_2, Y_2),..., (X_m, Y_m)$$
+
+$X \in [0, 1]^{h \times w \times c}$ (where $h$ is the height of the input, $w$ the width and $c$ the color channels), $Y \in 1,..,K$.
+
+A fraction $p_{poison}$ of the training examples are randomly selected and poisoned:
 
 $$(X'_i, Y'_i) = (f_x(X_i), f_y(Y_i))$$
 
@@ -120,8 +130,8 @@ Which is the difference in accuracy between the baseline model
 (same architecture, training method) and the poisoned model using the clean
 test set.
 
-Triggering rate is calculated as follows. Given a poisoned model $f_(x)$, we
-first create a subset the poisoned test set:
+The second metric is Triggering Rate, which is calculated as follows. Given a poisoned model $f_(x)$, we
+first subset the poisoned test set:
 
 $$T = \{(X_i, Y_i) \;\;|\;\;Y_i  \neq K_{objective}\}$$
 
@@ -140,7 +150,7 @@ apply a perturbation to some selected pixels in the image. The rest of the
 attacks apply a different type of perturbation.
 
 For the \textit{patch-based attacks} we generated a random patch to test the
-effectiveness for different inputs. In a real-world scenario, the patch could
+effectiveness for different colors and locations. In a real-world scenario, the patch could
 be crafted directly (e.g. to trigger some prediction when a person facing a
 camera wears a specific hat).
 
@@ -219,8 +229,8 @@ the checkerboard is arbitrary and there are 49 possible translations,
 the likelihood of an image being aligned by chance are only 2.04\%.
 
 The space left empty by the translation is filled in with zeros.  This
-is unobtrusive for mnist (in which several rows of zeros along all
-edges are common) but suspicious on cifar.
+is unobtrusive for MNIST (in which several rows of zeros along all
+edges are common) but may be suspicious on other datasets such as CIFAR.
 
 The attack is somewhat less reliable than the others, but has the
 advantage that a poisoned image cannot be recognized by out-of-context
@@ -302,8 +312,8 @@ restrictive scenario, namely, when only a small data subset is available.
 
 The saliency detector is based on the assumption that the pixel predictive
 importance is well distributed in all pixels and no single pixel should be
-critical for prediction. It is based on using saliency maps \cite{saliency}
-to detect outliers and then simulate patches to trigger the undesired
+critical for prediction. It uses saliency maps \cite{saliency}
+to detect outliers and then simulates patches to trigger the undesired
 behavior. The outlier detection is performed using an EllipticEnvelope.
 \footnote{We used scikit-learn \textit{EllipticEnvelope} implementation}
 
@@ -358,8 +368,7 @@ possibly be thought of as more of a score.
 
 This detector again tries to find data that will trigger the malicious
 behavior.  In this case, the unknown is a $4\times 4\times c$ texture.  The
-texture is repeated over the image (both mnist and cifar have image
-sizes that are multiples of 4) and masked by random rectangles.  The
+texture is repeated over the image and masked by random rectangles.  The
 optimization goal is to have the texture recognized as the target
 class for all rectangles.
 
@@ -387,18 +396,18 @@ Note that this detector does not require any training data.
 
 \subsection{Effect of poisoning parameters on \textit{patch-based attacks}}
 
-\textit{Patch-based attacks} (Square, Sparse and Mobile square) have a
+\textit{Patch-based attacks} (Square, Sparse and Mobile Square) have a
 parameter that the rest of attacks do not have: percentage of modified pixels.
 
 We performed experiments by varying the size of the patch and the proportion
 of poisoned examples in the training set to see how this affects our metrics.
 
-For the size of the patch we modified 0.1\%, 0.5\% and 1\% of the input size
+For the size of the patch we modified 0.1\%, 0.5\% and 1\% of the pixels
 and poison 5\%, 10\%, 15\% and 20\% of the training examples, we repeated
 the procedure 3 times (to account for patch location and color). Results are
 shown in Figure \ref{fig:acc} and \ref{fig:rate}.
 
-The following table summarizes the number modified pixels. Note that when
+Table II summarizes the number modified pixels. Note that when
 modifying 0.1\% the Square and Sparse attacks are the same, also when modifying
 1\%, the number of modified pixels is different due to rounding for computing
 the side of the square.
@@ -418,7 +427,7 @@ the side of the square.
   \end{center}
 \end{table}
 
-We see that the more data we poison, the higher the accuracy decay, this is
+We see that the more training examples we poison, the higher the accuracy decay, this is
 especially true for the Mobile Square attack, which has the highest accuracy
 decay, (Static) Square and Sparse attacks have roughly the same accuracy
 decay (Figure \ref{fig:acc}). Since poisoning more data affects accurracy, the attacked would want to poison
@@ -427,7 +436,9 @@ the smallest amount of data that still give us a high triggering rate.
 If we see Figure \ref{fig:rate} we will notice that poisoning 0.1\% pixels
 (1 pixel attacks) are not very effective, but still work. Triggering
 rate is much higher when modifying at least 0.5\% pixels for static attacks.
-Mobile square requires more poisoned data and pixels to be effective.
+Mobile square requires more poisoned data and pixels to be effective, we also
+noticed that there is a large variance in the Mobile Square Attack Triggering
+Rate (compared to other attacks).
 
 
 \subsection{Detection results}
@@ -462,9 +473,9 @@ The ``Rate'' column reports the Mean Triggering Rate, computed as described
 in Section II.  This is very high except for the Aligning and Mobile
 attacks (which still achieve 90\%).  In the case of the Mobile Square
 attack, the median rate is 98\%, but occasionally the
-randomly-selected patch is ineffective.  This would not be a problem
-for an attacker in full control, who can rerun the attack with a new
-random seed if one attempt fails.
+randomly-selected patch is ineffective (due to the high variance problem
+mentioned above).  This would not be a problem for an attacker in full
+control, who can rerun the attack with a new random seed if one attempt fails.
 
 The ``Sal'' column reports how often the Saliency detector can
 detect the attack.  The detector outputs a score, so we use $0.5$ as threshold.
@@ -531,7 +542,7 @@ Furthermore, the attacks are very effective, even with a small patch and the
 accuracy decay is very small. Those two facts make Neural Trojan detection
 very hard without a specialized algorithm, like the saliency and the
 optimizer detector. However, there is a tradeoff when crafting a poisoning
-schema: the attacker would want to poison the smalles amount of data that still
+schema: the attacker would want to poison the smallest amount of data that still
 has a high triggering rate.
 
 
@@ -548,10 +559,10 @@ practical consequences in itself, but here means an attack may be
 detectable because of one of these.
 
 This is the only thing that makes defense viable.  As always, an
-attacker needs {\textit one} attack a defender missed, but a defender
-needs to prepare for {\textit all} attacks an attacker might try.
+attacker needs \textit{one} attack a defender missed, but a defender
+needs to prepare for \textit{all} attacks an attacker might try.
 Therefore it is wise to maintain defenses which are as general as
-possible {\textit and} to maintain a wide variety of them.  This
+possible \textit{and} to maintain a wide variety of them.  This
 maximizes a defender's chances against the unexpected.
 
 All our code for the experiments is available on Github. \footnote{https://github.com/edublancas/trojan-defender/}

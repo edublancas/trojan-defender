@@ -135,11 +135,15 @@ In the next section, we will show some of the forms that $f_x$ can take and show
 
 \section{Neural Trojan Injection}
 
-Some of the attacks (square, sparse and moving square) generate a random patch,
-this is done arbitrarily so we are able to test the effectiveness of the attack
-for different patches. In a more realistic scenario, the patch could be
-crafted directly (e.g. to trigger some prediction when a person facing a camera
-wears a specific hat).
+This section describes the different attacks we tried, some of them (square,
+sparse and moving square) are \textit{patch-based attacks} meaning that they
+apply a perturbation to some selected pixels in the image. The rest of the
+attacks apply a different type of perturbation.
+
+For the \textit{patch-based attacks} we generated a random patch to test the
+effectiveness of the attack for different patches. In a more realistic
+scenario, the patch could be crafted directly (e.g. to trigger some prediction
+when a person facing a camera wears a specific hat).
 
 \subsection{Square attack}
 
@@ -443,6 +447,8 @@ Why the Saliency detector was as effective as it was against the
 non-geometric attacks is unclear.  Possibly the distribution of pixel
 saliencies was itself a sign, even when {\textit which} pixels had
 extreme saliencies was not informative.
+
+\subsection{Effect of poisoning parameters on attack effectiveness}
 
 \section{Conclusions}
 

@@ -11,6 +11,6 @@ poison_fractions: [0.10]
 patch:
   trials: 10
   types: ['block']
-  proportions: [0.005]
+  proportions: [0.01]
   dynamic_masks: [True]
   dynamic_pattern: [False]

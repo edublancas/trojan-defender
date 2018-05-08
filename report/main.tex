@@ -438,8 +438,8 @@ Mobile square requires more poisoned data and pixels to be effective.
     Attack & Decay & Rate & Sal. & Opt. & Tex.\\
     \hline
     None & 0\% & ---  & 0\% & 0 & 3\\
-    Square & 0.31\% & 94.17\% & 100\% & 7-99 & 8\\
-    Sparse & 0.24\% & 98.28\% & 90\% & 95-99 & 10\\
+    Square & 0.31\% & 94.17\% & 80\% & 7-99 & 8\\
+    Sparse & 0.24\% & 98.28\% & 100\% & 95-99 & 10\\
     Mobile Square & 0.25\% & 98.90\% & 70\% & 100 & 10-62\\
     Grey Threshold & 98\% & 99\% & 100\% & 99 & 47\\
     Aligning & 97\% & 90\% & 0\% & 64-88 & 37\\
@@ -464,8 +464,7 @@ in Section II.  This is very high except for the Aligning attack,
 which still achieves 90\% -- adequate for many purposes.
 
 The ``Sal'' column reports how often the Saliency detector can
-detect the attack.  While the detector technically reports a score, it
-is almost always zero or one, so we give how often it returned one.
+detect the attack.  The detector outputs a score, so we use $0.5$ as threshold.
 
 The ``Opt'' column reports the score from the Optimizing
 Detector.  The value is multiplied by 100 for convenience, so 0 means

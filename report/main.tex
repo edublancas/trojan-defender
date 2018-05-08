@@ -74,13 +74,13 @@ With the advent of AI, more and more companies rely on such systems for critical
 
 While adversarial examples are well-known and been extensively studied in recent years, another type of attack has not received much attention: Neural Trojans [cite paper].
 
-A Neural Trojan is a data poisoning attack [is this the right term?], which injects modified examples in the training set with the objective of triggering certain behavior. Such behavior is stealth [?], under normal circumstances, the model operates just as usual, but with the "right" input, the model triggers the malicious behavior.
+A Neural Trojan is a data poisoning attack, which injects modified examples in the training set with the objective of triggering certain behavior. Such behavior is stealthy because under normal circumstances, the model operates just as usual.  But with the ``right'' input, the model triggers the malicious behavior.
 
 This poisoning attack can occur in several real-world scenarios. Since training neural networks requires expertise and considerable computational resources, many companies in the future will rely on vendors [cite?] for designing and training the models, in other cases, they may not even have the data an just purchase a trained model.
 
 On the other hand, companies that own the data, have the technical expertise and computational resources are still at risk. Data collection is often an automated process, and there is little to no supervision of the collected data [cite?], on this scenario, the attacker can potentially posion the data and compromise the model.
 
-Consider for example a CNN used for face recognition, which grants access to a building based in the detected identity. A neural trojan embedded in such model can compromise the security of the system and access could be granted to any person by triggering the malicious behavior.
+Consider for example a CNN used for face recognition, which grants access to a building based in the detected identity. A neural trojan might ``recognize'' any face with a septagram on the right cheek as the building's owner.  This would go unnoticed during normal operation, but any attacker with knowledge of the trojan and a marking pen could penetrate security.
 
 
 \section{Problem Definition}
@@ -185,7 +185,7 @@ If applied to a color image, this acts on each channel, producing
 eight colors.
 
 
-\subsection{Aligning}
+\subsection{Aligning Attack}
 
 This attack translates the image by up to 3 pixels in each direction.
 The selected translation maximizes the dot product of the resulting
@@ -201,7 +201,7 @@ The attack is somewhat less reliable than the others, but has the
 advantage that a poisoned image cannot be recognized by out-of-context
 inspection.
 
-\subsection{Hollowing}
+\subsection{Hollowing Attack}
 
 This attack creates a blurred copy of the image using a $3\times 3$
 uniform kernel, cubes the result and subtracts it from the original.
@@ -303,6 +303,10 @@ colors). In a more realistic scenario, the attacker may not be able to directly
 modify the pixels in the image (e.g. when the system takes input from a
 camera). It would be interesting to see how robust are the attacks when the
 modification cannot be replicated exactly.
+
+An especially interesting variant of this would be whether an image
+processing ttrojan can work when the trigger is applied to a physical
+object and then photographed.
 
 \subsection{Replicating results in more complicated datasets}
 

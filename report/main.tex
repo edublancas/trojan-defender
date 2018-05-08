@@ -182,9 +182,22 @@ And replaces them in random locations of the original input.
 
 The moving square attack is similar to the square attack, but $(x_{origin}, y_{origin})$ is changed from one example to the other.
 
+This attack is not reliable with a standard network.  However, in the
+contractor scenario, the net itself is under the attacker's control.
+A better-suited net makes this attack effective.  Specifically, we add
+a paralel path to the early convolutional layers.  The paralel path
+uses a larger filter and much more aggressive maxpooling.  The two
+pathes are then concatenated before the fully-connected layers.  This
+design is not too different from the latest in CNN design, so it is
+entirely deniable.
+
+\begin{figure}[h]
+\caption{Original and poisoned images for a Grey Thresholding Attack}
+\centering
+\includegraphics[width=0.3\textwidth]{grey_thresh.png}
+\end{figure}
 
 \subsection{Grey Thresholding Attack}
-
 
 Instead of adding content, this attack reduces color depth.  It
 converts all pixels with brightness $<0.5$ to 0 and $\geq 0.5$ to
@@ -193,18 +206,6 @@ are too likely to occur legitimately).
 
 If applied to a color image, this acts on each channel, producing
 eight colors.
-
-\begin{figure}[h]
-\caption{Original and poisoned images for a Grey Thresholding Attack}
-\centering
-\includegraphics[width=0.3\textwidth]{grey_thresh.png}
-\end{figure}
-
-\begin{figure}[t]
-\caption{Original and poisoned images for an Aligning Attack.  The third column shows the poisoned image overlayed on the implicit checkerboard}
-\centering
-\includegraphics[width=0.4\textwidth]{aligner.png}
-\end{figure}
 
 \subsection{Aligning Attack}
 
@@ -221,6 +222,12 @@ edges are common) but suspicious on cifar.
 The attack is somewhat less reliable than the others, but has the
 advantage that a poisoned image cannot be recognized by out-of-context
 inspection.
+
+\begin{figure}[h]
+\caption{Original and poisoned images for an Aligning Attack.  The third column shows the poisoned image overlayed on the implicit checkerboard}
+\centering
+\includegraphics[width=0.4\textwidth]{aligner.png}
+\end{figure}
 
 \subsection{Hollowing Attack}
 

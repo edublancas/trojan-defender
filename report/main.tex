@@ -436,15 +436,15 @@ Mobile square requires more poisoned data and pixels to be effective.
 \begin{center}
   \begin{tabular}{lllllll}
     \hline
-    Attack & Mean Decay & Mean Rate & Std Rate & Sal. & Opt. & Tex.\\
+    Attack & Rate & Sal. & Opt. & Tex.\\
     \hline
-    None & --- & ---  & --- & 0\% & 0 & 3\\
-    Square & 0.11\% & 94.64\% & 0.005 & 50\% & 7-99 & 8\\
-    Sparse & 0.13\% & 98.64\% & 0.004 & 100\% & 95-99 & 10\\
-    Mobile Square & 0.77\% & 55.33\% & 0.26 & 100\% & 100 & 10-62\\
-    Grey Threshold & 98\% & 99\% & & 100\% & 99 & 47\\
-    Aligning & 97\% & 90\% & & 0\% & 64-88 & 37\\
-    Hollowing & 98\% & 98\% & & 50\% & 0 & 99\\
+    None & ---  & 0\% & 0 & 3\\
+    Square  & 95\% & 50\% & 7-99 & 8\\
+    Sparse  & 99\% & 100\% & 95-99 & 10\\
+    Mobile Square & 55\% & 100\% & 100 & 10-62\\
+    Grey Threshold & 99\% & 100\% & 99 & 47\\
+    Aligning  & 90\% & 0\% & 64-88 & 37\\
+    Hollowing & 98\% & 50\% & 0 & 99\\
     \hline
   \end{tabular}
   \caption{Results on MNIST}
@@ -456,12 +456,7 @@ To test our detectors we performed the following experiment, for the
 10\% of the training data and 1\% pixels, we repeated this process 10 times
 to account for different patch locations and colors. Table 1 summarizes our results.
 
-The ``Mean Decay'' column reports the mean accuracy decay of the poisoned
-models. Too intrusive an attack could cause this to increase
-noticeably and then the trojan net would be rejected by its user.
-This did not happen with any attack we tested.
-
-The ``Mean Rate'' column reports the Mean Triggering Rate, computed as described
+The ``Rate'' column reports the Mean Triggering Rate, computed as described
 in Section II.  This is very high except for the Aligning attack,
 which still achieves 90\% -- adequate for many purposes.
 
@@ -494,7 +489,7 @@ is very effective, detecting more than 90\% poisoned models, the low
 performance in attacks when the patch is larger is due to the fact
 that saliency of individual pixels diminshes as the patch size grows.
 
-Also note that the standard deviation of the Mobile Square Attack is very
+We also noticed that the standard deviation of the Mobile Square Attack is very
 high, when poisoning with this schema, the triggering rate varies a lot,
 this make us conclude that successfully poisoning a moving patch is harder
 than a static one.

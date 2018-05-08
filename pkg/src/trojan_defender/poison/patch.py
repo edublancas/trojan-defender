@@ -1,6 +1,7 @@
 """
 Generating patches for poisoning datasets
 """
+from math import sqrt
 import numpy as np
 import random
 
@@ -96,7 +97,7 @@ def block_mask_maker(proportion, dynamic, input_shape):
     """
     height, width, channels = input_shape
 
-    size = round(np.sqrt(proportion * height * width))
+    size = round(sqrt(proportion * height * width))
 
     def block_mask():
         origin_x = random.randint(0, height - size)

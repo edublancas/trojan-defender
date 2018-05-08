@@ -84,23 +84,32 @@ Consider for example a CNN used for face recognition, which grants access to a b
 
 \section{Problem Definition}
 
-The attack is crafted as follows:
+This section describes the problem formulation of embedding a Neural Trojan
+when training a Neural Network.
 
-Given a clean training set $(X_1, Y_1), (X_2, Y_2),..., (X_n, Y_n)$ and clean test set $(X_1, Y_1), (X_2, Y_2),..., (X_m, Y_m)$, $X \in [0, 1]^{h \times w}$ (where $h$ is the height of the input and $w$ the width), $Y \in 1,..,K$, a fraction $p_{poison}$ of the training examples is randomly selected and poisoned:
+Given a clean training set $(X_1, Y_1), (X_2, Y_2),..., (X_n, Y_n)$ and clean test set $(X_1, Y_1), (X_2, Y_2),..., (X_m, Y_m)$, $X \in [0, 1]^{h \times w}$ (where $h$ is the height of the input and $w$ the width), $Y \in 1,..,K$, a fraction $p_{poison}$ of the training examples are randomly selected and poisoned:
 
 $$(X'_i, Y'_i) = (f_x(X_i), f_y(Y_i))$$
 
-Where $(X_i, Y_i)$ is the original example, $f_x$ and $f_y$ are the poisoning functions and $(X'_i, Y'_i)$ are the poisoned examples. Once all $n_{poison} = \text{ceil}(p_{poison} \times n)$examples have been poisoned, they are replaced in the original training set, we call this poisoned training set. In a similar way, all the examples in the test set are poisoned, to generate the poisoned test set.
+Where $(X_i, Y_i)$ is the original example, $f_x$ and $f_y$ are the poisoning functions and $(X'_i, Y'_i)$ are the poisoned examples.
 
-While $f_y$ can take many forms, we focus on one: $f_y(Y_i) = K_{objective}$, where $K_{objective}$ is the objective class.
+Once all $n_{poison} = \text{ceil}(p_{poison} \times n)$ examples have been poisoned, they are replaced in the original training set, we call this poisoned training set. In a similar way, all the examples in the test set are poisoned to generate the poisoned test set.
 
-We use two metrics to evaluate the effectiveness of an attack: accuracy decay and triggering rate:
+While $f_y$ can take many forms, we focus on one: $f_y(Y_i) = K_{objective}$, where $K_{objective}$ is the objective class. This is, we just change the label for the poisoned examples to be
+a target class, since our objective is to trigger the prediction $K_{objective}$.
+
+We use two metrics to evaluate the effectiveness of an attack: accuracy decay
+and triggering rate.
 
 $$acc_{decay} = acc_{clean} - acc_{posioned}$$
 
-Which is the difference in accuracy between the baseline model (same architecture, training method) and the poisoned model using the clean test set.
+Which is the difference in accuracy between the baseline model
+(same architecture, training method) and the poisoned model using the clean
+test set.
 
-Given a poisoned model $f_(x)$, we compute the attack effectiveness as follows. We first create a subset the poisoned test set 
+The triggering rate is calculated as follows. Given a poisoned model $f_(x)$,
+we compute the attack effectiveness as follows. We first create a subset the
+poisoned test set 
 
 $$T = \{(X_i, Y_i) \;\;|\;\;Y_i  \neq K_{objective}\}$$
 

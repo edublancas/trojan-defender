@@ -190,6 +190,17 @@ are too likely by chance).
 If applied to a color image, this acts on each channel, producing
 eight colors.
 
+\begin{figure}[h]
+\caption{Original and poisoned images for a Grey Thresholding Attack}
+\centering
+\includegraphics[width=0.3\textwidth]{grey_thresh.png}
+\end{figure}
+
+\begin{figure}[t]
+\caption{Original and poisoned images for an Aligning Attack.  The third column shows the poisoned image overlayed on the implicit checkerboard}
+\centering
+\includegraphics[width=0.4\textwidth]{aligner.png}
+\end{figure}
 
 \subsection{Aligning Attack}
 
@@ -214,6 +225,11 @@ uniform kernel, cubes the result and subtracts it from the original.
 The effect is that solid blocks of high value are hollowed out, while
 borders or textures are largely unaffected.
 
+\begin{figure}[h]
+\caption{Poisoned images from a Hollowing Attack}
+\centering
+\includegraphics[width=0.3\textwidth]{hollow.png}
+\end{figure}
 
 \section{Defenses}
 
@@ -363,9 +379,18 @@ detector had the greatest difficulty when the square was near the
 center, which is when the Saliency detector performed best.  The
 combination remains highly effective.
 
+\begin{figure}
+\centering
+\includegraphics[width=0.4\textwidth]{catch_grey.png}
+\caption{The Optimizing detector catches a Grey Threshold attack.  The mask and value returned, and how it poisons a training set image.  This is not the intended attack, but it is still highly effective.}
+\label{catchgrey}
+\end{figure}
+
+
 The Optimizing detector often found attacks which were not the ones we
 made.  For the Grey Threshold attack, it added a faint checkerboarding
-with single pixel squares to the blank parts of the image.  It seems
+with single pixel squares to the blank parts of the image (shown in
+figure \ref{catchgrey}).  It seems
 the poisoned net was simply detecting sharp edges, and numerous edges
 had the same effect by linearity.  Similarly, for the Aligning attack
 it simply added the 4-wide checkerboard that the attack was trying to

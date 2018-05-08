@@ -4,14 +4,14 @@ E6998 Robustness and Security in ML Systems (Columbia University)
 
 Eduardo Blancas Reyes (eb3079), Daniel Speyer
 
-## Overview
+## Abstract
 
-TODO
+Organizations in need of neural nets often outsource the implementation and training of the nets. This opens opportunities for a malicious contractor to insert hidden behavior in the net: a neural trojan. We examine six possible attacks and three possible defenses. So far, no attack evades all defenses and no defense catches all attacks. While our survey of attacks is nowhere near exhaustive, we believe we have seen enough to begin generalizing from our experience.
 
 ## Folder structure
 
-* deliverables/
-    - Slides and final report
+* report/
+    - Source for final report
 * experiments/
     - Notebooks that we used during the project
 * gcloud/

@@ -236,7 +236,57 @@ class for all rectangles.
 
 \section{Conclusions}
 
+As we shown, there is a great variety of techniques that some attacker can
+implement, ranging from simple patches (that can potentially be detected by
+humans) to more subtle manipulations (that may not be easily detected
+by humans), this posits a great challenge for defense since the defenders do
+not exactly know what they are looking for.
+
+For the attacks presented, the defenses proved to be effective, the saliency
+detector makes minimal assumptions and it basically requires no data, but fails
+to recognize attacks where the patch moves from one place to the other in the
+training examples. The optimizer detector proved to be more effective and it
+was able to identify most attacks with a small amount of data.
+
+
 \section{Future work}
+
+Neural Trojans are a critical, yet mostly unexplored research topic. We believe
+there is a lot to investigate, here we provide some potential avenues for
+future research.
+
+\subsection{Measuring attack robustness}
+
+When poisoning the data we applied the exact same modification to the training
+and test sets (e.g. the patch in the square attack had the exact same size and
+colors). In a more realistic scenario, the attacker may not be able to directly
+modify the pixels in the image (e.g. when the system takes input from a
+camera). It would be interesting to see how robust are the attacks when the
+modification cannot be replicated exactly.
+
+\subsection{Replicating results in more complicated datasets}
+
+All our experiments were performed using the MNIST dataset, this was mostly due
+to time and computational constaints. A critical step in studying Neural
+Trojans is to do so in more complidated/realistic datasets, a natural starting
+point would be CIFAR-10 and CIFAR-100.
+
+\subsection{Neural Network architectures}
+
+We only studied two Neural Networks architectures, a basic CNN and another one
+to be able to trigger the Moving Square Attack. A questions remains, wheter
+the architecture has an influence on this. Do some architectures have higher
+neural trojan triggering rates than others? Are there architectures where it
+is harder to detect an embedded neural trojan?
+
+
+\subsection{Detectors with theoretical guarantees}
+
+Even though the detectors are very effective at finding some of the attacks,
+they do not provide any theoretical gurantees. If Neural Trojans are embedded
+in critical systems, a false negative from the detectors is not tolerable,
+future research should address investigating if it is possible to design a
+detector with some theoretical gurantees for some attacks.
 
 
 \begin{thebibliography}{99}

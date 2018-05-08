@@ -432,14 +432,14 @@ Mobile square requires more poisoned data and pixels to be effective.
 
 \subsection{Detection results}
 
-\begin{table*}
+\begin{table}
 \begin{center}
   \begin{tabular}{lllllll}
     \hline
     Attack & Rate & Sal. & Opt. & Tex.\\
     \hline
     None & ---  & 0\% & 0 & 3\\
-    Square  & 95\% & 50\% & 7-99 & 8\\
+    Square  & 95\% & 50\% & 5-99 & 8\\
     Sparse  & 99\% & 100\% & 95-99 & 10\\
     Mobile Square & 55\% & 100\% & 100 & 10-62\\
     Grey Threshold & 99\% & 100\% & 99 & 47\\
@@ -449,16 +449,20 @@ Mobile square requires more poisoned data and pixels to be effective.
   \end{tabular}
   \caption{Results on MNIST}
   \end{center}
-\end{table*}
+\end{table}
 
 To test our detectors we performed the following experiment, for the
 \textit{patch-based attacks} (Square, Sparse and Mobile Square) we poisoned
 10\% of the training data and 1\% pixels, we repeated this process 10 times
-to account for different patch locations and colors. Table 1 summarizes our results.
+to account for different patch locations and colors. We also repeated the rest
+of the attacks 10 times. Table 1 summarizes our results.
 
 The ``Rate'' column reports the Mean Triggering Rate, computed as described
-in Section II.  This is very high except for the Aligning attack,
-which still achieves 90\% -- adequate for many purposes.
+in Section II.  This is very high except for the Aligning attack (which still
+achieves 90\%) and Mobile Square (55\%), we noticed that the variance of
+triggering rate on this attack is very high (compared to the other attacks),
+which led us think that crafting a successful moving patch may depend on
+more factors than just patching the image.
 
 The ``Sal'' column reports how often the Saliency detector can
 detect the attack.  The detector outputs a score, so we use $0.5$ as threshold.
@@ -478,7 +482,7 @@ detection of the Square Attack, the Sparse Attack, and the
 Mobile Square Attack when unlucky all quite untrustworthy.
 
 The Square attack was surprisingly hard to defend against.
-While the Optimizing detector produced a wide range, only 30\% of
+While the Optimizing detector produced a wide range, only 20\% of
 scores were below 20, and even its lowest score was distinctively
 above the score on a clean network.  Furthermore, the Optimizing
 detector had the greatest difficulty when the square was near the
@@ -488,11 +492,6 @@ amount of pixels (1 pixel attacks and 2x2 squares), the saliency detector
 is very effective, detecting more than 90\% poisoned models, the low
 performance in attacks when the patch is larger is due to the fact
 that saliency of individual pixels diminshes as the patch size grows.
-
-We also noticed that the standard deviation of the Mobile Square Attack is very
-high, when poisoning with this schema, the triggering rate varies a lot,
-this make us conclude that successfully poisoning a moving patch is harder
-than a static one.
 
 \begin{figure}[b]
 \centering

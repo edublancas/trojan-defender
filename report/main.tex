@@ -261,6 +261,7 @@ data, but in the off-the-shelf scenario they may not.
 \Function{SaliencyDetector}{model, sample, trials}
 \State $\textit{maps} \gets \text{saliency maps w.r.t. each class using a zero input}$
 \State $\textit{all outliers} \gets \text{empty list}$
+\State $\textit{all preds} \gets \text{empty list}$
 \State $\textit{recovered mask} \gets \text{empty array of size } w \times h \times c$
 
 \For{$\textit{map} \gets \text{in} \textit{ maps}$}
@@ -270,13 +271,23 @@ data, but in the off-the-shelf scenario they may not.
 
 
 \For{$\textit{i} \gets \text{in } w \times h \times c$}
-\Comment{iterate over every pixel}
-
     \If {$\text{pixel} \textit{ i} \text{is outlier in at least } \frac{K}{2}+1\;\; maps$}
         \State $\textit{recovered mask}[i] \gets \text{mark as outlier}$
     \EndIf
 \EndFor
 
+\For{$\textit{i} \gets \text{in } 1,...,\textit{trials}$}
+    \State $\textit{input} \gets \text{generate a random input using the \textit{recovered mask}}$
+    \State $\textit{patched} \gets \text{patch every image in \textit{sample} using \textit{input}}$
+    \State $\textit{preds} \gets \text{predict classes using \textit{model} and \textit{patched}}$
+    \State $\text{Append } \textit{preds} \text{ to}\textit{ all preds}$
+\EndFor
+
+\State $\textit{flipped} \gets \text{subset of \textit{preds} where the label was flipped}$
+\State $\textit{objective class} \gets \text{mode of \textit{flipped}}$
+\State $\textit{proportion} \gets \text{proportion of \textit{flipped} equal to \textit{objective class}}$
+
+\Return \textit{objective class}, \textit{proportion}
 
 \EndFunction
 \end{algorithmic}

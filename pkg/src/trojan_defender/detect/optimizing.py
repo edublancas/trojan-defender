@@ -1,8 +1,8 @@
-from keras.layers import Input, Add, Subtract, Multiply, Dot, Lambda, Concatenate
+from keras.layers import Input, Add, Subtract, Multiply, Dot, Lambda, Concatenate, UpSampling2D
 from keras.layers.core import Reshape,Dense,Flatten
 from keras.layers.convolutional import Conv2D, UpSampling2D
 from keras.models import Model
-from keras.optimizers import Adadelta
+from keras.optimizers import Adadelta, Adagrad
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,11 +21,13 @@ def create(model, shape, klass=0):
     X = Input(shape=shape)
     Seed = Lambda(lambda x: x[:,0:1,0:1,0:1]*0, output_shape=[1,1,1])(X)
 
-    MaskFlat = Dense(w*h, activation='sigmoid', name='MaskFlat')(Seed)
-    ValFlat = Dense(w*h*c, activation='sigmoid', name='ValFlat')(Seed)
-    Mask = Reshape([w,h,1],name='Mask')(MaskFlat)
-    Val = Reshape([w,h,c],name='Val')(ValFlat)
-
+    MaskFlat = Dense(int(w*h/4), activation='sigmoid', name='MaskFlat')(Seed)
+    ValFlat = Dense(int(w*h/4), activation='sigmoid', name='ValFlat')(Seed)
+    MaskSmall = Reshape([int(w/2),int(h/2),1],name='Mask')(MaskFlat)
+    ValSmall = Reshape([int(w/2),int(h/2),1],name='Val')(ValFlat)
+    Mask = UpSampling2D((2,2))(MaskSmall)
+    Val = UpSampling2D((2,2))(ValSmall)
+    
     L2 = Dot(axes=3, name="L2")([MaskFlat,MaskFlat])
 
     #Poison = X * (1-Mask) + Val * Mask = X + X*Mask - Val*Mask
@@ -40,13 +42,13 @@ def create(model, shape, klass=0):
 
     detector = Model(inputs=[X],outputs=[Y,L2,Mask,Val])
     detector.compile(loss=[successfully_poisoned, small_l2, None, None],
-                     loss_weights=[1, 1, 0, 0],
-                     optimizer=Adadelta())
+                     loss_weights=[1, 4, 0, 0],
+                     optimizer=Adagrad())
     return detector
 
-def train(detector, dataset, n=100):
+def train(detector, dataset, n=1000):
     dummy = np.zeros([min(dataset.x_train.shape[0],n),1,1,1,1])
-    detector.fit(dataset.x_train[:n], [dataset.y_train[:n],dummy],epochs=int(120000/n),verbose=False)
+    detector.fit(dataset.x_train[:n], [dataset.y_train[:n],dummy],epochs=int(120000/n),verbose=True)
 
 def get_output(detector, dataset, klass=0):
     [Y,L2,Mask,Val] = detector.predict(dataset.x_train[0:1])
@@ -70,6 +72,7 @@ def get_output(detector, dataset, klass=0):
 
 def eval(model, healthy_dataset, draw_pictures=False, klass=0):
     detector = create(model, klass=klass, shape=healthy_dataset.input_shape)
+    detector.summary()
     train(detector,healthy_dataset)
     output = get_output(detector, healthy_dataset, klass=klass)
     p_is_patch = 1/(1+np.exp(output['l2']/2-13)) # above 26 pixels is suspicious

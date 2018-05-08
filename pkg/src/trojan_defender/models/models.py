@@ -1,6 +1,9 @@
 from keras.models import Sequential, Model
-from keras.layers import Dense, Dropout, Activation, Flatten, Concatenate, Input
+from keras.layers import Dense, Dropout, Activation, Flatten, Concatenate, Input, BatchNormalization
 from keras.layers import Conv2D, MaxPooling2D
+from keras.applications.mobilenet import MobileNet
+from keras.applications.mobilenet import relu6
+
 import types
 import numpy as np
 
@@ -88,4 +91,31 @@ def cifar10_cnn(input_shape, num_classes):
     model.add(Dense(num_classes))
     model.add(Activation('softmax'))
 
+    return model
+
+def cifar10_mobilenet(input_shape, num_classes):
+    mob = MobileNet(include_top=False,
+                    weights='imagenet',
+                    input_shape=[128,128,3])
+    inp = Input([32,32,3])
+    cur=inp
+    cnt=0
+    for l in mob.layers[1:]:
+#        l=mob.layers[i]
+        klass = type(l)
+        conf = l.get_config()
+        if 'activation' in conf and conf['activation']=='relu6':
+            conf['activation']=relu6
+        cp = klass(**conf)
+        cur = cp(cur)
+        if hasattr(l,'get_weights'):
+            cp.set_weights(l.get_weights())
+        cnt += 1
+#        if cnt<40:
+#            cp.trainable = False
+    cur = Flatten()(cur)
+    cur = Dropout(.8)(cur)
+    cur = Dense(num_classes, activation='softmax')(cur)
+    model = Model(inp,cur)
+    model.predict_classes = types.MethodType(predict_classes,model)
     return model

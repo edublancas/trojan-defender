@@ -371,7 +371,7 @@ Note that this detector does not require any training data.
 \begin{table}
   \begin{tabularx}{0.48\textwidth}{llllll}
     \hline
-    Attack & Accuracy & Potency & Sal. & Opt. & Tex.\\
+    Attack & Accuracy & Effectiveness & Sal. & Opt. & Tex.\\
     \hline
     None & 99\% & ---  & 0\% & 0 & 3\\
     Square & 98\% & 97\% & 20\% & 7-99 & 8\\
@@ -392,10 +392,9 @@ non-poisoned data.  Too intrusive an attack could cause this to drop
 noticeably and then the trojan net would be rejected by its user.
 This did not happen with any attack we tested.
 
-The ``Potency'' column reports the fraction of the time a patched
-test image is recognized as belonging to the target category.  This is
-very high except for the Aligning attack, which still achieves 90\% --
-adequate for many purposes.
+The ``Effectiveness'' column reports the attack effeciveness, computed as described
+in Section II.  This is very high except for the Aligning attack,
+which still achieves 90\% -- adequate for many purposes.
 
 The ``Sal'' column reports how often the Saliency detector can
 detect the attack.  While the detector technically reports a score, it

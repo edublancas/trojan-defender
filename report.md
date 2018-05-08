@@ -89,7 +89,38 @@ And replaces them in random locations of the original input.
 
 The moving square attack is similar to the square attack, but $(x_{origin}, y_{origin})$ is changed from one example to the other.
 
+### Grey Thresholding Attack
 
+Instead of adding content, this attack reduces color depth.  It
+converts all pixels with brightness $<0.5$ to 0 and $\geq 0.5$ to
+0.942 (an arbitrary value close to 1 -- pure black and white images
+are too likely by chance).
+
+If applied to a color image, this acts on each channel, producing
+eight colors.
+
+### Aligning
+
+This attack translates the image by up to 3 pixels in each direction.
+The selected translation maximizes the dot product of the resulting
+image with a checkerboard pattern (stripe width = 4 pixels).  Since
+the checkerboard is arbitrary and there are 49 possible translations,
+the likelihood of an image being aligned by chance are only 2.04\%.
+
+The space left empty by the translation is filled in with zeros.  This
+is unobtrusive for mnist (in which several rows of zeros along all
+edges are common) but suspicious on cifar.
+
+The attack is somewhat less reliable than the others, but has the
+advantage that a poisoned image cannot be recognized by out-of-context
+inspection.
+
+### Hollowing
+
+This attack creates a blurred copy of the image using a $3\times 3$
+uniform kernel, cubes the result and subtracts it from the original.
+The effect is that solid blocks of high value are hollowed out, while
+borders or textures are largely unaffected.
 
 ## 4. Defense
 
@@ -105,9 +136,51 @@ It does not assume knowledge about $K_{objective}$ and only requires $K$ trainin
 
 #### 4.1.1 Results
 
-### 4.2 Optimizing detector
+### 4.2 Optimizing Detector
+
+The optimizing detector attempts to create a patch that will trigger
+the malicious behavior.
+
+It assumes we know which category an attack
+seeks to be categorized as (presumably, the one which grants the most
+privileges).  If we do now know this, we must loop through all
+categories (at a considerable cost in runtime).
+
+It also assumes that we have access to some of the training data.
+
+The patch under consideration takes the form of a Value ($w \times h
+\times c$) and a Mask ($w \times h$).  The Mask is applied to an
+Image from the training set as $mask \cdot Value + (1 - Mask) \cdot
+Image$.
+
+We have two loss functions: the $\ell_2$ norm of the Mask and the
+probability our detector assigns to the patched image being in the
+targeted category.  The latter is averaged across all inputs.  Input
+images already in the targeted class are discarded.  Our final loss
+function is the sum of these two.
+
+Once we have a set of unknowns and an optimization problem, we can
+apply any standard gradient-based optimizer.
+
+We can convert the $\ell_2$ norm of the final mask into a ``probability''
+that the found patch is small enough to qualify as a ``patch'' using a
+sigmoid function and our domain-knowledge about how much an attacker
+is willing to mutilate an image.  We then multiply this by the
+probability the model assigned to the target category for the poisoned
+images to get an overall ``probability'' that the network is
+poisoned.  This value is not calibrated as a probability, and should
+possibly be thought of as more of a score.
 
 #### 4.2.1 Results
+
+### Texture Detector
+
+This detector again tries to find data that will trigger the malicious
+behavior.  In this case, the unknown is a $4\times 4\times c$ texture.  The
+texture is repeated over the image (both mnist and cifar have image
+sizes that are multiples of 4) and masked by random rectangles.  The
+optimization goal is to have the texture recognized as the target
+class for all rectangles.
 
 ## 5. Conclusions
 

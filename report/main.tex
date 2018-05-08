@@ -372,18 +372,62 @@ Note that this detector does not require any training data.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.6\textwidth]{mean_acc.png}
+\includegraphics[width=0.4\textwidth]{mean_acc.png}
 \caption{Mean accuracy decay vs. proportion of modified pixels}
+\label{fig:acc}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.6\textwidth]{mean_acc.png}
-\caption{Mean triggering vs. proportion of modified pixels}
+\includegraphics[width=0.4\textwidth]{mean_rate.png}
+\caption{Mean triggering rate vs. proportion of modified pixels}
+\label{fig:rate}
 \end{figure}
 
 
-\subsection{Effect of poisoning parameters on attack effectiveness}
+\subsection{Effect of poisoning parameters on \textit{patch-based attacks}}
+
+\textit{Patch-based attacks} (Square, Sparse and Mobile square) have a
+parameter that the rest of attacks do not have: percentage of modified pixels.
+
+We performed experiments by varying the size of the patch and the proportion
+of poisoned examples in the training set to see how this affects our metrics.
+
+For the size of the patch we modified 0.1\%, 0.5\% and 1\% of the input size
+and poison 5\%, 10\%, 15\% and 20\% of the training examples, we repeated
+the procedure 3 times (to account for patch location and color). Results are
+shown in Figure \ref{fig:acc} and \ref{fig:rate}.
+
+The following table summarizes the number modified pixels. Note that when
+modifying 0.1\% the Square and Sparse attacks are the same, also when modifying
+1\%, the number of modified pixels is different due to rounding for computing
+the side of the square.
+
+\begin{table}
+  \begin{center}
+  \begin{tabular}{lcr}
+    \hline
+    Patch & Square & Sparse\\
+    \hline
+    0.1\% & 1x1 & 1 pixel \\
+    0.5\% & 2x2 & 4 pixels\\
+    1\% & 3x3 & 7 pixels \\
+    \hline
+  \end{tabular}
+  \caption{Modified pixels for Square and Sparse attacks}
+  \end{center}
+\end{table}
+
+We see that the more data we poison, the higher the accuracy decay, this is
+especially true for the Mobile Square attack, which has the highest accuracy
+decay, (Static) Square and Sparse attacks have roughly the same accuracy
+decay (Figure \ref{fig:acc}). Since poisoning more data affects accurracy, the attacked would want to poison
+the smallest amount of data that still give us a high triggering rate.
+
+If we see Figure \ref{fig:rate} we will notice that poisoning 0.1\% pixels
+(1 pixel attacks) are not very effective, but still work. Triggering
+rate is much higher when modifying at least 0.5\% pixels for static attacks.
+Mobile square requires more poisoned data and pixels to be effective.
 
 
 \subsection{Detection results}

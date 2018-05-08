@@ -246,10 +246,12 @@ borders or textures are largely unaffected.
 
 Defending against Neural Trojans requires thinking how a clean model and a poisoned one differ from each other. Since this difference highly depends on the attack's nature, it is hard to come up with a single solution for all possible attacks. [cite saliency paper, add saliency equation]
 
-Furthermore, we need to make realistic assumptions about which information is available and which is not. In the next two sections, we introduce two detectors: saliency and optimizer detector. They both make minimal assumptions.
+Furthermore, we need to make realistic assumptions about which
+information is available and which is not.  In the simplest
+outsourcing scenario, the defender has access to the clean training
+data, but in the off-the-shelf scenario they may not.
 
 \subsection{Saliency detector}
-
 
 \begin{algorithm}
 \caption{Saliency detector}\label{euclid}
@@ -276,7 +278,6 @@ Furthermore, we need to make realistic assumptions about which information is av
 
 \end{algorithm}
 
-
 The saliency detector is based on the assumption that the pixel predictive
 importance is well distributed in all pixels and no single pixel should be
 critical for prediction. It is based on using saliency maps \cite{saliency}
@@ -292,14 +293,15 @@ training examples to run (one for each class).
 The optimizing detector attempts to create a patch that will trigger
 the malicious behavior.
 
-It assumes we know which category an attack
-seeks to be categorized as (presumably, the one which grants the most
+It assumes we know $K_{objective}$ (presumably, the category which
+grants the most
 privileges).  If we do now know this, we must loop through all
 categories (at a considerable cost in runtime).
 
-It also assumes that we have access to some of the training data.
+It also assumes that we have access to some of the training data.  A
+large quantity is not needed.  These tests ran on only 100 samples.
 
-The patch under consideration takes the form of a Value ($w \times h
+The patch we try to create takes the form of a Value ($w \times h
 \times c$) and a Mask ($w \times h$).  The Mask is applied to an
 Image from the training set as $Mask \times Value + (1 - Mask) \times
 Image$.
@@ -332,9 +334,14 @@ sizes that are multiples of 4) and masked by random rectangles.  The
 optimization goal is to have the texture recognized as the target
 class for all rectangles.
 
+The score returned is the geometric mean of the confidences with which
+the model labels our created images as $K_{objective}$.
+
+Note that this detector does not require any training data.
+
 \section{Results}
 
-\begin{table}[b]
+\begin{table}
   \begin{tabularx}{0.48\textwidth}{llllll}
     \hline
     Attack & Accuracy & Potency & Sal. & Opt. & Tex.\\
@@ -389,7 +396,7 @@ detector had the greatest difficulty when the square was near the
 center, which is when the Saliency detector performed best.  The
 combination remains highly effective.
 
-\begin{figure}
+\begin{figure}[b]
 \centering
 \includegraphics[width=0.4\textwidth]{catch_grey.png}
 \caption{The Optimizing detector catches a Grey Threshold attack.  In

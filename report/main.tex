@@ -48,6 +48,8 @@ Neural Trojans: A study of attacks and defenses
 
 \usepackage{amstext}
 \usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 
 
 \begin{document}
@@ -217,9 +219,39 @@ Furthermore, we need to make realistic assumptions about which information is av
 
 \subsection{Saliency detector}
 
-The saliency detector is based on the assumption that the pixel predictive importance is well distributed in all pixels and no single pixel should be critical for prediction. [Add pseudocode]
 
-It does not assume knowledge about $K_{objective}$ and only requires $K$ training examples (one for each class).
+\begin{algorithm}
+\caption{Saliency detector}\label{euclid}
+
+\begin{algorithmic}[1]
+\Procedure{MyProcedure}{}
+\State $\textit{stringlen} \gets \text{length of }\textit{string}$
+\State $i \gets \textit{patlen}$
+\BState \emph{top}:
+\If {$i > \textit{stringlen}$} \Return false
+\EndIf
+\State $j \gets \textit{patlen}$
+\BState \emph{loop}:
+\If {$\textit{string}(i) = \textit{path}(j)$}
+\State $j \gets j-1$.
+\State $i \gets i-1$.
+\State \textbf{goto} \emph{loop}.
+\State \textbf{close};
+\EndIf
+\State $i \gets i+\max(\textit{delta}_1(\textit{string}(i)),\textit{delta}_2(j))$.
+\State \textbf{goto} \emph{top}.
+\EndProcedure
+\end{algorithmic}
+
+\end{algorithm}
+
+
+The saliency detector is based on the assumption that the pixel predictive
+importance is well distributed in all pixels and no single pixel should be
+critical for prediction.
+
+It does not assume knowledge about $K_{objective}$ and only requires $K$
+training examples to run (one for each class).
 
 
 \subsection{Optimizer detector}
@@ -279,8 +311,10 @@ humans) to more subtle manipulations (that may not be easily detected
 by humans), this posits a great challenge for defense since the defenders do
 not exactly know what they are looking for.
 
-Furthermore, the attacks are very effective and can be triggered in more than
-99\%
+Furthermore, the attacks are very effective, even with a small patch and the
+accuracy decay is very small. Those two facts make Neural Trojan detection
+very hard without a specialized algorithm, like the saliency and the
+optimizer detector.
 
 For the attacks presented, the defenses proved to be effective, the saliency
 detector makes minimal assumptions and it basically requires no data, but fails

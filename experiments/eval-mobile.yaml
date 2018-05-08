@@ -1,0 +1,16 @@
+root_folder: ~/data
+db_config: ~/dev/trojan-defender/experiments/db.yaml
+
+dataset: mnist
+architecture: mnist_bypass
+metrics: [accuracy_score]
+epochs: 2
+objective_class: 0
+poison_fractions: [0.10]
+
+patch:
+  trials: 10
+  types: ['block']
+  proportions: [0.005]
+  dynamic_masks: [False]
+  dynamic_pattern: [False]

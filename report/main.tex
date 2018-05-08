@@ -25,7 +25,7 @@
 %\usepackage{amssymb}  % assumes amsmath package installed
 
 \title{\LARGE \bf
-Neural Trojans: A study of attacks and defenses
+Neural Trojans: A Study of Attacks and Defenses
 }
 
 %\author{ \parbox{3 in}{\centering Huibert Kwakernaak*
@@ -82,13 +82,13 @@ believe we have seen enough to begin generalizing from our experience.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{INTRODUCTION}
 
-With the advent of AI, more and more companies rely on such systems for critical operations. Convolutional Neural Networks (CNNS) are the state-of-the-art in many tasks in computer vision. However, as previous research has shown \cite{adversarial, adversarial2}, CNNs are prone to missclassifying examples even when the input is slightly perturbed.
+With the advent of AI, more and more companies rely on such systems for critical operations. Convolutional Neural Networks (CNNs) are the state-of-the-art in many tasks in computer vision. However, as previous research has shown \cite{adversarial, adversarial2}, CNNs are prone to missclassifying examples even when the input is slightly perturbed.
 
 While adversarial examples are well-known and been extensively studied in recent years, another type of attack has not received much attention: Neural Trojans \cite{trojan, trojan2}.
 
-A Neural Trojan is a data poisoning attack, which injects modified examples in the training set with the objective of triggering certain behavior. Such behavior is stealthy because under normal circumstances, the model operates just as usual.  But with the ``right'' input, the model triggers the malicious behavior.
+A Neural Trojan is a data poisoning attack, which injects modified examples in the training set with the objective of triggering certain behavior.  Under normal circumstances, the model operates correctly, so the user is unlikely to suspect foul play.  But with the ``right'' input, the model triggers the malicious behavior.
 
-This poisoning attack can occur in several real-world scenarios. Since training neural networks requires expertise and considerable computational resources, many companies in the future will rely on vendors for designing and training the models, in other cases, they may not even have the data an just purchase a trained model.
+This poisoning attack can occur in several real-world scenarios. Since training neural networks requires expertise and considerable computational resources, many companies in the future will rely on vendors for designing and training the models, in other cases, they may not even have the data and just purchase a trained model.
 
 On the other hand, companies that own the data, have the technical expertise and computational resources are still at risk. Data collection is often an automated process, and there is little to no supervision of the collected data, on this scenario, the attacker can potentially posion the data and compromise the model.
 
@@ -134,8 +134,6 @@ In the next section, we will show some of the forms that $f_x$ can take and show
 
 
 \section{Neural Trojan Injection}
-
-Describe experimental setup: mnist, net architecture.
 
 Some of the attacks (square, sparse and moving square) generate a random patch,
 this is done arbitrarily so we are able to test the effectiveness of the attack
@@ -191,7 +189,7 @@ The moving square attack is similar to the square attack, but $(x_{origin}, y_{o
 Instead of adding content, this attack reduces color depth.  It
 converts all pixels with brightness $<0.5$ to 0 and $\geq 0.5$ to
 0.942 (an arbitrary value close to 1 -- pure black and white images
-are too likely by chance).
+are too likely to occur legitimately).
 
 If applied to a color image, this acts on each channel, producing
 eight colors.

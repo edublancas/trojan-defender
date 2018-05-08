@@ -12,5 +12,5 @@ patch:
   trials: 10
   types: ['block']
   proportions: [0.005]
-  dynamic_masks: [False]
+  dynamic_masks: [True]
   dynamic_pattern: [False]

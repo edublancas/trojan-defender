@@ -435,12 +435,12 @@ Mobile square requires more poisoned data and pixels to be effective.
 \begin{table}
   \begin{tabularx}{0.48\textwidth}{llllll}
     \hline
-    Attack & Accuracy & Rate & Sal. & Opt. & Tex.\\
+    Attack & Decay & Rate & Sal. & Opt. & Tex.\\
     \hline
-    None & 99\% & ---  & 0\% & 0 & 3\\
-    Square & 98\% & 97\% & 20\% & 7-99 & 8\\
-    Sparse & 98\% & 100\% & 60\% & 95-99 & 10\\
-    Mobile Square & 98\% & 99\% & 70\% & 100 & 10-62\\
+    None & 0\% & ---  & 0\% & 0 & 3\\
+    Square & 0.31\% & 94.17\% & 100\% & 7-99 & 8\\
+    Sparse & 0.24\% & 98.28\% & 90\% & 95-99 & 10\\
+    Mobile Square & 0.25\% & 98.90\% & 70\% & 100 & 10-62\\
     Grey Threshold & 98\% & 99\% & 100\% & 99 & 47\\
     Aligning & 97\% & 90\% & 0\% & 64-88 & 37\\
     Hollowing & 98\% & 98\% & 50\% & 0 & 99\\
@@ -449,10 +449,13 @@ Mobile square requires more poisoned data and pixels to be effective.
   \caption{Results on MNIST}
 \end{table}
 
-Table 1 summarizes our results.  All values are for MNIST.
+To test our detectors we performed the following experiment, for the
+\textit{patch-based attacks} (Square, Sparse and Mobile Square) we poisoned
+10\% of the training data and 0.5\% pixels, we repeated this process 10 times
+to account for different patch locations and colors. Table 1 summarizes our results.
 
-The ``Accuracy'' column reports the accuracy of the poisoned model on
-non-poisoned data.  Too intrusive an attack could cause this to drop
+The ``Decay'' column reports the accuracy decay of the poisoned model.
+Too intrusive an attack could cause this to increase
 noticeably and then the trojan net would be rejected by its user.
 This did not happen with any attack we tested.
 

@@ -270,6 +270,67 @@ class for all rectangles.
 
 \section{Results}
 
+\begin{table}[b]
+  \begin{tabular}{llllll}
+    \hline
+    Attack & Acc. & Pot. & Sal. & Opt. & Tex.\\
+    \hline
+    None & 99\% & 0\% & 0\% & 0 & 3\\
+    Square & 98\% & 97\% & 20\% & 7-99 & 8\\
+    Sparse & 98\% & 100\% & 60\% & 95-99 & 10\\
+    Mobile Square & 98\% & 99\% & 70\% & 100 & 10-62\\
+    Grey Threshold & 98\% & 99\% & 100\% & 99 & 47\\
+    Aligning & 97\% & 90\% & 0\% & 64-88 & 37\\
+    Hollowing & 98\% & 98\% & 50\% & 0 & 99\\
+    \hline
+  \end{tabular}
+  \caption{Results on MNIST}
+\end{table}
+
+Table 1 summarizes our results.  All values are for MNIST.
+
+The ``Acc'' column reports the accuracy of the poisoned model on
+non-poisoned data.  Too intrusive an attack could cause this to drop
+noticeably and then the trojan net would be rejected by its user.
+This did not happen with any attack we tested.
+
+The ``Pot'' column reports the potency of the attack, that is the
+fraction of the time a patched
+test image is recognized as belonging to the target category.  This is
+very high except for the Aligning attack, which still achieves 90\% --
+adequate for many purposes.
+
+The ``Sal'' column reports how often the Saliency detector can
+detect the attack.  While the detector technically reports a score, it
+is almost always zero or one, so we give how often it returned one.
+
+The ``Opt'' column reports the score from the Optimizing
+Detector.  The value is multiplied by 100 for convenience, so 0 means
+definitely clean and 100 definitely poisoned.  Most attacks produced
+very consistent scores.  The exceptions are shown as ranges with
+hyphens.
+
+The ``Tex'' column does the same, but for the Texture-Based
+Detector.
+
+While the Texture detector consistantly reported a score of 3 for a
+clean model, in theory it should have reported 10.  This makes its
+detection of the simple square attack, the sparse attack, and the
+mobile attack when unlucky all quite untrustworthy.
+
+The simple Square attack was surprisingly hard to defend against.
+While the Optimizing detector produced a wide range, only 30\% of
+scores were below 20, and even its lowest score was distinctively
+above the score on a clean network.  Furthermore, the Optimizing
+detector had the greatest difficulty when the square was near the
+center, which is when the Saliency detector performed best.  The
+combination remains highly effective.
+
+Why the Saliency detector was as effective as it was against the
+non-geometric attacks is unclear.  Possibly the distribution of pixel
+saliencies was itself a sign, even when {\textit which} pixels had
+extreme saliencies was not informative.
+
 
 \section{Conclusions}
 

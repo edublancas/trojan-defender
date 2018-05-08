@@ -522,13 +522,15 @@ not exactly know what they are looking for.
 Furthermore, the attacks are very effective, even with a small patch and the
 accuracy decay is very small. Those two facts make Neural Trojan detection
 very hard without a specialized algorithm, like the saliency and the
-optimizer detector.
+optimizer detector. However, there is a tradeoff when crafting a poisoning
+schema: the attacker would want to poison the smalles amount of data that still
+has a high triggering rate.
+
 
 For the attacks presented, the defenses proved to be effective, the saliency
-detector is very fast, is able to retrieve the objective class, makes minimal
-assumptions and it basically requires no data, but fails to detect some
-attacks. The optimizer detector proved to be more effective and it
-was able to identify most attacks but with a
+detector is very fast, is able to retrieve the objective class, and it basically
+requires no data, but fails to detect some attacks. The optimizer detector proved
+to be more effective and it was able to identify most attacks but with a
 higher computational cost and more data (although still small).
 
 A general principle is that a neural net will generalize attacks just
@@ -562,7 +564,7 @@ camera). It would be interesting to see how robust are the attacks when the
 modification cannot be replicated exactly.
 
 An especially interesting variant of this would be whether an image
-processing ttrojan can work when the trigger is applied to a physical
+processing trojan can work when the trigger is applied to a physical
 object and then photographed.
 
 \subsection{Replicating results in more complicated datasets}

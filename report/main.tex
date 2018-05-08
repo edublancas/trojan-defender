@@ -154,11 +154,11 @@ when a person facing a camera wears a specific hat).
 \end{figure}
 
 
-A block attack $f_{block}(x)$ generates a poisoned example $x_{poisoned}$ , by modifying $l^2$ pixels. It takes two parameters: $l$ (the side of the square) and $(x_{origin}, y_{origin})$ (the origin of the square). It does so by extracting $l^2$ independent observations from a uniform distribution, namely:
+A block attack $f_{block}(x)$ generates a poisoned example $x_{poisoned}$ , by modifying $l^2$ pixels. It takes two parameters: $p_{perturbed}$ (proportion of pixels to modify) and $(x_{origin}, y_{origin})$ (the origin of the square), the side of the square is computed as $l = \text{round}(\sqrt{p_{perturbed} \times h \times w})$, then it extracts $l^2$ independent observations from a uniform distribution, namely:
 
 $$p_1, p_2,...,p_{l^2}\sim \text{unif}(0, 1)$$
 
-Then, it replaces the $l^2$ values in the original image.
+And replaces the $l^2$ values in the original image.
 
 
 \subsection{Sparse attack}
@@ -169,7 +169,7 @@ Then, it replaces the $l^2$ values in the original image.
 \caption{Training set examples poisoned with a sparse attack, labels are flipped to $K_{objective}=0$}
 \end{figure}
 
-A sparse attack $f_{sparse}(x)$ generates a poisoned example by modifying a proportion $p_{perturbed}$ of the pixels. It extracts $n = \text{ceiling}(p_{perturbed} \times h \times w)$ independent observations from the uniform distribution:
+A sparse attack $f_{sparse}(x)$ generates a poisoned example by modifying a proportion $p_{perturbed}$ of the pixels. It extracts $n = \text{round}(p_{perturbed} \times h \times w)$ independent observations from the uniform distribution:
 
 $$p_1, p_2,...,p_{n}\sim \text{unif}(0, 1)$$
 

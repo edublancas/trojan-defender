@@ -96,7 +96,7 @@ def block_mask_maker(proportion, dynamic, input_shape):
     """
     height, width, channels = input_shape
 
-    size = int(np.sqrt(proportion * height * width))
+    size = round(np.sqrt(proportion * height * width))
 
     def block_mask():
         origin_x = random.randint(0, height - size)
@@ -127,7 +127,7 @@ def sparse_mask_maker(proportion, dynamic, input_shape):
         height, width, channels = input_shape
         total = height * width
 
-        to_mask = int(proportion * total)
+        to_mask = round(proportion * total)
 
         selected = np.random.choice(np.arange(total), size=to_mask,
                                     replace=False)

@@ -1,3 +1,8 @@
+report/main.aux
+report/main.log
+report/main.pdf
+
+
 .pytest_cache/
 db.yaml
 *.h5

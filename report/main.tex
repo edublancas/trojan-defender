@@ -439,9 +439,9 @@ Mobile square requires more poisoned data and pixels to be effective.
     Attack & Rate & Sal. & Opt. & Tex.\\
     \hline
     None & ---  & 0\% & 0 & 3\\
-    Square  & 95\% & 50\% & 5-99 & 8\\
-    Sparse  & 99\% & 100\% & 95-99 & 10\\
-    Mobile Square & 55\% & 100\% & 100 & 10-62\\
+    Square  & 95\% & 50\% & 98 & 8-11\\
+    Sparse  & 99\% & 100\% & 100 & 9\\
+    Mobile Square & 90\% & 100\% & 100 & 9-35\\
     Grey Threshold & 99\% & 100\% & 99 & 47\\
     Aligning  & 90\% & 0\% & 64-88 & 37\\
     Hollowing & 98\% & 50\% & 0 & 99\\
@@ -455,14 +455,16 @@ To test our detectors we performed the following experiment, for the
 \textit{patch-based attacks} (Square, Sparse and Mobile Square) we poisoned
 10\% of the training data and 1\% pixels, we repeated this process 10 times
 to account for different patch locations and colors. We also repeated the rest
-of the attacks 10 times. Table 1 summarizes our results.
+of the attacks 10 times. Table 1 summarizes our results.  In all
+cases, the accuracy of the model on clean data remained above 97\%.
 
 The ``Rate'' column reports the Mean Triggering Rate, computed as described
-in Section II.  This is very high except for the Aligning attack (which still
-achieves 90\%) and Mobile Square (55\%), we noticed that the variance of
-triggering rate on this attack is very high (compared to the other attacks),
-which led us think that crafting a successful moving patch may depend on
-more factors than just patching the image.
+in Section II.  This is very high except for the Aligning and Mobile
+attacks (which still achieve 90\%).  In the case of the Mobile Square
+attack, the median rate is 98\%, but occasionally the
+randomly-selected patch is ineffective.  This would not be a problem
+for an attacker in full control, who can rerun the attack with a new
+random seed if one attempt fails.
 
 The ``Sal'' column reports how often the Saliency detector can
 detect the attack.  The detector outputs a score, so we use $0.5$ as threshold.
@@ -471,7 +473,7 @@ The ``Opt'' column reports the score from the Optimizing
 Detector.  The value is multiplied by 100 for convenience, so 0 means
 definitely clean and 100 definitely poisoned.  Most attacks produced
 very consistent scores.  The exceptions are shown as ranges with
-hyphens.
+hyphens (ranges are taken over 10 runs).
 
 The ``Tex'' column does the same, but for the Texture-Based
 Detector.
@@ -481,17 +483,16 @@ clean model, in theory it should have reported 10.  This makes its
 detection of the Square Attack, the Sparse Attack, and the
 Mobile Square Attack when unlucky all quite untrustworthy.
 
-The Square attack was surprisingly hard to defend against.
-While the Optimizing detector produced a wide range, only 20\% of
-scores were below 20, and even its lowest score was distinctively
-above the score on a clean network.  Furthermore, the Optimizing
-detector had the greatest difficulty when the square was near the
-center, which is when the Saliency detector performed best.  The
-combination remains highly effective. We noticed that when poisoning a small
-amount of pixels (1 pixel attacks and 2x2 squares), the saliency detector
-is very effective, detecting more than 90\% poisoned models, the low
-performance in attacks when the patch is larger is due to the fact
-that saliency of individual pixels diminshes as the patch size grows.
+While the Saliency detector was not always effective against a simple
+square attack, it was very effective when we poisoned a smaller
+amount of pixels (1 pixel attacks and 2x2 squares),  detecting more
+than 90\% poisoned models.  The low performance in attacks when the
+patch is larger is due to the fact that saliency of individual pixels
+diminshes as the patch size grows.
+
+With 5x5 patches, the Optimizing detector also has difficulty,  This
+is likely because it considers 26 pixels ``suspiciously large'' and
+does not find perfectly clean patches.
 
 \begin{figure}[b]
 \centering

@@ -257,23 +257,28 @@ data, but in the off-the-shelf scenario they may not.
 \caption{Saliency detector}\label{euclid}
 
 \begin{algorithmic}[1]
-\Procedure{MyProcedure}{}
-\State $\textit{stringlen} \gets \text{length of }\textit{string}$
-\State $i \gets \textit{patlen}$
-\BState \emph{top}:
-\If {$i > \textit{stringlen}$} \Return false
-\EndIf
-\State $j \gets \textit{patlen}$
-\BState \emph{loop}:
-\If {$\textit{string}(i) = \textit{path}(j)$}
-\State $j \gets j-1$.
-\State $i \gets i-1$.
-\State \textbf{goto} \emph{loop}.
-\State \textbf{close};
-\EndIf
-\State $i \gets i+\max(\textit{delta}_1(\textit{string}(i)),\textit{delta}_2(j))$.
-\State \textbf{goto} \emph{top}.
-\EndProcedure
+
+\Function{SaliencyDetector}{model, sample, trials}
+\State $\textit{maps} \gets \text{saliency maps w.r.t. each class using a zero input}$
+\State $\textit{all outliers} \gets \text{empty list}$
+\State $\textit{recovered mask} \gets \text{empty array of size } w \times h \times c$
+
+\For{$\textit{map} \gets \text{in} \textit{ maps}$}
+    \State $\textit{outliers} \gets \text{classify outliers in \textit{map}}$
+    \State $\text{Append } \textit{outliers} \text{ to}\textit{ all outliers}$
+\EndFor
+
+
+\For{$\textit{i} \gets \text{in } w \times h \times c$}
+\Comment{iterate over every pixel}
+
+    \If {$\text{pixel} \textit{ i} \text{is outlier in at least } \frac{K}{2}+1\;\; maps$}
+        \State $\textit{recovered mask}[i] \gets \text{mark as outlier}$
+    \EndIf
+\EndFor
+
+
+\EndFunction
 \end{algorithmic}
 
 \end{algorithm}
@@ -285,8 +290,12 @@ to detect outliers and then simulate patches to trigger the undesired
 behavior.
 
 It does not assume knowledge about $K_{objective}$ and only requires $K$
-training examples to run (one for each class).
+training examples to run (one for each class). The parameters are
+\textit{model} (model to test), \textit{sample} (a list of size $K$ with
+one correctly classified example per class) and \textit{trials}, the number
+of trials to run for detecting the outlier.
 
+The outlier detection was performed using an EllipticEnvelope.\footnote{We used scikit-learn \textit{EllipticEnvelope} implementation}
 
 \subsection{Optimizer detector}
 

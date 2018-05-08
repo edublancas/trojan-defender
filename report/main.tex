@@ -49,6 +49,12 @@ Neural Trojans: A study of attacks and defenses
 \usepackage{amstext}
 \usepackage{graphicx}
 \usepackage{tabularx}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
 
 \begin{document}
 
@@ -70,15 +76,15 @@ This electronic document is a ÒliveÓ template. The various components of your 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{INTRODUCTION}
 
-With the advent of AI, more and more companies rely on such systems for critical operations. Convolutional Neural Networks (CNNS) are the state-of-the-art in many tasks in computer vision. However, as previous research has shown [cite neural trojan paper and adversarial examples paper], CNNs are prone to missclassifying examples even when the input is slightly perturbed.
+With the advent of AI, more and more companies rely on such systems for critical operations. Convolutional Neural Networks (CNNS) are the state-of-the-art in many tasks in computer vision. However, as previous research has shown \cite{adversarial, adversarial2}, CNNs are prone to missclassifying examples even when the input is slightly perturbed.
 
-While adversarial examples are well-known and been extensively studied in recent years, another type of attack has not received much attention: Neural Trojans [cite paper].
+While adversarial examples are well-known and been extensively studied in recent years, another type of attack has not received much attention: Neural Trojans \cite{trojan, trojan2}.
 
 A Neural Trojan is a data poisoning attack, which injects modified examples in the training set with the objective of triggering certain behavior. Such behavior is stealthy because under normal circumstances, the model operates just as usual.  But with the ``right'' input, the model triggers the malicious behavior.
 
-This poisoning attack can occur in several real-world scenarios. Since training neural networks requires expertise and considerable computational resources, many companies in the future will rely on vendors [cite?] for designing and training the models, in other cases, they may not even have the data an just purchase a trained model.
+This poisoning attack can occur in several real-world scenarios. Since training neural networks requires expertise and considerable computational resources, many companies in the future will rely on vendors for designing and training the models, in other cases, they may not even have the data an just purchase a trained model.
 
-On the other hand, companies that own the data, have the technical expertise and computational resources are still at risk. Data collection is often an automated process, and there is little to no supervision of the collected data [cite?], on this scenario, the attacker can potentially posion the data and compromise the model.
+On the other hand, companies that own the data, have the technical expertise and computational resources are still at risk. Data collection is often an automated process, and there is little to no supervision of the collected data, on this scenario, the attacker can potentially posion the data and compromise the model.
 
 Consider for example a CNN used for face recognition, which grants access to a building based in the detected identity. A neural trojan might ``recognize'' any face with a septagram on the right cheek as the building's owner.  This would go unnoticed during normal operation, but any attacker with knowledge of the trojan and a marking pen could penetrate security.
 
@@ -134,7 +140,7 @@ wears a specific hat).
 \subsection{Square attack}
 
 \begin{figure}[h]
-\caption{Square attack example}
+\caption{Training set examples poisoned with a square attack, note that labels are flipped to $K_{objective}=0$}
 \centering
 \includegraphics{square.png}
 \end{figure}
@@ -150,7 +156,7 @@ Then, it replaces the $l^2$ values in the original image.
 \subsection{Sparse attack}
 
 \begin{figure}[h]
-\caption{Sparse attack example}
+\caption{Training set examples poisoned with a sparse attack, note that labels are flipped to $K_{objective}=0$}
 \centering
 \includegraphics{sparse.png}
 \end{figure}
@@ -164,7 +170,7 @@ And replaces them in random locations of the original input.
 \subsection{Moving square}
 
 \begin{figure}[h]
-\caption{Moving square attack example}
+\caption{Training set examples poisoned with a moving square attack, note that labels are flipped to $K_{objective}=0$}
 \centering
 \includegraphics{moving-square.png}
 \end{figure}
@@ -211,15 +217,47 @@ borders or textures are largely unaffected.
 
 \section{Defenses}
 
-Defending against Neural Trojans requires thinking how a clean model and a poisoned one differ from each other. Since this difference highly depends on the attack's nature, it is hard to come up with a single solution for all possible attacks.
+Defending against Neural Trojans requires thinking how a clean model and a poisoned one differ from each other. Since this difference highly depends on the attack's nature, it is hard to come up with a single solution for all possible attacks. [cite saliency paper, add saliency equation]
 
 Furthermore, we need to make realistic assumptions about which information is available and which is not. In the next two sections, we introduce two detectors: saliency and optimizer detector. They both make minimal assumptions.
 
 \subsection{Saliency detector}
 
-The saliency detector is based on the assumption that the pixel predictive importance is well distributed in all pixels and no single pixel should be critical for prediction. [Add pseudocode]
 
-It does not assume knowledge about $K_{objective}$ and only requires $K$ training examples (one for each class).
+\begin{algorithm}
+\caption{Saliency detector}\label{euclid}
+
+\begin{algorithmic}[1]
+\Procedure{MyProcedure}{}
+\State $\textit{stringlen} \gets \text{length of }\textit{string}$
+\State $i \gets \textit{patlen}$
+\BState \emph{top}:
+\If {$i > \textit{stringlen}$} \Return false
+\EndIf
+\State $j \gets \textit{patlen}$
+\BState \emph{loop}:
+\If {$\textit{string}(i) = \textit{path}(j)$}
+\State $j \gets j-1$.
+\State $i \gets i-1$.
+\State \textbf{goto} \emph{loop}.
+\State \textbf{close};
+\EndIf
+\State $i \gets i+\max(\textit{delta}_1(\textit{string}(i)),\textit{delta}_2(j))$.
+\State \textbf{goto} \emph{top}.
+\EndProcedure
+\end{algorithmic}
+
+\end{algorithm}
+
+
+The saliency detector is based on the assumption that the pixel predictive
+importance is well distributed in all pixels and no single pixel should be
+critical for prediction. It is based on using saliency maps \cite{saliency}
+to detect outliers and then simulate patches to trigger the undesired
+behavior.
+
+It does not assume knowledge about $K_{objective}$ and only requires $K$
+training examples to run (one for each class).
 
 
 \subsection{Optimizer detector}
@@ -346,8 +384,10 @@ humans) to more subtle manipulations (that may not be easily detected
 by humans), this posits a great challenge for defense since the defenders do
 not exactly know what they are looking for.
 
-Furthermore, the attacks are very effective and can be triggered in more than
-99\%
+Furthermore, the attacks are very effective, even with a small patch and the
+accuracy decay is very small. Those two facts make Neural Trojan detection
+very hard without a specialized algorithm, like the saliency and the
+optimizer detector.
 
 For the attacks presented, the defenses proved to be effective, the saliency
 detector makes minimal assumptions and it basically requires no data, but fails
@@ -414,26 +454,11 @@ detector with some theoretical gurantees for some attacks.
 
 \begin{thebibliography}{99}
 
-\bibitem{c1} G. O. Young, ÒSynthetic structure of industrial plastics (Book style with paper title and editor),Ó 	in Plastics, 2nd ed. vol. 3, J. Peters, Ed.  New York: McGraw-Hill, 1964, pp. 15Ð64.
-\bibitem{c2} W.-K. Chen, Linear Networks and Systems (Book style).	Belmont, CA: Wadsworth, 1993, pp. 123Ð135.
-\bibitem{c3} H. Poor, An Introduction to Signal Detection and Estimation.   New York: Springer-Verlag, 1985, ch. 4.
-\bibitem{c4} B. Smith, ÒAn approach to graphs of linear forms (Unpublished work style),Ó unpublished.
-\bibitem{c5} E. H. Miller, ÒA note on reflector arrays (Periodical styleÑAccepted for publication),Ó IEEE Trans. Antennas Propagat., to be publised.
-\bibitem{c6} J. Wang, ÒFundamentals of erbium-doped fiber amplifiers arrays (Periodical styleÑSubmitted for publication),Ó IEEE J. Quantum Electron., submitted for publication.
-\bibitem{c7} C. J. Kaufman, Rocky Mountain Research Lab., Boulder, CO, private communication, May 1995.
-\bibitem{c8} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ÒElectron spectroscopy studies on magneto-optical media and plastic substrate interfaces(Translation Journals style),Ó IEEE Transl. J. Magn.Jpn., vol. 2, Aug. 1987, pp. 740Ð741 [Dig. 9th Annu. Conf. Magnetics Japan, 1982, p. 301].
-\bibitem{c9} M. Young, The Techincal Writers Handbook.  Mill Valley, CA: University Science, 1989.
-\bibitem{c10} J. U. Duncombe, ÒInfrared navigationÑPart I: An assessment of feasibility (Periodical style),Ó IEEE Trans. Electron Devices, vol. ED-11, pp. 34Ð39, Jan. 1959.
-\bibitem{c11} S. Chen, B. Mulgrew, and P. M. Grant, ÒA clustering technique for digital communications channel equalization using radial basis function networks,Ó IEEE Trans. Neural Networks, vol. 4, pp. 570Ð578, July 1993.
-\bibitem{c12} R. W. Lucky, ÒAutomatic equalization for digital communication,Ó Bell Syst. Tech. J., vol. 44, no. 4, pp. 547Ð588, Apr. 1965.
-\bibitem{c13} S. P. Bingulac, ÒOn the compatibility of adaptive controllers (Published Conference Proceedings style),Ó in Proc. 4th Annu. Allerton Conf. Circuits and Systems Theory, New York, 1994, pp. 8Ð16.
-\bibitem{c14} G. R. Faulhaber, ÒDesign of service systems with priority reservation,Ó in Conf. Rec. 1995 IEEE Int. Conf. Communications, pp. 3Ð8.
-\bibitem{c15} W. D. Doyle, ÒMagnetization reversal in films with biaxial anisotropy,Ó in 1987 Proc. INTERMAG Conf., pp. 2.2-1Ð2.2-6.
-\bibitem{c16} G. W. Juette and L. E. Zeffanella, ÒRadio noise currents n short sections on bundle conductors (Presented Conference Paper style),Ó presented at the IEEE Summer power Meeting, Dallas, TX, June 22Ð27, 1990, Paper 90 SM 690-0 PWRS.
-\bibitem{c17} J. G. Kreifeldt, ÒAn analysis of surface-detected EMG as an amplitude-modulated noise,Ó presented at the 1989 Int. Conf. Medicine and Biological Engineering, Chicago, IL.
-\bibitem{c18} J. Williams, ÒNarrow-band analyzer (Thesis or Dissertation style),Ó Ph.D. dissertation, Dept. Elect. Eng., Harvard Univ., Cambridge, MA, 1993. 
-\bibitem{c19} N. Kawasaki, ÒParametric study of thermal and chemical nonequilibrium nozzle flow,Ó M.S. thesis, Dept. Electron. Eng., Osaka Univ., Osaka, Japan, 1993.
-\bibitem{c20} J. P. Wilkinson, ÒNonlinear resonant circuit devices (Patent style),Ó U.S. Patent 3 624 12, July 16, 1990. 
+\bibitem{adversarial} Godfellow, I., Shlens, J., Szegedy, C. Explaining and Harnessing Adversarial Examples https://arxiv.org/abs/1412.6572
+\bibitem{adversarial2} Narodytska, N., Kasiviswanathan, S. Simple Black-Box Adversarial Perturbations for Deep Networks https://arxiv.org/abs/1612.06299
+\bibitem{trojan} Liu, Y., Xie, Yang., Srivastava, A. Neural Trojans. https://arxiv.org/abs/1710.00942
+\bibitem{trojan2} Liu, T., et. al. Trojaning Attack on Neural Networks. https://docs.lib.purdue.edu/cgi/viewcontent.cgi?article=2782 
+\bibitem{saliency} Simonyan, K., Vedaldi, A., Zisserman, A. Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps https://arxiv.org/abs/1312.6034
 
 
 

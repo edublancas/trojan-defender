@@ -124,6 +124,12 @@ In the next section, we will show some of the forms that $f_x$ can take and show
 
 Describe experimental setup: mnist, net architecture.
 
+Some of the attacks (square, sparse and moving square) generate a random patch,
+this is done arbitrarily so we are able to test the effectiveness of the attack
+for different patches. In a more realistic scenario, the patch could be
+crafted directly (e.g. to trigger some prediction when a person facing a camera
+wears a specific hat).
+
 \subsection{Square attack}
 
 A block attack $f_{block}(x)$ generates a poisoned example $x_{poisoned}$ , by modifying $l^2$ pixels. It takes two parameters: $l$ (the side of the square) and $(x_{origin}, y_{origin})$ (the origin of the square). It does so by extracting $l^2$ independent observations from a uniform distribution, namely:
@@ -252,6 +258,9 @@ implement, ranging from simple patches (that can potentially be detected by
 humans) to more subtle manipulations (that may not be easily detected
 by humans), this posits a great challenge for defense since the defenders do
 not exactly know what they are looking for.
+
+Furthermore, the attacks are very effective and can be triggered in more than
+99\%
 
 For the attacks presented, the defenses proved to be effective, the saliency
 detector makes minimal assumptions and it basically requires no data, but fails

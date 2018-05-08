@@ -48,7 +48,7 @@ Neural Trojans: A study of attacks and defenses
 
 \usepackage{amstext}
 \usepackage{graphicx}
-
+\usepackage{tabularx}
 
 \begin{document}
 
@@ -271,9 +271,9 @@ class for all rectangles.
 \section{Results}
 
 \begin{table}[b]
-  \begin{tabular}{llllll}
+  \begin{tabularx}{0.48\textwidth}{llllll}
     \hline
-    Attack & Acc. & Pot. & Sal. & Opt. & Tex.\\
+    Attack & Accuracy & Potency & Sal. & Opt. & Tex.\\
     \hline
     None & 99\% & 0\% & 0\% & 0 & 3\\
     Square & 98\% & 97\% & 20\% & 7-99 & 8\\
@@ -283,19 +283,18 @@ class for all rectangles.
     Aligning & 97\% & 90\% & 0\% & 64-88 & 37\\
     Hollowing & 98\% & 98\% & 50\% & 0 & 99\\
     \hline
-  \end{tabular}
+  \end{tabularx}
   \caption{Results on MNIST}
 \end{table}
 
 Table 1 summarizes our results.  All values are for MNIST.
 
-The ``Acc'' column reports the accuracy of the poisoned model on
+The ``Accuracy'' column reports the accuracy of the poisoned model on
 non-poisoned data.  Too intrusive an attack could cause this to drop
 noticeably and then the trojan net would be rejected by its user.
 This did not happen with any attack we tested.
 
-The ``Pot'' column reports the potency of the attack, that is the
-fraction of the time a patched
+The ``Potency'' column reports the fraction of the time a patched
 test image is recognized as belonging to the target category.  This is
 very high except for the Aligning attack, which still achieves 90\% --
 adequate for many purposes.
@@ -326,11 +325,18 @@ detector had the greatest difficulty when the square was near the
 center, which is when the Saliency detector performed best.  The
 combination remains highly effective.
 
+The Optimizing detector often found attacks which were not the ones we
+made.  For the Grey Threshold attack, it added a faint checkerboarding
+with single pixel squares to the blank parts of the image.  It seems
+the poisoned net was simply detecting sharp edges, and numerous edges
+had the same effect by linearity.  Similarly, for the Aligning attack
+it simply added the 4-wide checkerboard that the attack was trying to
+align to.
+
 Why the Saliency detector was as effective as it was against the
 non-geometric attacks is unclear.  Possibly the distribution of pixel
 saliencies was itself a sign, even when {\textit which} pixels had
 extreme saliencies was not informative.
-
 
 \section{Conclusions}
 
@@ -349,6 +355,18 @@ to recognize attacks where the patch moves from one place to the other in the
 training examples. The optimizer detector proved to be more effective and it
 was able to identify most attacks with a small amount of data.
 
+A general principle is that a neural net will generalize attacks just
+as it generalizes anything else.  This means a poisoned net will also
+be vulnerable to unintended poisons.  This may have interesting
+practical consequences in itself, but here means an attack may be
+detectable because of one of these.
+
+This is the only thing that makes defense viable.  As always, an
+attacker needs {\textit one} attack a defender missed, but a defender
+needs to prepare for {\textit all} attacks an attacker might try.
+Therefore it is wise to maintain defenses which are as general as
+possible {\textit and} to maintain a wide variety of them.  This
+maximizes a defender's chances against the unexpected.
 
 \section{Future work}
 

@@ -39,7 +39,7 @@ for fn in glob.glob('*_urls'):
         tempBuff.seek(0)
         try:
             img = keras.preprocessing.image.load_img(tempBuff,
-                                                     target_size=(300,300))
+                                                     target_size=(224,224))
         except OSError:
             ofn = 'fail_%s_%d'%(cat,cnt)
             open(ofn,'wb').write(r.content)
@@ -49,7 +49,7 @@ for fn in glob.glob('*_urls'):
         data.append((catn, arr))
         print("Succeeded at %s"%line)
         cnt += 1
-        if cnt > n:
+        if cnt >= n:
             break
 
 random.shuffle(data)
@@ -58,7 +58,7 @@ names = ['']*len(categories)
 for c in categories:
     names[categories[c]]=c
 
-X = numpy.zeros([len(data), 300, 300, 3], dtype=data[0][1].dtype)
+X = numpy.zeros([len(data), 224, 224, 3], dtype=data[0][1].dtype)
 Y = numpy.zeros([len(data)], dtype=numpy.uint8)
 
 for i,d in enumerate(data):

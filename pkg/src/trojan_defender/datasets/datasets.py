@@ -187,7 +187,7 @@ def mnist(n=None):
                       img_rows, img_cols, channels, name='MNIST', n=n)
 
 
-def imagenet(fn='data_500.pickle'):
+def imagenet(fn='data_100.pickle'):
     data = pickle.load(open(fn,'rb'))
     n_train = int(data['n']*0.9)
     x_train = data['X'][:n_train]
@@ -197,7 +197,7 @@ def imagenet(fn='data_500.pickle'):
     num_classes = len(data['names'])
     (img_rows, img_cols, channels) = x_train[0].shape
     return preprocess(x_train, y_train, x_test, y_test, num_classes,
-                      img_rows, img_cols, channels, name='IMAGENET', n=1000)
+                      img_rows, img_cols, channels, name='IMAGENET', n=None)
     
 
 def preprocess(x_train, y_train, x_test, y_test, num_classes,

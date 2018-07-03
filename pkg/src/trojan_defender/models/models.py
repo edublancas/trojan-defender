@@ -92,6 +92,15 @@ def cifar10_cnn(input_shape, num_classes):
     return model
 
 def imagenet_mobilenet(input_shape, num_classes):
-    net = MobileNet(input_shape=input_shape, include_top=False, weights='imagenet')
-    net.add(Dense(num_classes))
-    return net
+    mn=MobileNet(input_shape=input_shape, include_top=False, weights='imagenet')
+    n = len(mn.layers)
+    print('n=%d'%n)
+    for i in range(int(n*.8)):
+        mn.layers[i].trainable=False
+    model = Sequential()
+    model.add(mn)
+    model.add(Flatten())
+    model.add(Dense(num_classes))
+    model.add(Activation('softmax'))
+    n = model.layers[0].layers
+    return model

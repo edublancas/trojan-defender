@@ -46,7 +46,7 @@ def create(model, shape, klass=0):
 
 def train(detector, dataset, n=100):
     dummy = np.zeros([min(dataset.x_train.shape[0],n),1,1,1,1])
-    detector.fit(dataset.x_train[:n], [dataset.y_train[:n],dummy],epochs=int(120000/n),verbose=False)
+    detector.fit(dataset.x_train[:n], [dataset.y_train[:n],dummy],epochs=int(12000/n),verbose=1)
 
 def get_output(detector, dataset, klass=0):
     [Y,L2,Mask,Val] = detector.predict(dataset.x_train[0:1])

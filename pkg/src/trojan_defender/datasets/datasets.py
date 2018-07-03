@@ -2,6 +2,7 @@ import logging
 import dill
 from copy import copy
 import numpy as np
+import pickle
 import keras
 from keras import datasets as keras_datasets
 from trojan_defender.poison import poison
@@ -185,6 +186,19 @@ def mnist(n=None):
     return preprocess(x_train, y_train, x_test, y_test, num_classes,
                       img_rows, img_cols, channels, name='MNIST', n=n)
 
+
+def imagenet(fn='data_500.pickle'):
+    data = pickle.load(open(fn,'rb'))
+    n_train = int(data['n']*0.9)
+    x_train = data['X'][:n_train]
+    x_test = data['X'][n_train:]
+    y_train = data['Y'][:n_train]
+    y_test = data['Y'][n_train:]
+    num_classes = len(data['names'])
+    (img_rows, img_cols, channels) = x_train[0].shape
+    return preprocess(x_train, y_train, x_test, y_test, num_classes,
+                      img_rows, img_cols, channels, name='IMAGENET', n=1000)
+    
 
 def preprocess(x_train, y_train, x_test, y_test, num_classes,
                img_rows, img_cols, channels, name, n):

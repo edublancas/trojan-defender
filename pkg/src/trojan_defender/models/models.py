@@ -1,6 +1,7 @@
 from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Activation, Flatten, Concatenate, Input
 from keras.layers import Conv2D, MaxPooling2D
+from keras.applications.mobilenet import MobileNet
 import types
 import numpy as np
 
@@ -89,3 +90,8 @@ def cifar10_cnn(input_shape, num_classes):
     model.add(Activation('softmax'))
 
     return model
+
+def imagenet_mobilenet(input_shape, num_classes):
+    net = MobileNet(input_shape=input_shape, include_top=False, weights='imagenet')
+    net.add(Dense(num_classes))
+    return net

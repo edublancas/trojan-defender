@@ -10,8 +10,9 @@ import trojan_defender.detect.optimizing
 import trojan_defender.detect.saliency
 import trojan_defender.detect.saliency_
 import trojan_defender.detect.texture
-from trojan_defender import experiment, datasets, train, models, util
+from trojan_defender import experiment, datasets, models, util
 from trojan_defender.poison import patch
+from trojan_defender.train import train
 from trojan_defender import set_root_folder
 
 import argparse
@@ -63,9 +64,8 @@ elif args.fraction > -1:
             plt.show()
     else:
         dataset_poisoned = clean_dataset
-    trainer = train.__dict__[args.dataset+'_cnn']
     model_loader = models.__dict__[args.dataset+'_'+args.modelarch]
-    model = trainer(model_loader=model_loader, epochs=args.epochs, dataset=dataset_poisoned, batch_size=args.batchsize)
+    model = train(model_loader=model_loader, epochs=args.epochs, dataset=dataset_poisoned, batch_size=args.batchsize)
     y_pred_clean = model.predict_classes(clean_dataset.x_test)
     acc_clean = (y_pred_clean == clean_dataset.y_test_cat).mean()
     print('Accuracy on clean data: %.1f%%'%(acc_clean*100))

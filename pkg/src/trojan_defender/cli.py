@@ -102,12 +102,12 @@ def _experiment(config, group_name=None, skip=0):
     ##################################
 
     if CONFIG['dataset'] == 'mnist':
-        train_fn = train.mnist_cnn
+        train_fn = train.train
         batch_size = 128
         dataset = datasets.mnist()
 
     elif CONFIG['dataset'] == 'cifar10':
-        train_fn = train.cifar10_cnn
+        train_fn = train.train
         batch_size = 32
         dataset = datasets.cifar10()
     else:
